@@ -121,3 +121,9 @@ docker rm rita
 ```
 
 
+## Running project
+```
+sudo python3 setup.py install
+```
+
+

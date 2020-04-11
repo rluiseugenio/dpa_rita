@@ -164,7 +164,7 @@ def create_ec2():
 #print("VPC: ", MY_VPC, "GATEWAY: ",  MY_GATEWAY, "SUBNET: ",MY_SUBNET,
 #        "GROUP: ", MY_GROUP)
 #create_ec2()
-describe_ec2()
+#describe_ec2()
 
 
 # Retrieves all regions/endpoints that work with EC2

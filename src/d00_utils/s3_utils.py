@@ -7,7 +7,7 @@ import time
 
 #import rita
 from src.d00_utils.log_utils import setup_logging
-#logger = setup_logging(__name__, "d00_utils.s3_objects")
+logger = setup_logging(__name__, "d00_utils.s3_objects")
 
 from src import (
     BUCKET,
@@ -70,6 +70,7 @@ def create_bucket(bucket_name):
         s3.create_bucket(Bucket=bucket_name,
                 CreateBucketConfiguration={'LocationConstraint': MY_REGION,},
                 ACL='private')
+        print("Cubeta " + bucket_name + "creada")
     except Exception as error:
         print (error)
         logger.error("{} Error in bucket".format(bucket_name))
@@ -77,5 +78,5 @@ def create_bucket(bucket_name):
 
 
 ## ========================================
-#describe_s3()
+describe_s3()
 #get_s3_objects(BUCKET)

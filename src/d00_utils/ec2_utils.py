@@ -135,7 +135,7 @@ def configure_network(my_block = '172.16.0.0/16', vpa_name  = "vpc_dpa"):
 
 def create_ec2():
     try:
-        ec2_resource.create_instances(
+        resp = ec2_resource.create_instances(
          ImageId= MY_AMI,
          InstanceType='t2.micro',
          MaxCount=1,
@@ -151,6 +151,7 @@ def create_ec2():
         'AvailabilityZone': MY_REGION2,
         }
         )
+        return resp
     except Exception as error:
         print(error)
 

@@ -171,25 +171,26 @@ def execute_sql(file_name):
 #response=rds_client.describe_security_groups()
 #print(response)
 #describe_db()
-execute_sql("metada_extract.sql")
+def main():
+    execute_sql("metada_extract.sql")
 
-query = "INSERT INTO metadatos.extract (fecha, nombre_task, year, month, usuario, ip_ec2, tamano_zip, nombre_archivo, ruta_s3, task_status) VALUES ( '2', '2', '3','3','4','5','5', '6', '6','8' ) ;"
-execute_query(query)
+    query = "INSERT INTO metadatos.extract (fecha, nombre_task, year, month, usuario, ip_ec2, tamano_zip, nombre_archivo, ruta_s3, task_status) VALUES ( '2', '2', '3','3','4','5','5', '6', '6','8' ) ;"
+    execute_query(query)
 
-query = "SELECT * FROM metadatos.extract ; "
-show_select(query)
+    query = "SELECT * FROM metadatos.extract ; "
+    show_select(query)
 
-query = "CREATE SCHEMA IF NOT EXISTS paola ;"
-execute_query(query)
+    query = "CREATE SCHEMA IF NOT EXISTS paola ;"
+    execute_query(query)
 
-query = "CREATE TABLE paola.prueba (nombre VARCHAR);"
-execute_query(query)
+    query = "CREATE TABLE paola.prueba (nombre VARCHAR);"
+    execute_query(query)
 
-query = "INSERT INTO paola.prueba (nombre) VALUES ('Paola');"
-execute_query(query)
+    query = "INSERT INTO paola.prueba (nombre) VALUES ('Paola');"
+    execute_query(query)
 
-query = "SELECT * FROM paola.prueba ; "
-show_select(query)
+    query = "SELECT * FROM paola.prueba ; "
+    show_select(query)
 
 #execute_sql("metada_extract.sql")
 

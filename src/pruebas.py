@@ -18,19 +18,24 @@ bucket = paths["bucket"]
 
 print(bucket)
 
+
+CURRENT_DIR = os.getcwd()
+dir = CURRENT_DIR + "/target/pass_parameter_task1.txt"
+print(CURRENT_DIR)
+print(dir)
 #filename = "metada_extract.sql"
 #file_dir = "./d00_utils/sql/" + filename
 
 #print(open(file_dir, "r").read())
 
-query = "DROP table metadatos.extract;"
-execute_query(query)
+#query = "DROP table metadatos.extract;"
+#execute_query(query)
 
-query = "INSERT INTO metadatos.extract (fecha, nombre_task, year, month, usuario, ip_ec2, tamano_zip, nombre_archivo, ruta_s3, task_status) VALUES ( '2', '2', '3','3','4','5','5', '6', '6','8' ) ;"
-execute_query(query)
+#query = "INSERT INTO metadatos.extract (fecha, nombre_task, year, month, usuario, ip_ec2, tamano_zip, nombre_archivo, ruta_s3, task_status) VALUES ( '2', '2', '3','3','4','5','5', '6', '6','8' ) ;"
+#execute_query(query)
 
-query = "SELECT * FROM metadatos.extract ; "
-show_select(query)
+#query = "SELECT * FROM metadatos.extract ; "
+#show_select(query)
 
 #describe_s3()
 #describe_ec2()

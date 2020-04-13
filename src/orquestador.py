@@ -4,9 +4,12 @@
 
 # PYTHONPATH='.' AWS_PROFILE=dpa luigi --module orquestador CreateS3 --local-scheduler --bucname prueba --rdsname prueba2
 # PYTHONPATH='.' AWS_PROFILE=dpa luigi --module orquestador RunTables --local-scheduler --filename metada_extract.sql --update-id 4
+# PYTHONPATH='.' AWS_PROFILE=dpa luigi --module orquestador RunTables --local-scheduler --filename metada_extract.sql --update-id 4
+
 import luigi
 import luigi.contrib.s3
 from luigi import Event, Task, build # Utilidades para acciones tras un task exitoso o fallido
+import os
 
 from src.d00_utils.s3_utils import create_bucket
 from src.d00_utils.db_utils import create_db, execute_sql
@@ -21,26 +24,37 @@ MY_DB,
 )
 
 from luigi.contrib.postgres import CopyToTable,PostgresQuery
+
+# ===============================
+CURRENT_DIR = os.getcwd()
+# ===============================
 # Create S3
 class CreateS3(luigi.Task):
     bucname = luigi.Parameter()
 
     def output(self):
-        output_path = "s3://" +str(self.bucname) + "/"
-        return luigi.contrib.s3.S3Target(path=output_path)
+        dir = CURRENT_DIR + "/target/create_s3_" + str(this.bucname) + ".txt"
+        return luigi.local_target.LocalTarget(dir)
 
     def run(self):
         create_bucket(str(self.bucname))
+        z = str(self.bucname)
+        with self.output().open('w') as output_file:
+            output_file.write(z)
 
 # Create RDS.
 class CreateRDS(luigi.Task):
     rdsname = luigi.Parameter()
 
     def output(self):
-        #NO SE
-        return luigi.Target()
+        dir = CURRENT_DIR + "/target/create_rds_" + str(this.rdsname) + ".txt"
+        return luigi.local_target.LocalTarget(dir)
+
     def run(self):
-        create_db(this.rdsname)
+        create_db(str(this.rdsname))
+        z = str(self.rdsname)
+        with self.output().open('w') as output_file:
+            output_file.write(z)
 
 # Create tables and squemas
 # "metada_extract.sql"
@@ -53,7 +67,6 @@ class CreateTables(PostgresQuery):
     database = MY_DB
     host = MY_HOST
     table = "metadatos"
-
 
     file_dir = "./d00_utils/sql/metada_extract.sql"
     query = open(file_dir, "r").read()
@@ -68,20 +81,25 @@ class RunTables(luigi.Task):
         return CreateTables(self.filename, self.update_id)
 
     def run(self):
-        z = str(self.filename, + " ", + self.update_id)
-        print("******* ", z)
+        z = str(self.filename) + " " + str(self.update_id)
+
         with self.output().open('w') as output_file:
             output_file.write(z)
 
     def output(self):
-        return luigi.local_target.LocalTarget('/home/paola/Documents/MCD/ProductoDatos/PROYECTO/dpa_rita/data/pass_parameter_task1.txt')
+        dir = CURRENT_DIR + "/target/create_tables.txt"
+        return luigi.local_target.LocalTarget(dir)
 
 
 
 # Create EC2
 class CreateEC2(luigi.Task):
     def output(self):
-        #No se
-        return luigi.contrib.ecs.ECSTask()
+        dir = CURRENT_DIR + "/target/create_ec2.txt"
+        return luigi.local_target.LocalTarget(dir)
+
     def run(self):
-        create_ec2()
+        resp = create_ec2()
+
+        with self.output().open('w') as output_file:
+            output_file.write(resp)

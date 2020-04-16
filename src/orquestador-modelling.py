@@ -22,6 +22,9 @@ class DataLocalStorage():
         self.X_test = None
         self.y_test = None
         self.y_train = None
+        
+    def get_sets():
+        return self.X_train, self.X_test, self.y_train, self.y_test
     
 CACHE = DataLocalStorage()
     
@@ -39,68 +42,27 @@ class GetDataSets(luigi.Task):
         CACHE.y_train = y_train
         CACHE.y_test = y_test
         
-        z = str(self.bucname)
+        z = "Obtiene Datos"
         with self.output().open('w') as output_file:
             output_file.write(z)
 
-# Create RDS.
-class CreateRDS(luigi.Task):
-    rdsname = luigi.Parameter()
-
-    def output(self):
-        dir = CURRENT_DIR + "/target/create_rds_" + str(this.rdsname) + ".txt"
-        return luigi.local_target.LocalTarget(dir)
-
-    def run(self):
-        create_db(str(this.rdsname))
-        z = str(self.rdsname)
-        with self.output().open('w') as output_file:
-            output_file.write(z)
-
-# Create tables and squemas
-# "metada_extract.sql"
-class CreateTables(PostgresQuery):
-    filename = luigi.Parameter()
-    update_id = luigi.Parameter()
-
-    user = MY_USER
-    password = MY_PASS
-    database = MY_DB
-    host = MY_HOST
-    table = "metadatos"
-
-    file_dir = "./utils/sql/metada_extract.sql"
-    query = open(file_dir, "r").read()
-
-
-
-class RunTables(luigi.Task):
-    filename = luigi.Parameter()
-    update_id = luigi.Parameter()
-
+class CreateModelCancelled(luigi.Task):
+    
     def requires(self):
-        return CreateTables(self.filename, self.update_id)
+        return GetDataSets()
+    
+    def output(self):
+        dir = CURRENT_DIR + "/target/model_cancelled.txt"
+        return luigi.local_target.LocalTarget(dir)
 
     def run(self):
-        z = str(self.filename) + " " + str(self.update_id)
+        objetivo = "cancelled"
+        X_train, X_test, y_train, y_test = CACHE.get_sets()
 
+        gridSearch_bins(X_train, X_test, y_train, y_test, objetivo)
+        
+        z = str(objetivo)
         with self.output().open('w') as output_file:
             output_file.write(z)
 
-    def output(self):
-        dir = CURRENT_DIR + "/target/create_tables.txt"
-        return luigi.local_target.LocalTarget(dir)
 
-
-
-# Create EC2
-class CreateEC2(luigi.Task):
-    def output(self):
-        dir = CURRENT_DIR + "/target/create_ec2.txt"
-        return luigi.local_target.LocalTarget(dir)
-
-    def run(self):
-        resp = create_ec2()
-
-        with self.output().open('w') as output_file:
-            output_file.write(resp)

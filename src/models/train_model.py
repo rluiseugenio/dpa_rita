@@ -1,16 +1,18 @@
 
+
 from src.features.build_features import clean
 
 from pyspark.sql import SparkSession
 from pyspark.sql.types import IntegerType, DoubleType
-from pyspark.sql.functions import monotonically_increasing_id, countDistinct, approxCountDistinct
+from pyspark.sql.functions import monotonically_increasing_id, countDistinct, approxCountDistinct, when
 
 from pyspark.ml.feature import OneHotEncoder, StringIndexer, Imputer, VectorAssembler, StandardScaler, PCA
 from pyspark.ml import Pipeline
 from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
 from pyspark.ml.classification import LogisticRegression, DecisionTreeClassifier
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator, BinaryClassificationEvaluator
-      
+from pyspark.mllib.evaluation import MulticlassMetrics
+    
 from collections import defaultdict
 
 import pandas as pd
@@ -111,9 +113,15 @@ def add_ids(X_train, X_test, y_train, y_test):
         
     return X_train, X_test, y_train, y_test
 
-def get_models_params():
-    lr = LogisticRegression()
 
+
+def get_models_params():
+    stage_pca = PCA(k = 15,inputCol = "scaled_features", 
+                        outputCol = "features")
+    
+        
+    lr = LogisticRegression()
+    
     lr_paramGrid = ParamGridBuilder() \
     .addGrid(stage_pca.k, [1]) \
     .addGrid(lr.maxIter, [1]) \
@@ -130,7 +138,6 @@ def get_models_params():
     model_list = [lr,dt]
     
     return model_list,paramGrid_list
-
 
 def evaluate(predictionAndLabels):
     log = {}
@@ -225,7 +232,6 @@ def init_data_luigi():
     df = clean(df)
     X_train, X_test, y_train, y_test = get_processed_train_test(df)
     return X_train, X_test, y_train, y_test
-
 
 def main():
 

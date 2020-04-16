@@ -3,7 +3,7 @@
 """
 Created on Mon Aug 5 2019
 @author: wiebket
-Taken from https://github.com/dssg/usal_echo_public/blob/master/src/usal_echo/d00_utils/log_utils.py
+Taken from https://github.com/dssg/usal_echo_public/blob/master/src/usal_echo/utils/log_utils.py
 """
 
 # Logging levels: Critical, error, warning, indo, debug

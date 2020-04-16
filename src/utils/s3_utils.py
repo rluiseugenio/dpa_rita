@@ -6,8 +6,8 @@ import random
 import time
 
 #import rita
-from src.d00_utils.log_utils import setup_logging
-logger = setup_logging(__name__, "d00_utils.s3_objects")
+from src.utils.log_utils import setup_logging
+logger = setup_logging(__name__, "utils.s3_objects")
 
 from src import (
     BUCKET,

@@ -10,8 +10,8 @@ from botocore.config import Config
 import pandas as pd
 import subprocess
 
-from src.d00_utils.log_utils import setup_logging
-logger = setup_logging(__name__, "d00_utils.rds_objects")
+from src.utils.log_utils import setup_logging
+logger = setup_logging(__name__, "utils.rds_objects")
 
 from src import (
     BUCKET,

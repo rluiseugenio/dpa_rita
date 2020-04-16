@@ -6,8 +6,8 @@ import random
 import time
 import psycopg2
 
-from src.d00_utils.log_utils import setup_logging
-logger = setup_logging(__name__, "d00_utils.rds_objects")
+from src.utils.log_utils import setup_logging
+logger = setup_logging(__name__, "utils.rds_objects")
 
 # GLOBALS
 from src import (
@@ -217,18 +217,3 @@ def main():
 #create_db()
 #describe_db()
 #execute_query(query)
-"""
-response = client.create_db_subnet_group(
-    DBSubnetGroupName='string',
-    DBSubnetGroupDescription='string',
-    SubnetIds=[
-        'string',
-    ],
-    Tags=[
-        {
-            'Key': 'string',
-            'Value': 'string'
-        },
-    ]
-)
-"""

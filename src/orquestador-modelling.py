@@ -1,9 +1,3 @@
-# existe un bug con bot3 y luigi para pasar las credenciales
-# necesitas enviar el parametro AWS_PROFILE e indicar el profile
-# con el que quieres que se corra
-
-# PYTHONPATH='.' AWS_PROFILE=dpa luigi --module orquestador CreateS3 --local-scheduler --bucname prueba --rdsname prueba2
-# PYTHONPATH='.' AWS_PROFILE=dpa luigi --module orquestador RunTables --local-scheduler --filename metada_extract.sql --update-id 4
 # PYTHONPATH='.' AWS_PROFILE=dpa luigi --module orquestador RunTables --local-scheduler --filename metada_extract.sql --update-id 4
 
 import luigi
@@ -11,33 +5,40 @@ import luigi.contrib.s3
 from luigi import Event, Task, build # Utilidades para acciones tras un task exitoso o fallido
 import os
 
-from src.utils.s3_utils import create_bucket
-from src.utils.db_utils import create_db, execute_sql
-from src.utils.ec2_utils import create_ec2
-
-from src import(
-MY_USER,
-MY_PASS,
-MY_HOST,
-MY_PORT,
-MY_DB,
-)
+from pyspark.sql import SparkSession
+from src.models.train_model import get_processed_train_test, init_data_luigi
 
 from luigi.contrib.postgres import CopyToTable,PostgresQuery
+
+
 
 # ===============================
 CURRENT_DIR = os.getcwd()
 # ===============================
-# Create S3
-class CreateS3(luigi.Task):
-    bucname = luigi.Parameter()
+
+class DataLocalStorage(): 
+    def __init__(self, X_train, X_test, y_train, y_test):
+        self.X_train = None
+        self.X_test = None
+        self.y_test = None
+        self.y_train = None
+    
+CACHE = DataLocalStorage()
+    
+    
+class GetDataSets(luigi.Task):
 
     def output(self):
-        dir = CURRENT_DIR + "/target/create_s3_" + str(this.bucname) + ".txt"
+        dir = CURRENT_DIR + "/target/gets_data_sets.txt"
         return luigi.local_target.LocalTarget(dir)
 
     def run(self):
-        create_bucket(str(self.bucname))
+        X_train, X_test, y_train, y_test = init_data_luigi()
+        CACHE.X_train = X_train
+        CACHE.X_test = X_test
+        CACHE.y_train = y_train
+        CACHE.y_test = y_test
+        
         z = str(self.bucname)
         with self.output().open('w') as output_file:
             output_file.write(z)

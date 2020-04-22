@@ -139,6 +139,31 @@ def get_models_params():
 
     return model_list,paramGrid_list
 
+def get_models_params_dic():
+    stage_pca = PCA(k = 15,inputCol = "scaled_features",
+                        outputCol = "features")
+
+
+    lr = LogisticRegression()
+
+    lr_paramGrid = ParamGridBuilder() \
+    .addGrid(stage_pca.k, [1]) \
+    .addGrid(lr.maxIter, [1]) \
+    .build()
+
+    dt = DecisionTreeClassifier()
+
+    dt_paramGrid = ParamGridBuilder() \
+    .addGrid(stage_pca.k, [1]) \
+    .addGrid(dt.maxDepth, [2]) \
+    .build()
+
+    paramGrid_dic= {"LR":lr_paramGrid,"DT":dt_paramGrid}
+    model_dic = {"LR":lr,"DT":dt}
+
+    return model_dic,paramGrid_dic
+
+
 def evaluate(predictionAndLabels):
     log = {}
 
@@ -196,7 +221,7 @@ def get_data(luigi):
     if luigi:
         direccion =  "/home/data/raw/prueba.csv"
     else:
-        direccion = "./../../data/raw/prueba.csv"
+        direccion = "./../data/raw/prueba.csv"
 
 
     spark = SparkSession \
@@ -269,6 +294,40 @@ def gridSearch_bins(X_train, X_test, y_train, y_test, objetivo):
         prediction = cvModel.transform(df_test)
         evaluate(prediction)
 
+def grid_search_model(X_train, X_test, y_train, y_test, objetive, model_name):
+    y_test = y_test.withColumn("label",  when(y_test.rangoatrasohoras == objetive, 1.0).otherwise(0.0))
+    y_train = y_train.withColumn("label",  when(y_train.rangoatrasohoras == objetive, 1.0).otherwise(0.0))
+
+    df_train = X_train.join(y_train, "id", "outer").drop("id")
+    df_test = X_test.join(y_test, "id", "outer").drop("id")
+
+    stage_pca = PCA(k = 15,inputCol = "scaled_features",
+                            outputCol = "features")
+
+
+    # Selecciona el modelo
+    model_dic, paramGrid_dic  = get_models_params_dic()
+    clr_model = model_dic[model_name]
+    params =  paramGrid_dic[model_name]
+
+    print("Modelo evaluado: ", clr_model, "con params: ", params)
+    pipeline = Pipeline(stages= [stage_pca, clr_model])
+
+    crossval = CrossValidator(estimator=pipeline,
+                              estimatorParamMaps=params,
+                              evaluator=MulticlassClassificationEvaluator(metricName='f1'),
+                              numFolds=2)  # use 3+ folds in practice
+
+    cvModel  = crossval.fit(df_train)
+    prediction = cvModel.transform(df_test)
+    evaluate(prediction)
+
+    # Falta obtener mejor modelo
+    # Llamar a s3 utils para que lo guarde
+
+    # Obtener metadata como diccionario
+    # Llama db utils para que lo guarde
+    # return metadatos
 
 
 def main():

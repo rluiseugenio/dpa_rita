@@ -5,7 +5,7 @@ CREATE SCHEMA IF NOT EXISTS clean;
 CREATE SCHEMA IF NOT EXISTS semantic;
 
 ---- Crea tabla metadatos.extract
-DROP TABLE IF EXISTS metadatos.extract;
+--DROP TABLE IF EXISTS metadatos.extract;
 
 CREATE TABLE metadatos.extract(
   fecha VARCHAR,
@@ -22,7 +22,7 @@ CREATE TABLE metadatos.extract(
 
 --- Crea tabla metadatos.clean
 
-DROP TABLE IF EXISTS metadatos.clean;
+--DROP TABLE IF EXISTS metadatos.clean;
 
 CREATE TABLE metadatos.clean(
   fecha VARCHAR,
@@ -39,7 +39,7 @@ CREATE TABLE metadatos.clean(
 
 --- Crea tabla metadatos.clean
 
-DROP TABLE IF EXISTS metadatos.clean;
+--DROP TABLE IF EXISTS metadatos.clean;
 
 CREATE TABLE metadatos.clean(
   fecha VARCHAR,
@@ -56,7 +56,7 @@ CREATE TABLE metadatos.clean(
 
 --- Crea tabla metadatos.semantic
 
-DROP TABLE IF EXISTS metadatos.semantic;
+--DROP TABLE IF EXISTS metadatos.semantic;
 
 CREATE TABLE metadatos.semantic(
   fecha VARCHAR,
@@ -72,7 +72,7 @@ CREATE TABLE metadatos.semantic(
 
 --- Crea tabla metadatos.modeling
 
-DROP TABLE IF EXISTS metadatos.models;
+--DROP TABLE IF EXISTS metadatos.models;
 
 CREATE TABLE metadatos.models(
   fecha VARCHAR,
@@ -207,7 +207,7 @@ create table raw.rita (
 
 --- Crea tabla clean.rita
 
-DROP TABLE IF EXISTS clean.rita;
+--DROP TABLE IF EXISTS clean.rita;
 
 create table clean.rita (
 	year int,
@@ -271,7 +271,7 @@ create table clean.rita (
 );
 
 --- Crea tabla semantic.rita
-DROP TABLE IF EXISTS semantic.rita;
+--DROP TABLE IF EXISTS semantic.rita;
 
 CREATE TABLE semantic.rita(
 year INT,

@@ -38,7 +38,28 @@ from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw
 MiLinaje = Linaje_raw() # extract y load
 
 # Tasks de Luigi
+
+class Create_Tables_Schemas(PostgresQuery):
+    '''
+    Creamos esquemas y tablas para metadatos, asi como raw, clean y semantic
+    '''
+    # Sobreescribe credenciales de constructor de task
+    user = MY_USER
+    password = MY_PASS
+    database = MY_DB
+    host = MY_HOST
+    table = "metadatos"
+
+    # Lee query y lo ejecuta
+    file_dir = "./utils/sql/crear_tablas.sql"
+    query = open(file_dir, "r").read()
+
+
 class downloadDataS3(luigi.Task):
+
+    def requires():
+        return Create_Tables_Schemas()
+
     #Definimos los URL base para poder actualizarlo automaticamente despues
     BASE_URL="https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_"
 
@@ -133,42 +154,6 @@ class downloadDataS3(luigi.Task):
         # Ruta en donde se guarda el archivo solicitado
         output_path = "Tarea_EL.txt"
         return luigi.LocalTarget(output_path)
-
-
-
-# Create tables and squemas
-# "metada_extract.sql"
-# FALTA .rita y sql
-# class CreateTables(PostgresQuery):
-#     filename = luigi.Parameter()
-#     update_id = luigi.Parameter()
-#
-#     user = MY_USER
-#     password = MY_PASS
-#     database = MY_DB
-#     host = MY_HOST
-#     table = "metadatos"
-#
-#     file_dir = "./utils/sql/metada_extract.sql"
-#     query = open(file_dir, "r").read()
-#
-#
-# class RunTables(luigi.Task):
-#     filename = luigi.Parameter()
-#     update_id = luigi.Parameter()
-#
-#     def requires(self):
-#         return CreateTables(self.filename, self.update_id)
-#
-#     def run(self):
-#         z = str(self.filename) + " " + str(self.update_id)
-#
-#         with self.output().open('w') as output_file:
-#             output_file.write(z)
-#
-#     def output(self):
-#         dir = CURRENT_DIR + "/target/create_tables.txt"
-#         return luigi.local_target.LocalTarget(dir)
 
 # Preparamamos una clase para reunir los metadatos de la etapa de limpieza de datos
 class Linaje_clean_data():

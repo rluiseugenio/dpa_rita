@@ -18,3 +18,4 @@ luigi
 boto3
 psycopg2
 datetime
+redshift_tool

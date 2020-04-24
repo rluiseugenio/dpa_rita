@@ -49,8 +49,6 @@ class CreateModelBucket(luigi.Task):
             output_file.write(z)
 
 
-# En realidad podemos correr el que queramos
-#En un futuro podemos meter model_name y objetivo como queramos
 class RunModel(luigi.Task):
     bucname = luigi.Parameter()
     numIt = luigi.Parameter()
@@ -74,6 +72,44 @@ class RunModel(luigi.Task):
     def run(self):
         objetivo = "cancelled"
         model = "LR"
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        run_model(objetivo, model, hyperparams, True)
+
+
+
+#========================================================================
+#================== GRIDSEARCH EN PARALELO ==============================
+#========================================================================
+
+
+
+class RunModelGenerico(luigi.Task):
+    bucname = luigi.Parameter()
+    numIt = luigi.Parameter()
+    numPCA = luigi.Parameter()
+    objetivo = luigi.Parameter()
+    modelname = luigi.Parameter()
+
+    def requires(self):
+        return CreateModelBucket(self.bucname), CreateMetadataTable()
+
+    def output(self):
+        # Chance y aqui podemos guardar el mejor modelo en una S3
+        objetivo = str(self.objetivo)
+        model_name = str(self.modelname)
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        output_path = parse_filename(objetivo, model_name, hyperparams)
+        output_path = "s3://" + str(self.bucname) +  output_path[1:] + ".model.zip"
+
+        return luigi.contrib.s3.S3Target(path=output_path)
+
+    def run(self):
+        objetivo = str(self.objetivo)
+        model_name = str(self.modelname)
         hyperparams = {"iter": int(self.numIt),
                         "pca": int(self.numPCA)}
 

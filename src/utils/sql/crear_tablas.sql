@@ -20,6 +20,7 @@ CREATE TABLE metadatos.extract(
   task_status VARCHAR
 );
 
+GRANT ALL ON  metadatos.extract to postgres;
 --- Crea tabla metadatos.clean
 
 --DROP TABLE IF EXISTS metadatos.clean;
@@ -53,6 +54,7 @@ CREATE TABLE metadatos.clean(
   ruta_s3 VARCHAR,
   task_status VARCHAR
 );
+
 
 --- Crea tabla metadatos.semantic
 
@@ -69,6 +71,9 @@ CREATE TABLE metadatos.semantic(
   nombre_archivo VARCHAR,
   ruta_s3 VARCHAR,
   task_status VARCHAR
+)
+
+GRANT ALL ON  metadatos.semantic to postgres;
 
 --- Crea tabla metadatos.modeling
 
@@ -89,6 +94,7 @@ CREATE TABLE metadatos.models(
   train_nrows VARCHAR
 );
 
+GRANT ALL ON  metadatos.models to postgres;
 ---
 --DROP TABLE IF EXISTS raw.rita;
 
@@ -205,6 +211,8 @@ create table raw.rita (
 	fffff text
 );
 
+GRANT ALL ON  raw.rita to postgres;
+
 --- Crea tabla clean.rita
 
 --DROP TABLE IF EXISTS clean.rita;
@@ -270,6 +278,8 @@ create table clean.rita (
 
 );
 
+GRANT ALL ON  clean.rita to postgres;
+
 --- Crea tabla semantic.rita
 --DROP TABLE IF EXISTS semantic.rita;
 
@@ -319,3 +329,5 @@ findesemana INT,
 quincena INT,
 seishoras INT
 );
+
+GRANT ALL ON  semantic.rita to postgres;

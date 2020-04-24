@@ -58,11 +58,11 @@ Project Organization
 
 
 
-## Docker build
+## Running with Docker
 Set:
 
 ```
-VERSION=2.0.0
+VERSION=5.0.0
 REPO_URL=paolamedo/aws_rita
 BUILD_DIR=/home/paola/Documents/MCD/ProductoDatos/PROYECTO/dpa_rita
 
@@ -87,19 +87,21 @@ docker push $REPO_URL:$VERSION
 Run:
 
 ```
-docker run --rm -it --name rita  -v $BUILD_DIR:/home -v $HOME/.aws:/root/.aws:ro -v $HOME/.rita:/root/.rita:ro $REPO_URL:$VERSION
- 
+docker run --rm -it \
+-v $BUILD_DIR:/home  \
+-v $HOME/.aws:/root/.aws:ro  \
+-v $HOME/.rita:/root/.rita \
+--entrypoint "/bin/bash" \
+ $REPO_URL:$VERSION
+
 ```
 
 
 Using docker compose (in progress)
 ```
-docker-compose up 
+docker-compose up
 docker-compose down --volumes
 ```
-
-
-
 
 (not necessary) Enter to docker container with:
 
@@ -120,10 +122,31 @@ Delete (if `--rm` wasn't used):
 docker rm rita
 ```
 
+Other useful docker images for development:
 
-## Running project
+Pyspark notebook
 ```
-sudo python3 setup.py install
+BUILD_DIR_example=/home/paola/Documents/MCD/ProductoDatos/PROYECTO/dpa_rita
+VERSION=latest
+REPO_URL=jupyter/pyspark-notebook
+
+docker run --rm -it --name jupyterlab-local \
+-p 8888:8888 GRANT_SUDO=yes --user root \
+-v $BUILD_DIR:/home/jovyan/work  \
+-v $HOME/.aws:/home/jovyan/.aws:ro \
+-v $HOME/.rita:/home/jovyan/.rita: \
+ $REPO_URL:$VERSION
 ```
 
+Zepelling
+```
+VERSION=0.9.0
+REPO_URL=apache/zeppelin
+docker run --rm -it --name zeppy -p 8080:8080 -v $BUILD_DIR:/notebook $REPO_URL:$VERSION
+docker pull $REPO_URL:$VERSION
+```
 
+## Running project (in and out of Docker)
+```
+sudo python setup.py install
+```

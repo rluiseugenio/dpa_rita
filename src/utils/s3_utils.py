@@ -7,7 +7,7 @@ import time
 
 #import rita
 from src.utils.log_utils import setup_logging
-logger = setup_logging(__name__, "utils.s3_objects")
+logger = setup_logging(__name__, "utils.s3_objects2")
 
 from src import (
     BUCKET,
@@ -42,7 +42,7 @@ def get_s3_objects(bucket_name):
     try:
         my_bucket = s3.Bucket(bucket_name)
         for my_bucket_object in my_bucket.objects.all():
-            print(my_bucket_object)
+            print(my_bucket_object,my_bucket_object.size)
     except Exception as error:
         print (error)
         logger.error("{} Bucket not found".format(bucket_name))
@@ -58,6 +58,7 @@ def delete_object_s3(bucket_name, file_name):
 
 
 def delete_s3(bucket_name):
+    #aws s3 rm s3://models-dpa --recursive
     try:
         my_bucket = s3.Bucket(bucket_name)
         my_bucket.delete()
@@ -68,15 +69,26 @@ def delete_s3(bucket_name):
 def create_bucket(bucket_name):
     try:
         s3.create_bucket(Bucket=bucket_name,
-                CreateBucketConfiguration={'LocationConstraint': MY_REGION,},
+                #CreateBucketConfiguration={'LocationConstraint': MY_REGION,},
                 ACL='private')
-        print("Cubeta " + bucket_name + "creada")
+        print("Cubeta " + bucket_name + " creada")
     except Exception as error:
         print (error)
         logger.error("{} Error in bucket".format(bucket_name))
 
 
+def upload_file_to_bucket(model_dir, bucket_name, key_name):
+    try:
+        s3.meta.client.upload_file(model_dir, bucket_name, key_name)
+    except Exception as error:
+        print (error)
+        logger.error("{} Error uploading in ".format(bucket_name))
 
 ## ========================================
-describe_s3()
-#get_s3_objects(BUCKET)
+print("Nueva cubeta")
+
+#create_bucket("models-dpa")
+#describe_s3()
+bucket_name = "models-dpa"
+get_s3_objects(bucket_name)
+#delete_s3(bucket_name)

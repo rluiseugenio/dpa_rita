@@ -2,6 +2,10 @@
 # necesitas enviar el parametro AWS_PROFILE e indicar el profile
 # con el que quieres que se corra
 
+# Para crear cubeta:
+# PYTHONPATH='.' AWS_PROFILE=dpa luigi --module orquestador-modelling CreateModelBucket --local-scheduler --bucname models-dpa
+
+
 # PYTHONPATH='.' AWS_PROFILE=dpa luigi --module orquestador CreateS3 --local-scheduler --bucname prueba --rdsname prueba2
 # PYTHONPATH='.' AWS_PROFILE=dpa luigi --module orquestador RunTables --local-scheduler --filename metada_extract.sql --update-id 4
 # PYTHONPATH='.' AWS_PROFILE=dpa luigi --module orquestador RunTables --local-scheduler --filename metada_extract.sql --update-id 4
@@ -33,7 +37,7 @@ class CreateS3(luigi.Task):
     bucname = luigi.Parameter()
 
     def output(self):
-        dir = CURRENT_DIR + "/target/create_s3_" + str(this.bucname) + ".txt"
+        dir = CURRENT_DIR + "/target/create_s3_" + str(self.bucname) + ".txt"
         return luigi.local_target.LocalTarget(dir)
 
     def run(self):

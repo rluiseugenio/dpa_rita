@@ -7,7 +7,7 @@ import time
 import psycopg2
 
 from src.utils.log_utils import setup_logging
-logger = setup_logging(__name__, "utils.rds_objects")
+logger = setup_logging(__name__, "utils.rds_objects2")
 
 # GLOBALS
 from src import (
@@ -20,7 +20,12 @@ from src import (
     MY_VPC ,
     MY_GATEWAY,
     MY_SUBNET,
-    MY_GROUP
+    MY_GROUP,
+    MY_USER ,
+    MY_PASS ,
+    MY_HOST ,
+    MY_PORT,
+    MY_DB
 )
 
 os.environ['AWS_PROFILE'] = MY_PROFILE
@@ -94,35 +99,46 @@ def delete_db(id_borrar):
 
 def execute_query(query):
     try:
-        host="metadatos.clx22b04cf2j.us-west-2.rds.amazonaws.com"
-        conn = psycopg2.connect(user="dpa", # Usuario RDS
-                                     password="dpa01_largo", # password de usuario de RDS
-                                     host=host,#"127.0.0.1", # cambiar por el endpoint adecuado
-                                     port="5432", # cambiar por el puerto
-                                     database="postgres") # Nombre de la base de datos
-
-
-        cursor = conn.cursor()
+        connection = psycopg2.connect(user=MY_USER , # Usuario RDS
+                                     password=MY_PASS, # password de usuario de RDS
+                                     host=MY_HOST ,#"127.0.0.1", # cambiar por el endpoint adecuado
+                                     port=MY_PORT, # cambiar por el puerto
+                                     database=MY_DB ) # Nombre de la base de datos
+        cursor = connection.cursor()
         cursor.execute(query)
-        conn.commit()
-        conn.close()
+        connection.commit()
+        connection.close()
         print("PostgreSQL connection is closed")
     except Exception as error:
         print (error)
 
+def insert_query(query, record_to_insert):
+    try:
+        connection = psycopg2.connect(user=MY_USER , # Usuario RDS
+                                     password=MY_PASS, # password de usuario de RDS
+                                     host=MY_HOST ,#"127.0.0.1", # cambiar por el endpoint adecuado
+                                     port=MY_PORT, # cambiar por el puerto
+                                     database=MY_DB ) # Nombre de la base de datos
+        cursor = connection.cursor()
+        cursor.execute(query, record_to_insert)
+        connection.commit()
+        cursor.close()
+        connection.close()
+        print("PostgreSQL connection is closed")
+    except Exception as error:
+        print (error)
 
 #==============================================================
-def show_select(postgreSQL_select_Query):
+def show_select(query):
     try:
-        host="metadatos.clx22b04cf2j.us-west-2.rds.amazonaws.com"
-        connection = psycopg2.connect(user="dpa", # Usuario RDS
-                                     password="dpa01_largo", # password de usuario de RDS
-                                     host=host,#"127.0.0.1", # cambiar por el endpoint adecuado
-                                     port="5432", # cambiar por el puerto
-                                     database="postgres") # Nombre de la base de datos
+        connection = psycopg2.connect(user=MY_USER , # Usuario RDS
+                                     password=MY_PASS, # password de usuario de RDS
+                                     host=MY_HOST ,#"127.0.0.1", # cambiar por el endpoint adecuado
+                                     port=MY_PORT, # cambiar por el puerto
+                                     database=MY_DB ) # Nombre de la base de datos
         cursor = connection.cursor()
 
-        cursor.execute(postgreSQL_select_Query)
+        cursor.execute(query)
 
         print("Selecting rows from table using cursor.fetchall")
         records = cursor.fetchall()
@@ -130,49 +146,43 @@ def show_select(postgreSQL_select_Query):
         print("Print each row and it's columns values")
         for row in records:
            print(row)
+
+        cursor.close()
+        connection.close()
+        print("PostgreSQL connection is closed")
+
     except (Exception, psycopg2.Error) as error :
         print ("Error while fetching data from PostgreSQL", error)
 
-    finally:
-        #closing database connection.
-        if(connection):
-            cursor.close()
-            connection.close()
-            print("PostgreSQL connection is closed")
 
-
-def execute_sql(file_name):
+def execute_sql(file_dir):
     try:
-        host="metadatos.clx22b04cf2j.us-west-2.rds.amazonaws.com"
-        connection = psycopg2.connect(user="dpa", # Usuario RDS
-                                     password="dpa01_largo", # password de usuario de RDS
-                                     host=host,#"127.0.0.1", # cambiar por el endpoint adecuado
-                                     port="5432", # cambiar por el puerto
-                                     database="postgres") # Nombre de la base de datos
+        connection = psycopg2.connect(user=MY_USER , # Usuario RDS
+                                     password=MY_PASS, # password de usuario de RDS
+                                     host=MY_HOST ,#"127.0.0.1", # cambiar por el endpoint adecuado
+                                     port=MY_PORT, # cambiar por el puerto
+                                     database=MY_DB ) # Nombre de la base de datos
         cursor = connection.cursor()
-        file_dir = "./sql/" + file_name
 
+        print(file_dir)
         cursor.execute(open(file_dir, "r").read())
-
         connection.commit()
+        cursor.close()
+        connection.close()
     except (Exception, psycopg2.Error) as error :
         print ("Error while executing sql file", error)
 
-    finally:
-        #closing database connection.
-        if(connection):
-            cursor.close()
-            connection.close()
-            print("PostgreSQL connection is closed")
+
 
 
 
 #==============================================================
+# DE AQUI PARA ABAJO SON PRUEBAS (BASURA)
 #response=rds_client.describe_security_groups()
 #print(response)
 #describe_db()
 def main():
-    execute_sql("metada_extract.sql")
+    execute_sql("./sql/metada_extract.sql")
 
     query = "INSERT INTO metadatos.extract (fecha, nombre_task, year, month, usuario, ip_ec2, tamano_zip, nombre_archivo, ruta_s3, task_status) VALUES ( '2', '2', '3','3','4','5','5', '6', '6','8' ) ;"
     execute_query(query)
@@ -191,6 +201,22 @@ def main():
 
     query = "SELECT * FROM paola.prueba ; "
     show_select(query)
+
+#execute_sql("./sql/metada_model.sql")
+#query = "SELECT * FROM metadatos.models ; "
+#show_select(query)
+
+def otro():
+    query = """ INSERT INTO metadatos.models (fecha, objetivo, model_name, hyperparams, AUROC, AUPR, precision, recall, f1, train_time, test_split, train_nrows ) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s  ) """
+    values = ("d1",
+             "objetivo", "model_name",
+             "json.dumps(hyperparams)",
+             "AUROC"," AUPR"," precision"," recall", "f1", "train_time", "test_split"," train_nrows")
+    insert_query(query, values)
+
+    query = "SELECT * FROM metadatos.models ; "
+    show_select(query)
+
 
 #execute_sql("metada_extract.sql")
 

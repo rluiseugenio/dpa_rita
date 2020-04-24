@@ -5,7 +5,7 @@ import os
 import zipfile
 import json
 from datetime import date
-
+import shutil
 
 #https://linuxhint.com/python_zip_file_directory/
 #Declare the function to return all file paths of the particular directory
@@ -55,7 +55,7 @@ def clean(new_saved_model):
     folder = new_saved_model[:-4]
     shutil.rmtree(folder, ignore_errors=True)
 
-    
+
 def save_upload(cvModel, objetivo, model_name, hyperparams,bucket_name = "models-dpa"):
     trained_model = cvModel.stages[-1]
 

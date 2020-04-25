@@ -85,7 +85,7 @@ def upload_file_to_bucket(model_dir, bucket_name, key_name):
         logger.error("{} Error uploading in ".format(bucket_name))
 
 ## ========================================
-print("Nueva cubeta")
+#print("Nueva cubeta")
 
 #create_bucket("models-dpa")
 #describe_s3()

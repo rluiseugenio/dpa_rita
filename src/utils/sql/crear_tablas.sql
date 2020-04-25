@@ -7,7 +7,7 @@ CREATE SCHEMA IF NOT EXISTS semantic;
 ---- Crea tabla metadatos.extract
 --DROP TABLE IF EXISTS metadatos.extract;
 
-CREATE TABLE metadatos.extract(
+CREATE TABLE IF NOT EXISTS metadatos.extract(
   fecha VARCHAR,
   nombre_task VARCHAR,
   year VARCHAR,
@@ -25,7 +25,7 @@ GRANT ALL ON  metadatos.extract to postgres;
 
 --DROP TABLE IF EXISTS metadatos.clean;
 
-CREATE TABLE metadatos.clean(
+CREATE TABLE IF NOT EXISTS metadatos.clean(
   fecha VARCHAR,
   nombre_task VARCHAR,
   year VARCHAR,
@@ -38,29 +38,13 @@ CREATE TABLE metadatos.clean(
   task_status VARCHAR
 );
 
---- Crea tabla metadatos.clean
-
---DROP TABLE IF EXISTS metadatos.clean;
-
-CREATE TABLE metadatos.clean(
-  fecha VARCHAR,
-  nombre_task VARCHAR,
-  year VARCHAR,
-  month VARCHAR,
-  usuario VARCHAR,
-  ip_ec2 VARCHAR,
-  tamano_zip VARCHAR,
-  nombre_archivo VARCHAR,
-  ruta_s3 VARCHAR,
-  task_status VARCHAR
-);
-
+GRANT ALL ON  metadatos.clean to postgres;
 
 --- Crea tabla metadatos.semantic
 
 --DROP TABLE IF EXISTS metadatos.semantic;
 
-CREATE TABLE metadatos.semantic(
+CREATE TABLE IF NOT EXISTS metadatos.semantic(
   fecha VARCHAR,
   nombre_task VARCHAR,
   year VARCHAR,
@@ -71,7 +55,7 @@ CREATE TABLE metadatos.semantic(
   nombre_archivo VARCHAR,
   ruta_s3 VARCHAR,
   task_status VARCHAR
-)
+);
 
 GRANT ALL ON  metadatos.semantic to postgres;
 
@@ -79,7 +63,7 @@ GRANT ALL ON  metadatos.semantic to postgres;
 
 --DROP TABLE IF EXISTS metadatos.models;
 
-CREATE TABLE metadatos.models(
+CREATE TABLE IF NOT EXISTS metadatos.models(
   fecha VARCHAR,
   objetivo VARCHAR,
   model_name VARCHAR,
@@ -98,7 +82,7 @@ GRANT ALL ON  metadatos.models to postgres;
 ---
 --DROP TABLE IF EXISTS raw.rita;
 
-create table raw.rita (
+CREATE TABLE IF NOT EXISTS raw.rita (
 	year text,
 	quarter text,
 	month text,
@@ -217,7 +201,7 @@ GRANT ALL ON  raw.rita to postgres;
 
 --DROP TABLE IF EXISTS clean.rita;
 
-create table clean.rita (
+CREATE TABLE IF NOT EXISTS clean.rita (
 	year int,
 	quarter int,
 	month int,
@@ -283,7 +267,7 @@ GRANT ALL ON  clean.rita to postgres;
 --- Crea tabla semantic.rita
 --DROP TABLE IF EXISTS semantic.rita;
 
-CREATE TABLE semantic.rita(
+CREATE TABLE IF NOT EXISTS semantic.rita(
 year INT,
 quarter INT,
 month INT,

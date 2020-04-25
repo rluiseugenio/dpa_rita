@@ -19,7 +19,7 @@ from zipfile import ZipFile
 
 ###  Imports desde directorio de proyecto dpa_rita
 ## Credenciales
-from ../src import(
+from src import(
 MY_USER,
 MY_PASS,
 MY_HOST,
@@ -28,10 +28,10 @@ MY_DB,
 )
 
 ## Utilidades
-from utils.s3_utils import create_bucket
-from utils.db_utils import create_db, execute_sql
-from utils.ec2_utils import create_ec2
-from utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw
+from src.utils.s3_utils import create_bucket
+from src.utils.db_utils import create_db, execute_sql
+from src.utils.ec2_utils import create_ec2
+from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw
 
 
 # Inicializa la clase que reune los metadatos

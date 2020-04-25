@@ -31,7 +31,7 @@ MY_DB,
 from src.utils.s3_utils import create_bucket
 from src.utils.db_utils import create_db, execute_sql
 from src.utils.ec2_utils import create_ec2
-from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw
+from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata
 
 
 # Inicializa la clase que reune los metadatos
@@ -57,7 +57,7 @@ class Create_Tables_Schemas(PostgresQuery):
 
 class downloadDataS3(luigi.Task):
 
-    def requires():
+    def requires(self):
         return Create_Tables_Schemas()
 
     #Definimos los URL base para poder actualizarlo automaticamente despues
@@ -75,7 +75,7 @@ class downloadDataS3(luigi.Task):
         current_month = now.month
 
         # Obtiene anio y mes base (tres anios hacia atras)
-        base_year = current_year - 1
+        base_year = current_year - 0
         base_month = current_month
 
         # Recolectamos IP para metadatos
@@ -144,9 +144,9 @@ class downloadDataS3(luigi.Task):
                         zf.extract(DATA_CSV)
                         os.rename(DATA_CSV,'data.csv')
                         ## Inserta archivo y elimina csv
-                        os.system('bash insert_to_rds.sh')
+                        os.system('bash ./utils/insert_to_rds.sh')
                         os.system('rm data.csv')
-
+                        #EL_rawdata()
 
         os.system('echo OK > Tarea_EL.txt')
 

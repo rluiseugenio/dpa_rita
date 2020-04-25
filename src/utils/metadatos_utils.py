@@ -111,11 +111,11 @@ def EL_metadata(record_to_insert):
     Funcion para insertar metadatos de cierto month y year a metados.extract
     '''
     # Conexion y cursor para query
-    connection = psycopg2.connect(user=user, # Usuario RDS
-                                 password=password, # password de usuario de RDS
-                                 host=host,# endpoint
+    connection = psycopg2.connect(user = MY_USER, # Usuario RDS
+                                 password = MY_PASS, # password de usuario de RDS
+                                 host = MY_HOST,# endpoint
                                  port="5432", # cambiar por el puerto
-                                 database=database) # Nombre de la base de datos
+                                 database=MY_DB) # Nombre de la base de datos
     cursor = connection.cursor()
 
     # Query para insertar metadatos

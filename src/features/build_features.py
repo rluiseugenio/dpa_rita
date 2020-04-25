@@ -1,9 +1,11 @@
+from pyspark.sql import SparkSession
 from pyspark.sql import functions as f
 from pyspark.sql.functions import udf
 from pyspark.sql.types import StringType
 from pyspark.sql.functions import col, lower, regexp_replace, split
-!wget https://jdbc.postgresql.org/download/postgresql-9.4.1207.jar
-!export SPARK_CLASSPATH=postgresql-9.4.1207.jar
+import psycopg2 as pg
+import pandas.io.sql as psql
+import pandas as pd
 
 def clean(df):
     #Pasar a minusculas los nombres de columnas
@@ -22,7 +24,7 @@ def clean(df):
     from pyspark.sql.types import StringType
     from pyspark.sql.functions import col, lower, regexp_replace, split
 
-    #Función limpieza
+    #Función limpiar texto: minúsculas, espacios por guiones, split
     def clean_text(c):
         c = lower(c)
         c = regexp_replace(c, " ", "_")
@@ -34,16 +36,27 @@ def clean(df):
     string_cols = [item[0] for item in base.dtypes if item[1].startswith('string')]
     for x in string_cols:
         base = base.withColumn(x, clean_text(col(x)))
-       
+
     return base
+
 def get_data():
     
-    url = 'jdbc:postgresql://rita-1.ENDPOINT.com/postgres'
-    properties = {'user': 'XXXX', 'password': 'SECRETO'}
-        
-    spark = SparkSession.builder.config('spark.driver.extraClassPath', 'postgresql-9.4.1207.jar').getOrCreate()
 
-    df = spark.read.jdbc(url=url, table='raw.rita_light', properties=properties)
+    spark = SparkSession \
+        .builder \
+        .appName("Python Spark SQL basic example") \
+        .config("spark.jars", "./postgresql-9.4.1207.jar") \
+        .getOrCreate()
+
+    df = spark.read \
+        .format("jdbc") \
+        .option("url", "jdbc:postgresql://ENDPOINT/user") \
+        .option("dbtable", "raw.rita_light") \
+        .option("user", "SECRETO") \
+        .option("password", "SECRETO") \
+        .option("driver", "org.postgresql.Driver") \
+        .load()
+
     return df
 
 def init_data_luigi():

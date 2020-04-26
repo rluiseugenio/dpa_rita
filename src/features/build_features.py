@@ -91,7 +91,7 @@ def clean(df):
     from pyspark.sql import functions as f
 
     # Seleccion de columnas
-    n0 = 0 len(df.columns)
+    n0 = len(df.columns)
 
     base = base.withColumn('rangoatrasohoras', f.when(f.col('cancelled') == 1, "cancelled").when(f.col('depdelayminutes') < 90, "0-1.5").when((f.col('depdelayminutes') > 90) & (f.col('depdelayminutes')<210), "1.5-3.5").otherwise("3.5-"))
 

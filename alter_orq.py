@@ -17,8 +17,8 @@ import psycopg2
 from psycopg2 import extras
 from zipfile import ZipFile
 ###librerias para clean
-from pyspark.sql import SparkSession
-from src.features.build_features import clean, init_data_luigi
+#from pyspark.sql import SparkSession
+#from src.features.build_features import clean, init_data_luigi
 
 ###  Imports desde directorio de proyecto dpa_rita
 ## Credenciales
@@ -157,6 +157,22 @@ class downloadDataS3(luigi.Task):
         # Ruta en donde se guarda el archivo solicitado
         output_path = "Tarea_EL.txt"
         return luigi.LocalTarget(output_path)
+
+class Create_Rita_Light(PostgresQuery): # Agregar al requires del siguiente task
+    '''
+    Creamos esquemas y tablas para metadatos, asi como raw, clean y semantic
+    '''
+    # Sobreescribe credenciales de constructor de task
+    user = MY_USER
+    password = MY_PASS
+    database = MY_DB
+    host = MY_HOST
+    table = "metadatos"
+
+    # Lee query y lo ejecuta
+    file_dir = "./src/utils/sql/crear_ritalight.sql"
+    query = open(file_dir, "r").read()
+
 #-----------------------------------------------------------------------------------------------------------------------------
 # Limpiar DATOS
 CURRENT_DIR = os.getcwd()

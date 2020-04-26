@@ -7,12 +7,7 @@ import psycopg2 as pg
 import pandas.io.sql as psql
 import pandas as pd
 
-# Database credentials
-MY_USER = paths["user"]
-MY_PASS = paths["password"]
-MY_HOST = paths["host"]
-MY_PORT = paths["port"]
-MY_DB = paths["database"]
+
 
 def clean(df):
     #Pasar a minusculas los nombres de columnas

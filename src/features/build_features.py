@@ -53,11 +53,11 @@ def clean(df):
     MiLinaje_clean.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
 
     # Seleccion de columnas
-    n0 = 0 # Pendiente: numero de columnas antes de la seleccion
+    n0 = len(df.columns)
 
     base = df.select(df.year,df.quarter, df.month, df.dayofmonth, df.dayofweek, df.flightdate, df.reporting_airline, df.dot_id_reporting_airline, df.iata_code_reporting_airline, df.tail_number, df.flight_number_reporting_airline, df.originairportid, df.originairportseqid, df.origincitymarketid, df.origin, df.origincityname, df.originstate, df.originstatefips, df.originstatename, df.originwac, df.destairportid, df.destairportseqid, df.destcitymarketid, df.dest, df.destcityname, df.deststate, df.deststatefips, df.deststatename, df.destwac, df.crsdeptime, df.deptime, df.depdelay, df.depdelayminutes, df.depdel15, df.departuredelaygroups, df.deptimeblk, df.taxiout, df.wheelsoff, df.wheelson, df.taxiin, df.crsarrtime, df.arrtime, df.arrdelay, df.arrdelayminutes, df.arrdel15, df.arrivaldelaygroups, df.arrtimeblk, df.cancelled, df.diverted, df.crselapsedtime, df.actualelapsedtime, df.airtime, df.flights, df.distance, df.distancegroup, df.divairportlandings )
 
-    n1 = 0 # Pendiente: numero de columnas despues de la seleccion
+    n1 = len(df.columns)
 
     # Metadadatos de columas o registros modificados
     MiLinaje_clean.num_columnas_modificadas = n1 - n0
@@ -91,11 +91,11 @@ def clean(df):
     from pyspark.sql import functions as f
 
     # Seleccion de columnas
-    n0 = 0 # Pendiente: numero de columnas antes de la seleccion
+    n0 = 0 len(df.columns)
 
     base = base.withColumn('rangoatrasohoras', f.when(f.col('cancelled') == 1, "cancelled").when(f.col('depdelayminutes') < 90, "0-1.5").when((f.col('depdelayminutes') > 90) & (f.col('depdelayminutes')<210), "1.5-3.5").otherwise("3.5-"))
 
-    n1 = 0 # Pendiente: numero de columnas despues de la seleccion
+    n1 = len(df.columns)
 
     # Metadadatos de columas o registros modificados
     MiLinaje_clean.num_columnas_modificadas = n1 - n0

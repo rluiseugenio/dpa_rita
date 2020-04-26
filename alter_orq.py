@@ -158,7 +158,7 @@ class downloadDataS3(luigi.Task):
         output_path = "Tarea_EL.txt"
         return luigi.LocalTarget(output_path)
 #-----------------------------------------------------------------------------------------------------------------------------
-# Limpiar DATOS 
+# Limpiar DATOS
 CURRENT_DIR = os.getcwd()
 
 class DataLocalStorage():
@@ -184,9 +184,9 @@ class GetDataSet(luigi.Task):
         z = "Obtiene Datos"
         with self.output().open('w') as output_file:
             output_file.write(z)
-#Limpiamos los datos            
+#Limpiamos los datos
 class GetCleanData(luigi.Task):
-    
+
     def requires(self):
         return GetDataSet(), downloadDataS3()
 
@@ -197,11 +197,11 @@ class GetCleanData(luigi.Task):
     def run(self):
         df_clean = CACHE.get_data()
         CACHE.df_clean = clean(df_clean)
-        
+
         z = "Limpia Datos"
         with self.output().open('w') as output_file:
             output_file.write(z)
-    
+
 # Preparamamos una clase para reunir los metadatos de la etapa de limpieza de datos
 class Linaje_clean_data():
     def __init__(self, fecha=0, nombre_task=0,year=0, month=0, usuario=0, ip_clean=0, num_filas_modificadas=0, variables_limpias=0, task_status=0):
@@ -219,7 +219,7 @@ class Linaje_clean_data():
         return (self.fecha, self.nombre_task, self.year, self.month, self.usuario,\
          self.ip_clean, self.num_filas_modificadas, self.variables_limpias,\
           self.task_status)
-#-----------------------------------------------------------------------------------------------------------------------------   
+#-----------------------------------------------------------------------------------------------------------------------------
 #FEATURE ENGINERING
 # Preparamamos una clase para reunir los metadatos de la etapa Raw
 class Linaje_feature_engineering():

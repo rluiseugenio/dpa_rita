@@ -101,7 +101,7 @@ def clean(df):
     MiLinaje_clean.num_columnas_modificadas = n1 - n0
 
     # Metadadatos de columas o registros modificados
-    MiLinaje_clean.num_filas_modificadas = 0 # Pendiente: numero de renglones
+    MiLinaje_clean.num_filas_modificadas = df.count()
 
     MiLinaje_clean.variables_limpias = "year,quarter, month, dayofmonth, dayofweek,\
          flightdate, reporting_airline, dot_id_reporting_airline, iata_code_reporting_airline,\
@@ -146,8 +146,8 @@ def clean(df):
         base = base.withColumn(x, clean_text(col(x)))
 
     # Metadadatos de columas o registros modificados
-    MiLinaje_clean.num_filas_modificadas = 0 # Pendiente: numero de renglones (entiendo que son todas)
-    MiLinaje_clean.num_columnas_modificadas = 0 # Pendiente: numero de columnas (entiendo que son todas)
+    MiLinaje_clean.num_filas_modificadas = df.count()
+    MiLinaje_clean.num_columnas_modificadas = len(df.columns)
 
     MiLinaje_clean.variables_limpias = "year,quarter, month, dayofmonth, dayofweek,\
              flightdate, reporting_airline, dot_id_reporting_airline, iata_code_reporting_airline,\

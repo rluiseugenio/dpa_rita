@@ -7,6 +7,11 @@ import psycopg2 as pg
 import pandas.io.sql as psql
 import pandas as pd
 from pyspark.sql.types import StructType, StructField, StringType
+from src.utils.metadatos_utils import Linaje_clean_data
+from datetime import date, datetime
+import getpass
+import socket 
+import requests
 
 
 
@@ -16,7 +21,7 @@ def clean(df):
     #====================================================================
 
     # Inicializa clase para reunir metadatos
-    Mi_Linaje_clean = Linaje_clean_data()
+    MiLinaje_clean = Linaje_clean_data()
 
     # Recolectamos fecha, usuario IP, nobre de task para metadatos
     MiLinaje_clean.fecha =  datetime.now()

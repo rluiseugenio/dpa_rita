@@ -28,13 +28,11 @@ GRANT ALL ON  metadatos.extract to postgres;
 CREATE TABLE IF NOT EXISTS metadatos.clean(
   fecha VARCHAR,
   nombre_task VARCHAR,
-  year VARCHAR,
-  month VARCHAR,
   usuario VARCHAR,
   ip_ec2 VARCHAR,
-  tamano_zip VARCHAR,
-  nombre_archivo VARCHAR,
-  ruta_s3 VARCHAR,
+  num_columnas_modificadas VARCHAR,
+  num_filas_modificadas VARCHAR,
+  variables_limpias VARCHAR,
   task_status VARCHAR
 );
 

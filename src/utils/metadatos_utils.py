@@ -38,6 +38,23 @@ class Linaje_raw():
          self.ip_ec2, self.tamano_zip, self.nombre_archivo, self.ruta_s3,\
           self.task_status)
 
+# Clase para reunir los metadatos de la etapa de limpieza de datos (tabla metadatos.clean)
+class Linaje_clean_data():
+    def __init__(self, fecha=0, nombre_task=0, usuario=0, ip_clean=0, num_columnas_modificadas=0,num_filas_modificadas=0, variables_limpias=0, task_status=0):
+        self.fecha = fecha # time stamp
+        self.nombre_task = self.__class__.__name__#nombre_task
+        self.usuario = usuario # Usuario de la maquina de GNU/Linux que corre la instancia
+        self.ip_clean = ip_clean #Corresponde a la dirección IP desde donde se ejecuto la tarea
+        self.num_columnas_modificadas = num_columnas_modificadas #    número de columnas modificados
+        self.num_filas_modificadas = num_filas_modificadas #    número de registros modificados
+        self.variables_limpias = variables_limpias #variables limpias con las que se pasará a la siguiente parte
+        self.task_status = "Successful" # estatus de ejecución: Fallido, exitoso, etc.
+
+    def to_upsert(self):
+        return (self.fecha, self.nombre_task, self.usuario,\
+         self.ip_clean, self.num_columnas_modificadas,self.num_filas_modificadas, self.variables_limpias,\
+          self.task_status)
+
 # ==========================================
 # Funciones para insertar metadatos a RDS
 # ==========================================
@@ -157,3 +174,26 @@ def EL_rawdata():
     connection.close()
 
     return print("Raw.Rita insertion Done - PostgreSQL connection is closed")
+
+def clean_metadata_rds(record_to_insert):
+    '''
+    Funcion para insertar metadatos de cierto month y year a metados.extract
+    '''
+    # Conexion y cursor para query
+    connection = psycopg2.connect(user = MY_USER, # Usuario RDS
+                                 password = MY_PASS, # password de usuario de RDS
+                                 host = MY_HOST,# endpoint
+                                 port="5432", # cambiar por el puerto
+                                 database=MY_DB) # Nombre de la base de datos
+    cursor = connection.cursor()
+
+    # Query para insertar metadatos
+    postgres_insert_query = """ INSERT INTO metadatos.clean (fecha, nombre_task,\
+     usuario, ip_ec2, num_columnas_modificadas, num_filas_modificadas, variables_limpias, \
+     task_status) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s) """
+    cursor.execute(postgres_insert_query, record_to_insert)
+    connection .commit()
+    cursor.close()
+    connection.close()
+
+    return print("Metadadata Insertion Done - PostgreSQL connection is closed")

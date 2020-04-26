@@ -11,39 +11,162 @@ from pyspark.sql.types import StructType, StructField, StringType
 
 
 def clean(df):
-    #Pasar a minusculas los nombres de columnas
+    #====================================================================
+    # Task: Pasar a minusculas los nombres de columnas
+    #====================================================================
+
+    # Inicializa clase para reunir metadatos
+    Mi_Linaje_clean = Linaje_clean_data()
+
+    # Recolectamos fecha, usuario IP, nobre de task para metadatos
+    MiLinaje_clean.fecha =  datetime.now()
+    MiLinaje_clean.nombre_task = "Colnames_to_lower"
+    MiLinaje_clean.usuario = getpass.getuser()
+    MiLinaje_clean.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
+
+    MiLinaje_clean.variables_limpias = "All_from_raw data"
+
+    counting_cols = 0
+
     for col in df.columns:
+        counting_cols = counting_cols +1
         df = df.withColumnRenamed(col, col.lower())
 
-    #Seleccionar columnas no vacias
+    # Metadadatos de columas o registros modificados
+    MiLinaje_clean.nombre_task = counting_cols
+    MiLinaje_clean.variables_limpias = counting_cols
+
+    # Subimos los metadatos al RDS
+    clean_metadata_rds(MiLinaje_clean.to_upsert())
+
+    #====================================================================
+    # Task: Seleccionar columnas no vacias
+    #====================================================================
+
+    # Inicializa clase para reunir metadatos
+    Mi_Linaje_clean = Linaje_clean_data()
+
+    # Recolectamos fecha, usuario IP, nobre de task para metadatos
+    MiLinaje_clean.fecha =  datetime.now()
+    MiLinaje_clean.nombre_task = "Colnames_selection"
+    MiLinaje_clean.usuario = getpass.getuser()
+    MiLinaje_clean.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
+
+    # Seleccion de columnas
+    n0 = 0 # Pendiente: numero de columnas antes de la seleccion
+
     base = df.select(df.year,df.quarter, df.month, df.dayofmonth, df.dayofweek, df.flightdate, df.reporting_airline, df.dot_id_reporting_airline, df.iata_code_reporting_airline, df.tail_number, df.flight_number_reporting_airline, df.originairportid, df.originairportseqid, df.origincitymarketid, df.origin, df.origincityname, df.originstate, df.originstatefips, df.originstatename, df.originwac, df.destairportid, df.destairportseqid, df.destcitymarketid, df.dest, df.destcityname, df.deststate, df.deststatefips, df.deststatename, df.destwac, df.crsdeptime, df.deptime, df.depdelay, df.depdelayminutes, df.depdel15, df.departuredelaygroups, df.deptimeblk, df.taxiout, df.wheelsoff, df.wheelson, df.taxiin, df.crsarrtime, df.arrtime, df.arrdelay, df.arrdelayminutes, df.arrdel15, df.arrivaldelaygroups, df.arrtimeblk, df.cancelled, df.diverted, df.crselapsedtime, df.actualelapsedtime, df.airtime, df.flights, df.distance, df.distancegroup, df.divairportlandings )
 
-    #agregar columna con clasificación de tiempo en horas de atraso del vuelo 0-1.5, 1.5-3.5,3.5-, cancelled
+    n1 = 0 # Pendiente: numero de columnas despues de la seleccion
+
+    # Metadadatos de columas o registros modificados
+    MiLinaje_clean.num_columnas_modificadas = n1 - n0
+    MiLinaje_clean.variables_limpias = "year,quarter, month, dayofmonth, dayofweek,\
+     flightdate, reporting_airline, dot_id_reporting_airline, iata_code_reporting_airline,\
+     tail_number, flight_number_reporting_airline, originairportid, originairportseqid,\
+     origincitymarketid, origin, origincityname, originstate, originstatefips, originstatename,\
+     originwac, destairportid, destairportseqid, destcitymarketid, dest, destcityname, deststate,\
+     deststatefips, deststatename, destwac, crsdeptime, deptime, depdelay, depdelayminutes,\
+     depdel15, departuredelaygroups, deptimeblk, taxiout, wheelsoff, wheelson, taxiin, crsarrtime,\
+     arrtime, arrdelay, arrdelayminutes, arrdel15, arrivaldelaygroups, arrtimeblk, cancelled,\
+     diverted, crselapsedtime, actualelapsedtime, airtime, flights, distance, distancegroup,\
+     divairportlandings"
+
+    # Subimos los metadatos al RDS
+    clean_metadata_rds(MiLinaje_clean.to_upsert())
+
+    #========================================================================================================
+    # agregar columna con clasificación de tiempo en horas de atraso del vuelo 0-1.5, 1.5-3.5,3.5-, cancelled
+    #========================================================================================================
+
+    # Inicializa clase para reunir metadatos
+    Mi_Linaje_clean = Linaje_clean_data()
+
+    # Recolectamos fecha, usuario IP, nobre de task para metadatos
+    MiLinaje_clean.fecha =  datetime.now()
+    MiLinaje_clean.nombre_task = "creation_of_categories"
+    MiLinaje_clean.usuario = getpass.getuser()
+    MiLinaje_clean.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
 
     from pyspark.sql import functions as f
+
+    # Seleccion de columnas
+    n0 = 0 # Pendiente: numero de columnas antes de la seleccion
+
     base = base.withColumn('rangoatrasohoras', f.when(f.col('cancelled') == 1, "cancelled").when(f.col('depdelayminutes') < 90, "0-1.5").when((f.col('depdelayminutes') > 90) & (f.col('depdelayminutes')<210), "1.5-3.5").otherwise("3.5-"))
 
+    n1 = 0 # Pendiente: numero de columnas despues de la seleccion
+
+    # Metadadatos de columas o registros modificados
+    MiLinaje_clean.num_columnas_modificadas = n1 - n0
+
+    # Metadadatos de columas o registros modificados
+    MiLinaje_clean.num_filas_modificadas = 0 # Pendiente: numero de renglones
+
+    MiLinaje_clean.variables_limpias = "year,quarter, month, dayofmonth, dayofweek,\
+         flightdate, reporting_airline, dot_id_reporting_airline, iata_code_reporting_airline,\
+         tail_number, flight_number_reporting_airline, originairportid, originairportseqid,\
+         origincitymarketid, origin, origincityname, originstate, originstatefips, originstatename,\
+         originwac, destairportid, destairportseqid, destcitymarketid, dest, destcityname, deststate,\
+         deststatefips, deststatename, destwac, crsdeptime, deptime, depdelay, depdelayminutes,\
+         depdel15, departuredelaygroups, deptimeblk, taxiout, wheelsoff, wheelson, taxiin, crsarrtime,\
+         arrtime, arrdelay, arrdelayminutes, arrdel15, arrivaldelaygroups, arrtimeblk, cancelled,\
+         diverted, crselapsedtime, actualelapsedtime, airtime, flights, distance, distancegroup,\
+         divairportlandings,rangoatrasohoras,cancelled,0-1.5,1.5-3.5,3.5-"
+
+    # Subimos los metadatos al RDS
+    clean_metadata_rds(MiLinaje_clean.to_upsert())
+
+    #===================================================================
+    # Aplicación de la función limpieza texto
+    #===================================================================
+
+    # Función limpiar texto: minúsculas, espacios por guiones, split
     from pyspark.sql.functions import udf
     from pyspark.sql.types import StringType
     from pyspark.sql.functions import col, lower, regexp_replace, split
 
-    #Función limpiar texto: minúsculas, espacios por guiones, split
     def clean_text(c):
         c = lower(c)
         c = regexp_replace(c, " ", "_")
         c = f.split(c, '\,')[0]
         return c
 
+    # Inicializa clase para reunir metadatos
+    Mi_Linaje_clean = Linaje_clean_data()
 
-    # Aplicación de la función limpieza texto
+    # Recolectamos fecha, usuario IP, nobre de task para metadatos
+    MiLinaje_clean.fecha =  datetime.now()
+    MiLinaje_clean.nombre_task = "cleaning_text_spaces_and_others"
+    MiLinaje_clean.usuario = getpass.getuser()
+    MiLinaje_clean.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
+
     string_cols = [item[0] for item in base.dtypes if item[1].startswith('string')]
     for x in string_cols:
         base = base.withColumn(x, clean_text(col(x)))
 
+    # Metadadatos de columas o registros modificados
+    MiLinaje_clean.num_filas_modificadas = 0 # Pendiente: numero de renglones (entiendo que son todas)
+    MiLinaje_clean.num_columnas_modificadas = 0 # Pendiente: numero de columnas (entiendo que son todas)
+
+    MiLinaje_clean.variables_limpias = "year,quarter, month, dayofmonth, dayofweek,\
+             flightdate, reporting_airline, dot_id_reporting_airline, iata_code_reporting_airline,\
+             tail_number, flight_number_reporting_airline, originairportid, originairportseqid,\
+             origincitymarketid, origin, origincityname, originstate, originstatefips, originstatename,\
+             originwac, destairportid, destairportseqid, destcitymarketid, dest, destcityname, deststate,\
+             deststatefips, deststatename, destwac, crsdeptime, deptime, depdelay, depdelayminutes,\
+             depdel15, departuredelaygroups, deptimeblk, taxiout, wheelsoff, wheelson, taxiin, crsarrtime,\
+             arrtime, arrdelay, arrdelayminutes, arrdel15, arrivaldelaygroups, arrtimeblk, cancelled,\
+             diverted, crselapsedtime, actualelapsedtime, airtime, flights, distance, distancegroup,\
+             divairportlandings,rangoatrasohoras,cancelled,0-1.5,1.5-3.5,3.5-"
+
+    # Subimos los metadatos al RDS
+    clean_metadata_rds(MiLinaje_clean.to_upsert())
+
     return base
 
 def get_data():
-    
+
    schema = StructType([StructField('year', StringType(), True),
 					 StructField('quarter', StringType(), True),
                      StructField('month', StringType(), True),

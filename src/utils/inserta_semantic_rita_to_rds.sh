@@ -10,9 +10,12 @@
 . credentials_psql.txt
 
 # Correcion para evitar errores de importacion con psql
+cat *csv > semantic.csv
 cat semantic.csv | sed 's/\"\"/?????/g' > semantic.csv
 
 # importa datos hacia psql
 PGPASSWORD=$password psql -U $user -h $host -d $db_name -c "\copy semantic.rita FROM 'semantic.csv' with null as E'?????' CSV;"
 
 echo "Data insertion on semantic.rita completed"
+
+cat rm *

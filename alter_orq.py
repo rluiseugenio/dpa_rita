@@ -148,7 +148,7 @@ class downloadDataS3(luigi.Task):
                         zf.extract(DATA_CSV)
                         os.rename(DATA_CSV,'data.csv')
                         ## Inserta archivo y elimina csv
-                        os.system('bash ./utils/insert_to_rds.sh')
+                        os.system('bash ./src/utils/insert_to_rds.sh')
                         os.system('rm data.csv')
                         #EL_rawdata()
 
@@ -261,12 +261,6 @@ MiLinajeSemantic = Linaje_semantic()
 
 #Creamos features nuevas
 class GetFEData(luigi.Task):
-    MiLinajeSemantic.fecha =  datetime.now()
-    MiLinajeSemantic.nombre_task = 'GetFEData'
-    MiLinajeSemantic.usuario = getpass.getuser()
-    MiLinajeSemantic.year = datetime.today().year
-    MiLinajeSemantic.month = datetime.today().month
-    MiLinajeSemantic.ip_ec2 =  str(socket.gethostbyname(socket.gethostname()))
 
     def requires(self):
         return GetCleanDataSet()
@@ -278,12 +272,23 @@ class GetFEData(luigi.Task):
     def run(self):
         df_util = init_data_clean_luigi() #CACHE.get_clean_data()
         CACHE.df_semantic = crear_features(df_util)
+        CACHE.df_semantic.write.csv('semantic')
+
         MiLinajeSemantic.ip_ec2 = df_util.count()
+        MiLinajeSemantic.fecha =  datetime.now()
+        MiLinajeSemantic.nombre_task = 'GetFEData'
+        MiLinajeSemantic.usuario = getpass.getuser()
+        MiLinajeSemantic.year = datetime.today().year
+        MiLinajeSemantic.month = datetime.today().month
+        MiLinajeSemantic.ip_ec2 =  str(socket.gethostbyname(socket.gethostname()))
         MiLinajeSemantic.variables = "findesemana,quincena,dephour,seishoras"
         MiLinajeSemantic.ruta_s3 = "s3://test-aws-boto/semantic"
         MiLinajeSemantic.task_status = 'Successful'
         # Insertamos metadatos a DB
         semantic_metadata(MiLinajeSemantic.to_upsert())
+        ## Inserta archivo y elimina csv
+        os.system('bash ./src/utils/inserta_semantic_rita_to_rds.sh')
+        os.system('rm semantic.csv')
 
         z = "CreaFeaturesDatos"
         with self.output().open('w') as output_file:

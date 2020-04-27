@@ -189,6 +189,8 @@ CACHE = DataLocalStorage()
 
 #Obtenemos raw.rita de la RDS
 class GetDataSet(luigi.Task):
+    def requires(self):
+        return Create_Rita_Light()
 
     def output(self):
         dir = CURRENT_DIR + "/target/gets_data.txt"

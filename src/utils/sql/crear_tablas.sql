@@ -325,7 +325,7 @@ divairportlandings VARCHAR,
 rangoatrasohoras VARCHAR,
 findesemana INT,
 quincena FLOAT,
-dephour INT,
+dephour FLOAT,
 seishoras FLOAT
 );
 

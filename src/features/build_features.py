@@ -7,7 +7,7 @@ import psycopg2 as pg
 import pandas.io.sql as psql
 import pandas as pd
 from pyspark.sql.types import StructType, StructField, StringType
-from src.utils.metadatos_utils import Linaje_clean_data
+from src.utils.metadatos_utils import Linaje_clean_data, clean_metadata_rds
 from datetime import date, datetime
 import getpass
 import socket

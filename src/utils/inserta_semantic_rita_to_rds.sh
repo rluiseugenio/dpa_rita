@@ -17,5 +17,3 @@ cat semantic.csv | sed 's/\"\"/?????/g' > semantic.csv
 PGPASSWORD=$password psql -U $user -h $host -d $db_name -c "\copy semantic.rita FROM 'semantic.csv' with null as E'?????' CSV;"
 
 echo "Data insertion on semantic.rita completed"
-
-cat rm *

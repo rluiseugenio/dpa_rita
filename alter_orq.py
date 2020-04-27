@@ -212,7 +212,7 @@ class GetCleanData(luigi.Task):
         return luigi.local_target.LocalTarget(dir)
 
     def run(self):
-        df_clean = CACHE.get_data()
+        df_clean = init_data_luigi() #CACHE.get_data()
         CACHE.df_clean = clean(df_clean)
 
         z = "Limpia Datos"

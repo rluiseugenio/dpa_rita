@@ -27,8 +27,8 @@ Cabe destacar que RITA posee una frecuencia de actualización mensual, con datos
 
 En este sentido, para facilitar el entendimiento de los documentos y acciones desarrolladas para llevar a cabo este proyecto, la información del repositorio se ha organizado en la estructura de carpetas que se resume en seguida:
 
-| # | Carpeta                       | Descripción  |
-|---|-----------------------------------|--------|
+| # | Carpeta                           | Descripción  |
+|---|-----------------------------------|--------------|
 | 1 | Docs | Refiere la documentación de los pasos realizados para las diferentes etapas del proyecto. |
 | 2 | Diseño | Contiene un documento *mock-up* con de la conceptualización del proyecto a realizar. |
 | 3 | EDA | Análisis exploratorio preeliminar para identificar potenciales transformaciones. |
@@ -47,9 +47,9 @@ Posteriormente realizamos un análisis EDA para ver la estructura de los datos.
 
 El siguiente paso fue realizar el ETL;
 
-* Extract: en esta estapa se plantea 
+* Extract: en esta etapa se plantea la descarga de los datos de la base de RITA.
 
-* Load:
+* Load: en esta etapa se cargan los datos descargados en formato zip en una cubeta S3.
 
 * Transform:
 

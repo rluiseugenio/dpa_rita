@@ -16,9 +16,10 @@ import pandas as pd
 import psycopg2
 from psycopg2 import extras
 from zipfile import ZipFile
+
 ###librerias para clean
-#from pyspark.sql import SparkSession
-#from src.features.build_features import clean, init_data_luigi
+from pyspark.sql import SparkSession
+from src.features.build_features import clean, crear_features, init_data_luigi, init_data_clean_luigi
 
 ###  Imports desde directorio de proyecto dpa_rita
 ## Credenciales
@@ -219,25 +220,69 @@ class GetCleanData(luigi.Task):
         with self.output().open('w') as output_file:
             output_file.write(z)
 
-
 #-----------------------------------------------------------------------------------------------------------------------------
-#FEATURE ENGINERING
-# Preparamamos una clase para reunir los metadatos de la etapa Raw
-class Linaje_feature_engineering():
-    def __init__(self, url = 0, fecha=0, year=0, month=0, usuario=0, ip_ec2=0, filas_modificadas=0, variables=0, ruta_s3=0,task_status=0):
-        self.url = url
-        self.fecha = fecha # time stamp
-        self.nombre_task = self.__class__.__name__#nombre_task
-        self.year = year #
-        self.month = month #
-        self.usuario = usuario # Usuario de la maquina de GNU/Linux que corre la instancia
-        self.ip_ec2 = ip_ec2
-        self.filas_modificadas = filas_modificadas
-        self.variables = variables
-        self.ruta_s3= ruta_s3
-        self.task_status= task_status
+#FEATURE ENGINERING------------------------------------------------------------------------------------------------------------
+# Crear caracteristicas DATOS
+CURRENT_DIR = os.getcwd()
 
-    def to_upsert(self):
-        return (self.fecha, self.nombre_task, self.year, self.month, self.usuario,\
-         self.ip_ec2, self.filas_modificadas, self.variables, self.ruta_s3,\
-          self.task_status)
+class DataCleanLocalStorage():
+    def _init_(self, df_semantic= None):
+        self.df_semantic =df_semantic
+
+    def get_data(self):
+        return self.df_semantic
+
+CACHE = DataCleanLocalStorage()
+
+#Obtenemos clean.rita de la RDS
+class GetCleanDataSet(luigi.Task):
+
+    def requires(self):
+
+        return GetCleanData()
+
+    def output(self):
+        dir = CURRENT_DIR + "/target/gets_clean_data.txt"
+        return luigi.local_target.LocalTarget(dir)
+
+    def run(self):
+        df_util = init_data_clean_luigi()
+        CACHE.df_semantic = df_util
+
+        z = "ObtieneDatosClean"
+        with self.output().open('w') as output_file:
+            output_file.write(z)
+
+
+#metadata FE
+MiLinajeSemantic = Linaje_semantic()
+
+#Creamos features nuevas
+class GetFEData(luigi.Task):
+    MiLinajeSemantic.fecha =  datetime.now()
+    MiLinajeSemantic.nombre_task = 'GetFEData'
+    MiLinajeSemantic.usuario = getpass.getuser()
+    MiLinajeSemantic.year = datetime.today().year
+    MiLinajeSemantic.month = datetime.today().month
+    MiLinajeSemantic.ip_ec2 =  str(socket.gethostbyname(socket.gethostname()))
+
+    def requires(self):
+        return GetCleanDataSet()
+
+    def output(self):
+        dir = CURRENT_DIR + "/target/data_semantic.txt"
+        return luigi.local_target.LocalTarget(dir)
+
+    def run(self):
+        df_util = init_data_clean_luigi() #CACHE.get_clean_data()
+        CACHE.df_semantic = crear_features(df_util)
+        MiLinajeSemantic.ip_ec2 = df_util.count()
+        MiLinajeSemantic.variables = "findesemana,quincena,dephour,seishoras"
+        MiLinajeSemantic.ruta_s3 = "s3://test-aws-boto/semantic"
+        MiLinajeSemantic.task_status = 'Successful'
+        # Insertamos metadatos a DB
+        semantic_metadata(MiLinajeSemantic.to_upsert())
+
+        z = "CreaFeaturesDatos"
+        with self.output().open('w') as output_file:
+            output_file.write(z)

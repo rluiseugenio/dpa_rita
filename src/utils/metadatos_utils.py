@@ -156,7 +156,7 @@ def EL_verif_query(url,anio,mes):
     return tam
 
 
-def rita_light_query(url,anio,mes):
+def rita_light_query():
     '''
     Crea una base raw de rita para prueba
     '''
@@ -169,13 +169,14 @@ def rita_light_query(url,anio,mes):
     cursor = connection.cursor()
 
     # Query para verificacion a la base de datos
-    postgreSQL_select_Query = "CREATE TABLE raw.rita_light AS SELECT * FROM raw.rita LIMIT 1000;"
+    postgreSQL_select_Query = """CREATE TABLE raw.rita_light AS (SELECT * FROM raw.rita LIMIT 1000);"""
     cursor.execute(postgreSQL_select_Query)
+    connection.commit()
     cursor.close()
     connection.close()
     #print("PostgreSQL connection is closed")
 
-    return print("raw.rita ha sido creada")
+    return print("raw.rita_light ha sido creada")
 
 
 def EL_metadata(record_to_insert):
@@ -195,7 +196,7 @@ def EL_metadata(record_to_insert):
      year, month, usuario, ip_ec2, tamano_zip, nombre_archivo, ruta_s3, \
      task_status) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) """
     cursor.execute(postgres_insert_query, record_to_insert)
-    connection .commit()
+    connection.commit()
     cursor.close()
     connection.close()
 
@@ -223,7 +224,7 @@ def EL_rawdata():
     #cursor.copy_from(f, 'raw.rita', sep=",")
     postgres_insert_query = """copy raw.rita FROM 'data.csv' WITH CSV HEADER;"""
     cursor.execute(postgres_insert_query)
-    connection .commit()
+    connection.commit()
     #
     cursor.close()
     connection.close()
@@ -247,7 +248,7 @@ def clean_metadata_rds(record_to_insert):
      usuario, ip_ec2, num_columnas_modificadas, num_filas_modificadas, variables_limpias, \
      task_status) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s) """
     cursor.execute(postgres_insert_query, record_to_insert)
-    connection .commit()
+    connection.commit()
     cursor.close()
     connection.close()
 
@@ -289,7 +290,7 @@ def semantic_metadata(record_to_insert):
     # Query para insertar metadatos
     postgres_insert_query = """ INSERT INTO metadatos.semantic  VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """
     cursor.execute(postgres_insert_query, record_to_insert)
-    connection .commit()
+    connection.commit()
     cursor.close()
     connection.close()
 

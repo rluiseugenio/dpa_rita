@@ -67,8 +67,8 @@ class Create_Tables_Schemas(PostgresQuery):
 
 class downloadDataS3(luigi.Task):
 
-    def requires(self):
-        return Create_Tables_Schemas()
+    #def requires(self):
+    #    return Create_Tables_Schemas()
 
     #Definimos los URL base para poder actualizarlo automaticamente despues
     BASE_URL="https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_"

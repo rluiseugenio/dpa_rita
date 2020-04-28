@@ -1,7 +1,7 @@
 # PYTHONPATH='.' AWS_PROFILE=educate1 luigi --module alter_orq downloadDataS3 --local-scheduler
 
 # PARA UN MODELO
-#PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunModel --local-scheduler  --bucname models-dpa --numIt 2 --numPCA 2  --model LR --obj cancelled
+#PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunModel --local-scheduler  --bucname models-dpa --numIt 2 --numPCA 3  --model LR --obj cancelled
 
 # PARA TODOS LOS MODELOS
 # PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunAllTargets --local-scheduler  --bucname models-dpa --numIt 1 --numPCA 2  --model LR
@@ -162,7 +162,7 @@ class downloadDataS3(luigi.Task):
                         os.system('rm data.csv')
                         #EL_rawdata()
 
-        os.system('PGPASS=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c ./src/utils/sql/crear_ritalight.sql')
+        os.system('PGPASSWORD=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c ./src/utils/sql/crear_ritalight.sql')
         os.system('echo OK > Tarea_EL.txt')
 
     def output(self):

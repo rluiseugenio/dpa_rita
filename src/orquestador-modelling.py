@@ -53,14 +53,16 @@ class RunModel(luigi.Task):
     bucname = luigi.Parameter()
     numIt = luigi.Parameter()
     numPCA = luigi.Parameter()
+    obj = luigi.Parameter()
+    model = luigi.Parameter()
 
     def requires(self):
         return CreateModelBucket(self.bucname), CreateMetadataTable()
 
     def output(self):
         # Chance y aqui podemos guardar el mejor modelo en una S3
-        objetivo = "cancelled"
-        model_name = "LR"
+        objetivo = self.obj
+        model_name = self.model
         hyperparams = {"iter": int(self.numIt),
                         "pca": int(self.numPCA)}
 
@@ -70,35 +72,59 @@ class RunModel(luigi.Task):
         return luigi.contrib.s3.S3Target(path=output_path)
 
     def run(self):
-        objetivo = "cancelled"
-        model = "LR"
+        objetivo = self.obj
+        model_name = self.model
         hyperparams = {"iter": int(self.numIt),
                         "pca": int(self.numPCA)}
 
-        run_model(objetivo, model, hyperparams, True)
+        run_model(objetivo, model_name, hyperparams, True)
 
 
+# =======================================================
+# ALL TARGETS
+# 1) "0-1.5"
+# 2) "1.5-3.5"
+# 3) "3.5-"
+# 4) "cancelled"
+# =======================================================
+TARGET_A = "0-1.5"
+TARGET_B = "1.5-3.5"
+TARGET_C =  "3.5-"
+TARGET_ D = "cancelled"
 
-#========================================================================
-#================== GRIDSEARCH EN PARALELO ==============================
-#========================================================================
-
-
-
-class RunModelGenerico(luigi.Task):
+class RunAllTargets(luigi.Task):
     bucname = luigi.Parameter()
     numIt = luigi.Parameter()
     numPCA = luigi.Parameter()
-    objetivo = luigi.Parameter()
-    modelname = luigi.Parameter()
+    model = luigi.Parameter()
 
     def requires(self):
-        return CreateModelBucket(self.bucname), CreateMetadataTable()
+        return RunTargetA(self.numIt, self.numPCA, self.model),
+         RunTargetB(self.numIt, self.numPCA, self.model),
+         RunTargetC(self.numIt, self.numPCA, self.model),
+         RunTargetD(self.numIt, self.numPCA, self.model)
 
     def output(self):
-        # Chance y aqui podemos guardar el mejor modelo en una S3
-        objetivo = str(self.objetivo)
-        model_name = str(self.modelname)
+        dir = CURRENT_DIR + "/target/run_all_models.txt"
+        return luigi.local_target.LocalTarget(dir)
+
+    def run(self):
+        z = str(TARGET_A) + "_" + str(TARGET_D)
+        with self.output().open('w') as output_file:
+            output_file.write(z)
+
+class RunTargetA(luigi.Task):
+    bucname = luigi.Parameter()
+    numIt = luigi.Parameter()
+    numPCA = luigi.Parameter()
+    model = luigi.Parameter()
+
+    def requires(self):
+        return CreateModelBucket(self.bucname)
+
+    def output(self):
+        objetivo = TARGET_A
+        model_name = self.model
         hyperparams = {"iter": int(self.numIt),
                         "pca": int(self.numPCA)}
 
@@ -108,12 +134,94 @@ class RunModelGenerico(luigi.Task):
         return luigi.contrib.s3.S3Target(path=output_path)
 
     def run(self):
-        objetivo = str(self.objetivo)
-        model_name = str(self.modelname)
+        objetivo = TARGET_A
+        model_name = self.model
         hyperparams = {"iter": int(self.numIt),
                         "pca": int(self.numPCA)}
 
-        # Esta funcion ya guarda los metadatos en un BD
-        # Corre los modelos y el mejor lo guarda en un S3 y guarda toda la info
-        # Toma la base de semantic
-        run_model(objetivo, model, hyperparams, True)
+        run_model(objetivo, model_name, hyperparams, True)
+
+class RunTargetB(luigi.Task):
+    bucname = luigi.Parameter()
+    numIt = luigi.Parameter()
+    numPCA = luigi.Parameter()
+    model = luigi.Parameter()
+
+    def requires(self):
+        return CreateModelBucket(self.bucname)
+
+    def output(self):
+        objetivo = TARGET_B
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        output_path = parse_filename(objetivo, model_name, hyperparams)
+        output_path = "s3://" + str(self.bucname) +  output_path[1:] + ".model.zip"
+
+        return luigi.contrib.s3.S3Target(path=output_path)
+
+    def run(self):
+        objetivo = TARGET_B
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        run_model(objetivo, model_name, hyperparams, True)
+
+class RunTargetC(luigi.Task):
+    bucname = luigi.Parameter()
+    numIt = luigi.Parameter()
+    numPCA = luigi.Parameter()
+    model = luigi.Parameter()
+
+    def requires(self):
+        return CreateModelBucket(self.bucname)
+
+    def output(self):
+        objetivo = TARGET_C
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        output_path = parse_filename(objetivo, model_name, hyperparams)
+        output_path = "s3://" + str(self.bucname) +  output_path[1:] + ".model.zip"
+
+        return luigi.contrib.s3.S3Target(path=output_path)
+
+    def run(self):
+        objetivo = TARGET_C
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        run_model(objetivo, model_name, hyperparams, True)
+
+
+class RunTargetD(luigi.Task):
+    bucname = luigi.Parameter()
+    numIt = luigi.Parameter()
+    numPCA = luigi.Parameter()
+    model = luigi.Parameter()
+
+    def requires(self):
+        return CreateModelBucket(self.bucname)
+
+    def output(self):
+        objetivo = TARGET_D
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        output_path = parse_filename(objetivo, model_name, hyperparams)
+        output_path = "s3://" + str(self.bucname) +  output_path[1:] + ".model.zip"
+
+        return luigi.contrib.s3.S3Target(path=output_path)
+
+    def run(self):
+        objetivo = TARGET_D
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        run_model(objetivo, model_name, hyperparams, True)

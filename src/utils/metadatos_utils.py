@@ -135,6 +135,8 @@ def EL_verif_query(url,anio,mes):
     Funcion para verificar si cierto month y year ya estan en metadatos.extract
     considerando el tamanio resultante de un query
     '''
+    import psycopg2
+    import psycopg2.extras
     # Conexion y cursor para query
     connection = psycopg2.connect(user = MY_USER, # Usuario RDS
                                  password = MY_PASS, # password de usuario de RDS

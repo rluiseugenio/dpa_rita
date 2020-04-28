@@ -59,6 +59,39 @@ class Linaje_clean_data():
 # Funciones para insertar metadatos a RDS
 # ==========================================
 
+
+def Insert_to_RDS(data_file, nombre_esquema, nombre_tabla):
+    '''
+    Funcion para insertar metadatos a una tabla y esquema del RDS desde un data_file (por ejemplo, un csv)
+    '''
+	import io
+	import psycopg2
+	import psycopg2.extras
+
+	conn = psycopg2.connect(database= MY_DB,
+		user=MY_USER,
+		password=MY_PASS,
+		host=MY_HOST,
+		port='5432')
+
+
+	with conn.cursor() as cursor:
+		print('nombre_tabla: ' + nombre_tabla)
+
+		#Query
+		sql_statement = f"copy "+ nombre_esquema + "." + nombre_tabla + " from stdin with csv delimiter as ','"
+		print(sql_statement)
+		buffer = io.StringIO()
+
+		with open(data_file,'r') as data:
+			buffer.write(data.read())
+			buffer.seek(0)
+			cursor.copy_expert(sql_statement, file=buffer)
+
+	return print("Insertion in "+ nombre_esquema + "." + nombre_tabla + " is done!!")
+
+
+
 class InsertExtractMetada(CopyToTable):
     '''
     Task de luigi para insertar renglones en renglones en tabla de metadatos

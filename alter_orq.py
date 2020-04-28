@@ -41,7 +41,7 @@ MY_DB,
 from src.utils.s3_utils import create_bucket
 from src.utils.db_utils import create_db, execute_sql
 from src.utils.ec2_utils import create_ec2
-from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata
+from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS
 from src.utils.db_utils import execute_sql
 from src.models.train_model import run_model
 from src.models.save_model import parse_filename
@@ -157,8 +157,9 @@ class downloadDataS3(luigi.Task):
                         DATA_CSV='On_Time_Reporting_Carrier_On_Time_Performance_(1987_present)_'+str(anio)+"_"+str(mes)+'.csv'
                         zf.extract(DATA_CSV)
                         os.rename(DATA_CSV,'data.csv')
-                        ## Inserta archivo y elimina csv DELIMITER ';' CSV HEADER
-                        os.system('PGPASSWORD=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c "\COPY raw.rita FROM data.csv DELIMITER ',' CSV HEADER;"')
+                        ## Inserta archivo y elimina
+                        Insert_to_RDS("data2.csv", "raw", "rita")
+                        #os.system('PGPASSWORD=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c "\COPY raw.rita FROM data.csv DELIMITER ',' CSV HEADER;"')
                         os.system('rm data.csv')
                         #EL_rawdata()
 

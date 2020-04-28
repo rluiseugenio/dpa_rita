@@ -13,6 +13,13 @@ import getpass
 import socket
 import requests
 
+from src import (
+    MY_USER ,
+    MY_PASS ,
+    MY_HOST ,
+    MY_PORT,
+    MY_DB
+)
 
 
 def clean(df):
@@ -283,11 +290,12 @@ def get_data():
                      StructField('div5tailnum', StringType(), True),
                      StructField('fffff', StringType(), True)
                      ])
-   connection = pg.connect("host='MY_HOST' dbname='MY_DB' user='MY_USER' password='MY_PASS'")
+
+   config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
+   connection = pg.connect(config_psyco)
    pdf = pd.read_sql_query('select * from raw.rita_light',con=connection)
    spark = SparkSession.builder.config('spark.driver.extraClassPath', 'postgresql-9.4.1207.jar').getOrCreate()
    df = spark.createDataFrame(pdf, schema=schema)
-
    return df
 
 def init_data_luigi():
@@ -298,7 +306,7 @@ def init_data_luigi():
 
 #FEATURE ENGINEERING ------------------------------------------
 def get_clean_data():
-    
+
 
     clean_rita = StructType([StructField('year', StringType(), True),
                              StructField('quarter', StringType(), True),
@@ -356,7 +364,7 @@ def get_clean_data():
                              StructField('distance', StringType(), True),
                              StructField('distancegroup', StringType(), True),
                              StructField('divairportlandings', StringType(), True),
-                             StructField('rangoatrasohoras', StringType(), True) 
+                             StructField('rangoatrasohoras', StringType(), True)
                             ])
     config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
     connection = pg.connect(config_psyco)
@@ -373,15 +381,15 @@ def init_data_clean_luigi():
 
 
 def crear_features(base):
-    
+
     from pyspark.sql import functions as f
-    
+
     base = base.withColumn('findesemana', f.when(f.col('dayofweek') == 5, 1).when(f.col('dayofweek') == 6, 1).when(f.col('dayofweek') == 7, 1).otherwise(0))
-    
+
     base = base.withColumn('quincena', f.when(f.col('dayofmonth') == 15, 1).when(f.col('dayofmonth') == 14, 1).when(f.col('dayofmonth') == 16, 1).when(f.col('dayofmonth') == 29, 1).when(f.col('dayofmonth') == 30, 1).when(f.col('dayofmonth') == 31, 1).when(f.col('dayofmonth') == 1, 1).when(f.col('dayofmonth') == 2, 1).when(f.col('dayofmonth') == 3, 1).otherwise(0))
-    
+
     base = base.withColumn('dephour',f.when(f.length('crsdeptime')==3,f.col('crsdeptime').substr(0,1).cast("float")).otherwise(f.col('crsdeptime').substr(0,2).cast("float")) )
-    
+
     base = base.withColumn('seishoras', f.when(f.col('dephour') == 6, 1).when(f.col('dephour') == 12, 1).when(f.col('dephour') == 18, 1).when(f.col('dephour') == 0, 1).otherwise(0))
-    
+
     return(base)

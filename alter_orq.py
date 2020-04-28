@@ -123,7 +123,7 @@ class downloadDataS3(luigi.Task):
 
                         ## Escribimos los archivos que se consultan al API Rita en S3
                         # Autenticación en S3 con boto3
-                        ses = boto3.session.Session(profile_name='educate1', region_name='us-east-1')
+                        ses = boto3.session.Session(profile_name='dpa', region_name='us-east-1')
                         s3_resource = ses.resource('s3')
                         obj = s3_resource.Bucket("test-aws-boto")
                         print(ses)
@@ -138,7 +138,7 @@ class downloadDataS3(luigi.Task):
                         MiLinaje.nombre_archivo =  str(anio)+"_"+str(mes)+".zip"
 
                         # Recolectamos tamano del archivo recien escrito en S3 para metadatos
-                        ses = boto3.session.Session(profile_name="educate1", region_name='us-east-1')
+                        ses = boto3.session.Session(profile_name="dpa", region_name='us-east-1')
                         s3 = ses.resource('s3')
                         bucket_name = "test-aws-boto"
                         my_bucket = s3.Bucket(bucket_name)
@@ -157,12 +157,12 @@ class downloadDataS3(luigi.Task):
                         DATA_CSV='On_Time_Reporting_Carrier_On_Time_Performance_(1987_present)_'+str(anio)+"_"+str(mes)+'.csv'
                         zf.extract(DATA_CSV)
                         os.rename(DATA_CSV,'data.csv')
-                        ## Inserta archivo y elimina csv
-                        os.system('bash ./src/utils/insert_to_rds.sh')
+                        ## Inserta archivo y elimina csv DELIMITER ';' CSV HEADER
+                        os.system('PGPASSWORD=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c "\COPY raw.rita FROM data.csv DELIMITER ',' CSV HEADER;"')
                         os.system('rm data.csv')
                         #EL_rawdata()
 
-        os.system('PGPASSWORD=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c ./src/utils/sql/crear_ritalight.sql')
+        os.system('PGPASSWORD=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c "CREATE TABLE rita.raw_light AS SELECT * FROM rita.raw LIMIT 1000;" ')
         os.system('echo OK > Tarea_EL.txt')
 
     def output(self):

@@ -163,7 +163,7 @@ class downloadDataS3(luigi.Task):
                         #EL_rawdata()
 
         # Crea raw.rita_light
-        rita_light_query()
+        #rita_light_query()
 
         os.system('echo OK > Tarea_EL.txt')
 

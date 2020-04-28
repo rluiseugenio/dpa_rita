@@ -325,7 +325,6 @@ class RunModel(luigi.Task):
         return CreateModelBucket(self.bucname)
 
     def output(self):
-        # Chance y aqui podemos guardar el mejor modelo en una S3
         objetivo = self.obj
         model_name = self.model
         hyperparams = {"iter": int(self.numIt),

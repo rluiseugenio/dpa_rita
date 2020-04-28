@@ -44,7 +44,9 @@ from src.models.save_model import parse_filename
 
 # Inicializa la clase que reune los metadatos
 MiLinaje = Linaje_raw() # extract y load
-
+# ===============================
+CURRENT_DIR = os.getcwd()
+# ===============================s
 # Tasks de Luigi
 
 class Create_Tables_Schemas(PostgresQuery):

@@ -71,8 +71,8 @@ class Create_Tables_Schemas(PostgresQuery):
 
 class downloadDataS3(luigi.Task):
 
-    def requires(self):
-        return Create_Tables_Schemas()
+    #def requires(self):
+    #    return Create_Tables_Schemas()
 
     #Definimos los URL base para poder actualizarlo automaticamente despues
     BASE_URL="https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_"
@@ -162,27 +162,16 @@ class downloadDataS3(luigi.Task):
                         os.system('rm data.csv')
                         #EL_rawdata()
 
+			#Creamos rita light			
+			os.system('PGPASS=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c ./src/utils/sql/crear_ritalight.sql')
+
+
         os.system('echo OK > Tarea_EL.txt')
 
     def output(self):
         # Ruta en donde se guarda el archivo solicitado
         output_path = "Tarea_EL.txt"
         return luigi.LocalTarget(output_path)
-
-class Create_Rita_Light(PostgresQuery): # Agregar al requires del siguiente task
-    '''
-    Creamos esquemas y tablas para metadatos, asi como raw, clean y semantic
-    '''
-    # Sobreescribe credenciales de constructor de task
-    user = MY_USER
-    password = MY_PASS
-    database = MY_DB
-    host = MY_HOST
-    table = "metadatos"
-
-    # Lee query y lo ejecuta
-    file_dir = "./src/utils/sql/crear_ritalight.sql"
-    query = open(file_dir, "r").read()
 
 #-----------------------------------------------------------------------------------------------------------------------------
 # Limpiar DATOS
@@ -199,8 +188,8 @@ CACHE = DataLocalStorage()
 
 #Obtenemos raw.rita de la RDS
 class GetDataSet(luigi.Task):
-    def requires(self):
-        return Create_Rita_Light()
+    #def requires(self):
+    #    return Create_Rita_Light()
 
     def output(self):
         dir = CURRENT_DIR + "/target/gets_data.txt"

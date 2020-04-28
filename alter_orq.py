@@ -370,8 +370,7 @@ class RunAllTargets(luigi.Task):
         return RunTargetA(self.bucname, self.numIt, self.numPCA, self.model), \
          RunTargetB(self.bucname,self.numIt, self.numPCA, self.model), \
          RunTargetC(self.bucname,self.numIt, self.numPCA, self.model), \
-         RunTargetD(self.bucname,self.numIt, self.numPCA, self.model), \
-         CreateModelBucket(self.bucname)
+         RunTargetD(self.bucname,self.numIt, self.numPCA, self.model)
 
     def output(self):
         dir = CURRENT_DIR + "/target/run_all_models.txt"

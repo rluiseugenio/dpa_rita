@@ -42,18 +42,7 @@ GRANT ALL ON  metadatos.clean to postgres;
 
 --DROP TABLE IF EXISTS metadatos.semantic;
 
-CREATE TABLE IF NOT EXISTS metadatos.semantic(
-  fecha VARCHAR,
-  nombre_task VARCHAR,
-  year VARCHAR,
-  month VARCHAR,
-  usuario VARCHAR,
-  ip_ec2 VARCHAR,
-  tamano_zip VARCHAR,
-  nombre_archivo VARCHAR,
-  ruta_s3 VARCHAR,
-  task_status VARCHAR
-);
+CREATE TABLE IF NOT EXISTS metadatos.semantic (num_filas_modificadas VARCHAR, fecha VARCHAR, nombre_task  VARCHAR, usuario VARCHAR, year VARCHAR, month VARCHAR, ip_ec2 VARCHAR, variables VARCHAR, ruta_s3 VARCHAR, task_status  VARCHAR);
 
 GRANT ALL ON  metadatos.semantic to postgres;
 

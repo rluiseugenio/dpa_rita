@@ -391,8 +391,3 @@ def add_meta_data(objetivo, model_name,hyperparams, log,train_time, test_split, 
              json.dumps(hyperparams),
              AUROC, AUPR, precision, recall, f1, train_time, test_split, train_nrows)
     insert_query(query, values)
-
-df = get_data()
-print(df.show())
-print("hola")
-print(df.columns)

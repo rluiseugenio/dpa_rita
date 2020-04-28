@@ -41,7 +41,7 @@ MY_DB,
 from src.utils.s3_utils import create_bucket
 from src.utils.db_utils import create_db, execute_sql
 from src.utils.ec2_utils import create_ec2
-from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata
+from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query
 from src.utils.db_utils import execute_sql
 from src.models.train_model import run_model
 from src.models.save_model import parse_filename
@@ -123,7 +123,7 @@ class downloadDataS3(luigi.Task):
 
                         ## Escribimos los archivos que se consultan al API Rita en S3
                         # Autenticación en S3 con boto3
-                        ses = boto3.session.Session(profile_name='educate1', region_name='us-east-1')
+                        ses = boto3.session.Session(profile_name='dpa', region_name='us-east-1')
                         s3_resource = ses.resource('s3')
                         obj = s3_resource.Bucket("test-aws-boto")
                         print(ses)
@@ -138,7 +138,7 @@ class downloadDataS3(luigi.Task):
                         MiLinaje.nombre_archivo =  str(anio)+"_"+str(mes)+".zip"
 
                         # Recolectamos tamano del archivo recien escrito en S3 para metadatos
-                        ses = boto3.session.Session(profile_name="educate1", region_name='us-east-1')
+                        ses = boto3.session.Session(profile_name="dpa", region_name='us-east-1')
                         s3 = ses.resource('s3')
                         bucket_name = "test-aws-boto"
                         my_bucket = s3.Bucket(bucket_name)
@@ -157,12 +157,14 @@ class downloadDataS3(luigi.Task):
                         DATA_CSV='On_Time_Reporting_Carrier_On_Time_Performance_(1987_present)_'+str(anio)+"_"+str(mes)+'.csv'
                         zf.extract(DATA_CSV)
                         os.rename(DATA_CSV,'data.csv')
-                        ## Inserta archivo y elimina csv
-                        os.system('bash ./src/utils/insert_to_rds.sh')
+                        ## Inserta archivo y elimina
+                        Insert_to_RDS("data.csv", "raw", "rita") # inserta data.csv en esquema raw y tabla rita
                         os.system('rm data.csv')
                         #EL_rawdata()
 
-        os.system('PGPASSWORD=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c ./src/utils/sql/crear_ritalight.sql')
+        # Crea raw.rita_light
+        rita_light_query()
+
         os.system('echo OK > Tarea_EL.txt')
 
     def output(self):
@@ -270,17 +272,18 @@ class GetFEData(luigi.Task):
         CACHE.df_semantic = crear_features(df_util)
         CACHE.df_semantic.write.csv('semantic')
 
-        MiLinajeSemantic.ip_ec2 = df_util.count()
-        MiLinajeSemantic.fecha =  datetime.now()
+        MiLinajeSemantic.ip_ec2 = str(df_util.count())
+        MiLinajeSemantic.fecha =  str(datetime.now())
         MiLinajeSemantic.nombre_task = 'GetFEData'
-        MiLinajeSemantic.usuario = getpass.getuser()
-        MiLinajeSemantic.year = datetime.today().year
-        MiLinajeSemantic.month = datetime.today().month
+        MiLinajeSemantic.usuario = str(getpass.getuser())
+        MiLinajeSemantic.year = str(datetime.today().year)
+        MiLinajeSemantic.month = str(datetime.today().month)
         MiLinajeSemantic.ip_ec2 =  str(socket.gethostbyname(socket.gethostname()))
         MiLinajeSemantic.variables = "findesemana,quincena,dephour,seishoras"
         MiLinajeSemantic.ruta_s3 = "s3://test-aws-boto/semantic"
         MiLinajeSemantic.task_status = 'Successful'
         # Insertamos metadatos a DB
+        print(MiLinajeSemantic.to_upsert())
         semantic_metadata(MiLinajeSemantic.to_upsert())
         ## Inserta archivo y elimina csv
         os.system('bash ./src/utils/inserta_semantic_rita_to_rds.sh')

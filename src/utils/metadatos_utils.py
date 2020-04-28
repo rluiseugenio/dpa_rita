@@ -59,6 +59,39 @@ class Linaje_clean_data():
 # Funciones para insertar metadatos a RDS
 # ==========================================
 
+
+def Insert_to_RDS(data_file, nombre_esquema, nombre_tabla):
+    '''
+    Funcion para insertar metadatos a una tabla y esquema del RDS desde un data_file (por ejemplo, un csv)
+    '''
+	import io
+	import psycopg2
+	import psycopg2.extras
+
+	conn = psycopg2.connect(database= MY_DB,
+		user=MY_USER,
+		password=MY_PASS,
+		host=MY_HOST,
+		port='5432')
+
+
+	with conn.cursor() as cursor:
+		print('nombre_tabla: ' + nombre_tabla)
+
+		#Query
+		sql_statement = f"copy "+ nombre_esquema + "." + nombre_tabla + " from stdin with csv delimiter as ','"
+		print(sql_statement)
+		buffer = io.StringIO()
+
+		with open(data_file,'r') as data:
+			buffer.write(data.read())
+			buffer.seek(0)
+			cursor.copy_expert(sql_statement, file=buffer)
+
+	return print("Insertion in "+ nombre_esquema + "." + nombre_tabla + " is done!!")
+
+
+
 class InsertExtractMetada(CopyToTable):
     '''
     Task de luigi para insertar renglones en renglones en tabla de metadatos
@@ -122,6 +155,29 @@ def EL_verif_query(url,anio,mes):
     #print("PostgreSQL connection is closed")
 
     return tam
+
+
+def rita_light_query(url,anio,mes):
+    '''
+    Crea una base raw de rita para prueba
+    '''
+    # Conexion y cursor para query
+    connection = psycopg2.connect(user = MY_USER, # Usuario RDS
+                                 password = MY_PASS, # password de usuario de RDS
+                                 host = MY_HOST,# endpoint
+                                 port="5432", # cambiar por el puerto
+                                 database=MY_DB) # Nombre de la base de datos
+    cursor = connection.cursor()
+
+    # Query para verificacion a la base de datos
+    postgreSQL_select_Query = "CREATE TABLE raw.rita_light AS SELECT * FROM raw.rita LIMIT 1000;"
+    cursor.execute(postgreSQL_select_Query)
+    cursor.close()
+    connection.close()
+    #print("PostgreSQL connection is closed")
+
+    return print("raw.rita ha sido creada")
+
 
 def EL_metadata(record_to_insert):
     '''
@@ -204,11 +260,10 @@ def clean_metadata_rds(record_to_insert):
 
 # Preparamamos una clase para reunir los metadatos de la etapa Raw
 class Linaje_semantic():
-    def _init_(self,num_filas_modificadas=0, fecha=0, nombre_task=0, usuario=0, year=0, month=0, ip_ec2=0, variables=0, ruta_s3=0, task_status=0):
-
-        self.num_filas_modificadas = url
+    def __init__(self, num_filas_modificadas=0, fecha=0, nombre_task=0, usuario=0, year=0, month=0, ip_ec2=0, variables=0, ruta_s3=0, task_status=0):
+        self.num_filas_modificadas = num_filas_modificadas
         self.fecha = fecha # time stamp
-        self.nombre_task = self._class.name_#nombre_task
+        self.nombre_task =  "self.__class__.__name__"#nombre_task
         self.usuario = usuario # Usuario de la maquina de GNU/Linux que corre la instancia
         self.year = year #
         self.month = month #
@@ -218,7 +273,7 @@ class Linaje_semantic():
         self.task_status= task_status
 
     def to_upsert(self):
-        return (self.num_filas_modificadas, self.fecha, self.nombre_task, self.usuario, self.year, self.month, self.ip_ec2, self.variables, self.ruta_s3, self.task_status)
+        return (str(self.num_filas_modificadas), str(self.fecha), str(self.nombre_task), str(self.usuario), str(self.year), str(self.month), str(self.ip_ec2), str(self.variables), str(self.ruta_s3), str(self.task_status))
 
 def semantic_metadata(record_to_insert):
     '''
@@ -233,7 +288,7 @@ def semantic_metadata(record_to_insert):
     cursor = connection.cursor()
 
     # Query para insertar metadatos
-    postgres_insert_query = """ INSERT INTO metadatos.semantic(num_filas_modificadas, fecha, nombre_task, usuario, year, month, ip_ec2, variables, ruta_s3, task_status) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s) """
+    postgres_insert_query = """ INSERT INTO metadatos.semantic  VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """
     cursor.execute(postgres_insert_query, record_to_insert)
     connection .commit()
     cursor.close()

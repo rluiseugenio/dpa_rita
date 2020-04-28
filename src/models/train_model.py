@@ -292,7 +292,7 @@ def run_model(objetivo, model_name, hyperparams, luigi= False, test_split = 0.2)
 
     # Parametros especificos
     num_it = int(hyperparams["iter"])
-    if num_it > 0 & model_name == "LR":
+    if num_it > 0 and model_name == "LR":
         clr_model.setMaxIter(num_it)
 
     # Adds new stages

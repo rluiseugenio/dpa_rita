@@ -1,5 +1,7 @@
 # PYTHONPATH='.' AWS_PROFILE=educate1 luigi --module alter_orq downloadDataS3 --local-scheduler
 
+# PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunAllTargets --local-scheduler  --bucname models-dpa --numIt 1 --numPCA 2  --model LR
+
 ###  Librerias necesarias
 import luigi
 import luigi.contrib.s3
@@ -35,8 +37,10 @@ MY_DB,
 from src.utils.s3_utils import create_bucket
 from src.utils.db_utils import create_db, execute_sql
 from src.utils.ec2_utils import create_ec2
-from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data
-
+from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic
+from src.utils.db_utils import execute_sql
+from src.models.train_model import run_model
+from src.models.save_model import parse_filename
 
 # Inicializa la clase que reune los metadatos
 MiLinaje = Linaje_raw() # extract y load
@@ -366,7 +370,8 @@ class RunAllTargets(luigi.Task):
         return RunTargetA(self.bucname, self.numIt, self.numPCA, self.model), \
          RunTargetB(self.bucname,self.numIt, self.numPCA, self.model), \
          RunTargetC(self.bucname,self.numIt, self.numPCA, self.model), \
-         RunTargetD(self.bucname,self.numIt, self.numPCA, self.model)
+         RunTargetD(self.bucname,self.numIt, self.numPCA, self.model), \
+         CreateModelBucket(self.bucname)
 
     def output(self):
         dir = CURRENT_DIR + "/target/run_all_models.txt"

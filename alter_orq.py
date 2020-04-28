@@ -1,5 +1,9 @@
 # PYTHONPATH='.' AWS_PROFILE=educate1 luigi --module alter_orq downloadDataS3 --local-scheduler
 
+# PARA UN MODELO
+#PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunModel --local-scheduler  --bucname models-dpa --numIt 2 --numPCA 2  --model LR --obj cancelled
+
+# PARA TODOS LOS MODELOS
 # PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunAllTargets --local-scheduler  --bucname models-dpa --numIt 1 --numPCA 2  --model LR
 
 ###  Librerias necesarias
@@ -37,7 +41,7 @@ MY_DB,
 from src.utils.s3_utils import create_bucket
 from src.utils.db_utils import create_db, execute_sql
 from src.utils.ec2_utils import create_ec2
-from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic
+from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata
 from src.utils.db_utils import execute_sql
 from src.models.train_model import run_model
 from src.models.save_model import parse_filename
@@ -328,7 +332,7 @@ class RunModel(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return CreateModelBucket(self.bucname)
+        return GetFEData()
 
     def output(self):
         objetivo = self.obj
@@ -369,7 +373,8 @@ class RunAllTargets(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return RunTargetA(self.bucname, self.numIt, self.numPCA, self.model), \
+        return CreateModelBucket(self.bucname), \
+         RunTargetA(self.bucname, self.numIt, self.numPCA, self.model), \
          RunTargetB(self.bucname,self.numIt, self.numPCA, self.model), \
          RunTargetC(self.bucname,self.numIt, self.numPCA, self.model), \
          RunTargetD(self.bucname,self.numIt, self.numPCA, self.model)
@@ -390,7 +395,7 @@ class RunTargetA(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return CreateModelBucket(self.bucname)
+        return GetFEData()
 
     def output(self):
         objetivo = TARGET_A
@@ -418,7 +423,7 @@ class RunTargetB(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return CreateModelBucket(self.bucname)
+        return GetFEData()
 
     def output(self):
         objetivo = TARGET_B
@@ -446,7 +451,7 @@ class RunTargetC(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return CreateModelBucket(self.bucname)
+        return GetFEData()
 
     def output(self):
         objetivo = TARGET_C
@@ -475,7 +480,7 @@ class RunTargetD(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return CreateModelBucket(self.bucname)
+        return GetFEData()
 
     def output(self):
         objetivo = TARGET_D

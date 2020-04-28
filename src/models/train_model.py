@@ -16,15 +16,103 @@ from pyspark.ml.classification import LogisticRegression, DecisionTreeClassifier
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator, BinaryClassificationEvaluator
 from pyspark.mllib.evaluation import MulticlassMetrics
 
+from pyspark.sql import SparkSession
+from pyspark.sql import functions as f
+from pyspark.sql.functions import udf
+from pyspark.sql.functions import col, lower, regexp_replace, split
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType
+
 from collections import defaultdict
 
+import psycopg2 as pg
+import pandas.io.sql as psql
 import pandas as pd
 import time
 import json
 
+from src import (
+    MY_USER ,
+    MY_PASS ,
+    MY_HOST ,
+    MY_PORT,
+    MY_DB
+)
+
+def get_data(luigi=True):
+    config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
+    connection = pg.connect(config_psyco)
+    pdf = pd.read_sql_query('select * from semantic.rita',con=connection)
+    spark = SparkSession \
+    .builder \
+    .appName("Python Spark SQL basic example") \
+    .config("spark.some.config.option", "some-value") \
+    .getOrCreate()
+    df = spark.createDataFrame(pdf, schema=StructType([StructField('year', IntegerType(), True),
+                         StructField('quarter', IntegerType(), True),
+                         StructField('month', IntegerType(), True),
+                         StructField('dayofmonth', IntegerType(), True),
+                         StructField('dayofweek', IntegerType(), True),
+                         StructField('flightdate', StringType(), True),
+                         StructField('reporting_airline', StringType(), True),
+                         StructField('dot_id_reporting_airline', IntegerType(), True),
+                         StructField('iata_code_reporting_airline', StringType(), True),
+                         StructField('tail_number', StringType(), True),
+                         StructField('flight_number_reporting_airline', IntegerType(), True),
+                         StructField('originairportid', IntegerType(), True),
+                         StructField('originairportseqid', IntegerType(), True),
+                         StructField('origincitymarketid', IntegerType(), True),
+                         StructField('origin', StringType(), True),
+                         StructField('origincityname', StringType(), True),
+                         StructField('originstate', StringType(), True),
+                         StructField('originstatefips', IntegerType(), True),
+                         StructField('originstatename', StringType(), True),
+                         StructField('originwac', IntegerType(), True),
+                         StructField('destairportid', IntegerType(), True),
+                         StructField('destairportseqid', IntegerType(), True),
+                         StructField('destcitymarketid', IntegerType(), True),
+                         StructField('dest', StringType(), True),
+                         StructField('destcityname', StringType(), True),
+                         StructField('deststate', StringType(), True),
+                         StructField('deststatefips', IntegerType(), True),
+                         StructField('deststatename', StringType(), True),
+                         StructField('destwac', IntegerType(), True),
+                         StructField('crsdeptime', StringType(), True),
+                                                   StructField('deptime', StringType(), True),
+                         StructField('depdelay', FloatType(), True),
+                         StructField('depdelayminutes', FloatType(), True),
+                         StructField('depdel15', FloatType(), True),
+                         StructField('departuredelaygroups', FloatType(), True),
+                         StructField('deptimeblk', StringType(), True),
+                         StructField('taxiout', FloatType(), True),
+                         StructField('wheelsoff', FloatType(), True),
+                         StructField('wheelson', FloatType(), True),
+                         StructField('taxiin', FloatType(), True),
+                         StructField('crsarrtime', IntegerType(), True),
+                         StructField('arrtime', FloatType(), True),
+                         StructField('arrdelay', FloatType(), True),
+                         StructField('arrdelayminutes', FloatType(), True),
+                         StructField('arrdel15', FloatType(), True),
+                         StructField('arrivaldelaygroups', FloatType(), True),
+                         StructField('arrtimeblk', StringType(), True),
+                         StructField('cancelled', FloatType(), True),
+                         StructField('diverted', FloatType(), True),
+                         StructField('crselapsedtime', FloatType(), True),
+                         StructField('actualelapsedtime', FloatType(), True),
+                         StructField('airtime', FloatType(), True),
+                         StructField('flights', FloatType(), True),
+                         StructField('distance', StringType(), True),
+                         StructField('distancegroup', IntegerType(), True),
+                         StructField('divairportlandings', StringType(), True),
+                         StructField('rangoatrasohoras', StringType(), True),
+                         StructField('findesemana', IntegerType(), True),
+                         StructField('quincena', FloatType(), True),
+                         StructField('dephour', FloatType(), True),
+                         StructField('seishoras', FloatType(), True)
+                        ]))
+    return df
 
 
-def get_data(luigi):
+def get_data_viejo(luigi=True):
     #El parametro luigi es True si se corre en luigi (y docker)
     import os
     dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -190,6 +278,10 @@ def prepare_data(df):
 
 def run_model(objetivo, model_name, hyperparams, luigi= False, test_split = 0.2):
     df = get_data(False)
+
+    cnt = df.agg(*(f.countDistinct(c).alias(c) for c in df.columns)).first()
+    df = df.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
+
     first_stages,df = prepare_data(df)
 
     df = df.withColumn("label",  when(df.rangoatrasohoras == objetivo, 1.0).otherwise(0.0))
@@ -200,7 +292,7 @@ def run_model(objetivo, model_name, hyperparams, luigi= False, test_split = 0.2)
 
     # Parametros especificos
     num_it = int(hyperparams["iter"])
-    if num_it > 0:
+    if num_it > 0 & model_name == "LR":
         clr_model.setMaxIter(num_it)
 
     # Adds new stages
@@ -299,3 +391,8 @@ def add_meta_data(objetivo, model_name,hyperparams, log,train_time, test_split, 
              json.dumps(hyperparams),
              AUROC, AUPR, precision, recall, f1, train_time, test_split, train_nrows)
     insert_query(query, values)
+
+df = get_data()
+print(df.show())
+print("hola")
+print(df.columns)

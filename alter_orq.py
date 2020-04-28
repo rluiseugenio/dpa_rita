@@ -293,3 +293,53 @@ class GetFEData(luigi.Task):
         z = "CreaFeaturesDatos"
         with self.output().open('w') as output_file:
             output_file.write(z)
+
+
+# ------------------- MODELLING ----------------------------
+#--bucname models-dpa --numIt 1 --numPCA 2 --obj 0-1.5 --model LR
+
+class CreateModelBucket(luigi.Task):
+    bucname = luigi.Parameter()
+    def requires():
+        return GetFEData()
+
+    def output(self):
+        dir = CURRENT_DIR + "/target/create_s3_" + str(self.bucname) + ".txt"
+        return luigi.local_target.LocalTarget(dir)
+
+    def run(self):
+        create_bucket(str(self.bucname))
+        z = str(self.bucname)
+        with self.output().open('w') as output_file:
+            output_file.write(z)
+
+
+class RunModel(luigi.Task):
+    bucname = luigi.Parameter()
+    numIt = luigi.Parameter()
+    numPCA = luigi.Parameter()
+    obj = luigi.Parameter()
+    model = luigi.Parameter()
+
+    def requires(self):
+        return CreateModelBucket(self.bucname), CreateMetadataTable()
+
+    def output(self):
+        # Chance y aqui podemos guardar el mejor modelo en una S3
+        objetivo = self.obj
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        output_path = parse_filename(objetivo, model_name, hyperparams)
+        output_path = "s3://" + str(self.bucname) +  output_path[1:] + ".model.zip"
+
+        return luigi.contrib.s3.S3Target(path=output_path)
+
+    def run(self):
+        objetivo = self.obj
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        run_model(objetivo, model_name, hyperparams, True)

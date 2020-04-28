@@ -342,3 +342,150 @@ class RunModel(luigi.Task):
                         "pca": int(self.numPCA)}
 
         run_model(objetivo, model_name, hyperparams, True)
+
+
+# =======================================================
+# ALL TARGETS
+# 1) "0-1.5"
+# 2) "1.5-3.5"
+# 3) "3.5-"
+# 4) "cancelled"
+# =======================================================
+TARGET_A = "0-1.5"
+TARGET_B = "1.5-3.5"
+TARGET_C =  "3.5-"
+TARGET_D = "cancelled"
+
+class RunAllTargets(luigi.Task):
+    bucname = luigi.Parameter()
+    numIt = luigi.Parameter()
+    numPCA = luigi.Parameter()
+    model = luigi.Parameter()
+
+    def requires(self):
+        return RunTargetA(self.bucname, self.numIt, self.numPCA, self.model), \
+         RunTargetB(self.bucname,self.numIt, self.numPCA, self.model), \
+         RunTargetC(self.bucname,self.numIt, self.numPCA, self.model), \
+         RunTargetD(self.bucname,self.numIt, self.numPCA, self.model)
+
+    def output(self):
+        dir = CURRENT_DIR + "/target/run_all_models.txt"
+        return luigi.local_target.LocalTarget(dir)
+
+    def run(self):
+        z = str(TARGET_A) + "_" + str(TARGET_D)
+        with self.output().open('w') as output_file:
+            output_file.write(z)
+
+class RunTargetA(luigi.Task):
+    bucname = luigi.Parameter()
+    numIt = luigi.Parameter()
+    numPCA = luigi.Parameter()
+    model = luigi.Parameter()
+
+    def requires(self):
+        return CreateModelBucket(self.bucname)
+
+    def output(self):
+        objetivo = TARGET_A
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        output_path = parse_filename(objetivo, model_name, hyperparams)
+        output_path = "s3://" + str(self.bucname) +  output_path[1:] + ".model.zip"
+
+        return luigi.contrib.s3.S3Target(path=output_path)
+
+    def run(self):
+        objetivo = TARGET_A
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        run_model(objetivo, model_name, hyperparams, True)
+
+class RunTargetB(luigi.Task):
+    bucname = luigi.Parameter()
+    numIt = luigi.Parameter()
+    numPCA = luigi.Parameter()
+    model = luigi.Parameter()
+
+    def requires(self):
+        return CreateModelBucket(self.bucname)
+
+    def output(self):
+        objetivo = TARGET_B
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        output_path = parse_filename(objetivo, model_name, hyperparams)
+        output_path = "s3://" + str(self.bucname) +  output_path[1:] + ".model.zip"
+
+        return luigi.contrib.s3.S3Target(path=output_path)
+
+    def run(self):
+        objetivo = TARGET_B
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        run_model(objetivo, model_name, hyperparams, True)
+
+class RunTargetC(luigi.Task):
+    bucname = luigi.Parameter()
+    numIt = luigi.Parameter()
+    numPCA = luigi.Parameter()
+    model = luigi.Parameter()
+
+    def requires(self):
+        return CreateModelBucket(self.bucname)
+
+    def output(self):
+        objetivo = TARGET_C
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        output_path = parse_filename(objetivo, model_name, hyperparams)
+        output_path = "s3://" + str(self.bucname) +  output_path[1:] + ".model.zip"
+
+        return luigi.contrib.s3.S3Target(path=output_path)
+
+    def run(self):
+        objetivo = TARGET_C
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        run_model(objetivo, model_name, hyperparams, True)
+
+
+class RunTargetD(luigi.Task):
+    bucname = luigi.Parameter()
+    numIt = luigi.Parameter()
+    numPCA = luigi.Parameter()
+    model = luigi.Parameter()
+
+    def requires(self):
+        return CreateModelBucket(self.bucname)
+
+    def output(self):
+        objetivo = TARGET_D
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        output_path = parse_filename(objetivo, model_name, hyperparams)
+        output_path = "s3://" + str(self.bucname) +  output_path[1:] + ".model.zip"
+
+        return luigi.contrib.s3.S3Target(path=output_path)
+
+    def run(self):
+        objetivo = TARGET_D
+        model_name = self.model
+        hyperparams = {"iter": int(self.numIt),
+                        "pca": int(self.numPCA)}
+
+        run_model(objetivo, model_name, hyperparams, True)

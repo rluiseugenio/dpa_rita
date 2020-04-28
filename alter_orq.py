@@ -158,7 +158,7 @@ class downloadDataS3(luigi.Task):
                         zf.extract(DATA_CSV)
                         os.rename(DATA_CSV,'data.csv')
                         ## Inserta archivo y elimina
-                        Insert_to_RDS("data2.csv", "raw", "rita")
+                        Insert_to_RDS("data.csv", "raw", "rita")
                         #os.system('PGPASSWORD=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c "\COPY raw.rita FROM data.csv DELIMITER ',' CSV HEADER;"')
                         os.system('rm data.csv')
                         #EL_rawdata()

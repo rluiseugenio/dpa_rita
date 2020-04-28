@@ -156,6 +156,29 @@ def EL_verif_query(url,anio,mes):
 
     return tam
 
+
+def rita_light_query(url,anio,mes):
+    '''
+    Crea una base raw de rita para prueba
+    '''
+    # Conexion y cursor para query
+    connection = psycopg2.connect(user = MY_USER, # Usuario RDS
+                                 password = MY_PASS, # password de usuario de RDS
+                                 host = MY_HOST,# endpoint
+                                 port="5432", # cambiar por el puerto
+                                 database=MY_DB) # Nombre de la base de datos
+    cursor = connection.cursor()
+
+    # Query para verificacion a la base de datos
+    postgreSQL_select_Query = "CREATE TABLE raw.rita_light AS SELECT * FROM raw.rita LIMIT 1000;"
+    cursor.execute(postgreSQL_select_Query)
+    cursor.close()
+    connection.close()
+    #print("PostgreSQL connection is closed")
+
+    return print("raw.rita ha sido creada")
+
+
 def EL_metadata(record_to_insert):
     '''
     Funcion para insertar metadatos de cierto month y year a metados.extract

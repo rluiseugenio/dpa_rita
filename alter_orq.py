@@ -41,7 +41,7 @@ MY_DB,
 from src.utils.s3_utils import create_bucket
 from src.utils.db_utils import create_db, execute_sql
 from src.utils.ec2_utils import create_ec2
-from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS
+from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query
 from src.utils.db_utils import execute_sql
 from src.models.train_model import run_model
 from src.models.save_model import parse_filename
@@ -158,12 +158,13 @@ class downloadDataS3(luigi.Task):
                         zf.extract(DATA_CSV)
                         os.rename(DATA_CSV,'data.csv')
                         ## Inserta archivo y elimina
-                        Insert_to_RDS("data.csv", "raw", "rita")
-                        #os.system('PGPASSWORD=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c "\COPY raw.rita FROM data.csv DELIMITER ',' CSV HEADER;"')
+                        Insert_to_RDS("data.csv", "raw", "rita") # inserta data.csv en esquema raw y tabla rita
                         os.system('rm data.csv')
                         #EL_rawdata()
 
-        os.system('PGPASSWORD=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c "CREATE TABLE rita.raw_light AS SELECT * FROM rita.raw LIMIT 1000;" ')
+        # Crea raw.rita_light
+        rita_light_query()
+
         os.system('echo OK > Tarea_EL.txt')
 
     def output(self):

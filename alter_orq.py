@@ -335,12 +335,13 @@ class RunModel(luigi.Task):
         return luigi.contrib.s3.S3Target(path=output_path)
 
     def run(self):
+        df_semantic = CACHE.get_data()
         objetivo = self.obj
         model_name = self.model
         hyperparams = {"iter": int(self.numIt),
                         "pca": int(self.numPCA)}
 
-        run_model(objetivo, model_name, hyperparams, True)
+        run_model(df_semantic, objetivo, model_name, hyperparams, True)
 
 
 # =======================================================

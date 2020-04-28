@@ -270,17 +270,18 @@ class GetFEData(luigi.Task):
         CACHE.df_semantic = crear_features(df_util)
         CACHE.df_semantic.write.csv('semantic')
 
-        MiLinajeSemantic.ip_ec2 = df_util.count()
-        MiLinajeSemantic.fecha =  datetime.now()
+        MiLinajeSemantic.ip_ec2 = str(df_util.count())
+        MiLinajeSemantic.fecha =  str(datetime.now())
         MiLinajeSemantic.nombre_task = 'GetFEData'
-        MiLinajeSemantic.usuario = getpass.getuser()
-        MiLinajeSemantic.year = datetime.today().year
-        MiLinajeSemantic.month = datetime.today().month
+        MiLinajeSemantic.usuario = str(getpass.getuser())
+        MiLinajeSemantic.year = str(datetime.today().year)
+        MiLinajeSemantic.month = str(datetime.today().month)
         MiLinajeSemantic.ip_ec2 =  str(socket.gethostbyname(socket.gethostname()))
         MiLinajeSemantic.variables = "findesemana,quincena,dephour,seishoras"
         MiLinajeSemantic.ruta_s3 = "s3://test-aws-boto/semantic"
         MiLinajeSemantic.task_status = 'Successful'
         # Insertamos metadatos a DB
+        print(MiLinajeSemantic.to_upsert())
         semantic_metadata(MiLinajeSemantic.to_upsert())
         ## Inserta archivo y elimina csv
         os.system('bash ./src/utils/inserta_semantic_rita_to_rds.sh')

@@ -1,6 +1,5 @@
-# PYTHONPATH='.' AWS_PROFILE=dpa luigi \
-# --module orquestador-modelling RunModel --local-scheduler \
-# --bucname models-dpa --numIt 1 --numPCA 2
+#PYTHONPATH='.' AWS_PROFILE=dpa luigi --module orquestador-modelling RunModel --local-scheduler  --bucname models-dpa --numIt 1 --numPCA 2 --obj 0-1.5 --model LR
+#PYTHONPATH='.' AWS_PROFILE=dpa luigi --module orquestador-modelling  RunAllTargets --local-scheduler  --bucname models-dpa --numIt 1 --numPCA 2  --model LR
 
 import luigi
 import luigi.contrib.s3
@@ -90,7 +89,7 @@ class RunModel(luigi.Task):
 TARGET_A = "0-1.5"
 TARGET_B = "1.5-3.5"
 TARGET_C =  "3.5-"
-TARGET_ D = "cancelled"
+TARGET_D = "cancelled"
 
 class RunAllTargets(luigi.Task):
     bucname = luigi.Parameter()
@@ -99,10 +98,10 @@ class RunAllTargets(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return RunTargetA(self.numIt, self.numPCA, self.model),
-         RunTargetB(self.numIt, self.numPCA, self.model),
-         RunTargetC(self.numIt, self.numPCA, self.model),
-         RunTargetD(self.numIt, self.numPCA, self.model)
+        return RunTargetA(self.bucname, self.numIt, self.numPCA, self.model), \
+         RunTargetB(self.bucname,self.numIt, self.numPCA, self.model), \
+         RunTargetC(self.bucname,self.numIt, self.numPCA, self.model), \
+         RunTargetD(self.bucname,self.numIt, self.numPCA, self.model)
 
     def output(self):
         dir = CURRENT_DIR + "/target/run_all_models.txt"

@@ -322,7 +322,7 @@ class RunModel(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return CreateModelBucket(self.bucname), CreateMetadataTable()
+        return CreateModelBucket(self.bucname)
 
     def output(self):
         # Chance y aqui podemos guardar el mejor modelo en una S3

@@ -162,10 +162,7 @@ class downloadDataS3(luigi.Task):
                         os.system('rm data.csv')
                         #EL_rawdata()
 
-			#Creamos rita light
-			os.system('PGPASS=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c ./src/utils/sql/crear_ritalight.sql')
-
-
+        os.system('PGPASS=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c ./src/utils/sql/crear_ritalight.sql')
         os.system('echo OK > Tarea_EL.txt')
 
     def output(self):

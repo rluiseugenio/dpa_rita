@@ -1,5 +1,9 @@
 # PYTHONPATH='.' AWS_PROFILE=educate1 luigi --module alter_orq downloadDataS3 --local-scheduler
 
+# PARA UN MODELO
+#PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunModel --local-scheduler  --bucname models-dpa --numIt 2 --numPCA 3  --model LR --obj cancelled
+
+# PARA TODOS LOS MODELOS
 # PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunAllTargets --local-scheduler  --bucname models-dpa --numIt 1 --numPCA 2  --model LR
 
 ###  Librerias necesarias
@@ -37,14 +41,16 @@ MY_DB,
 from src.utils.s3_utils import create_bucket
 from src.utils.db_utils import create_db, execute_sql
 from src.utils.ec2_utils import create_ec2
-from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic
+from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata
 from src.utils.db_utils import execute_sql
 from src.models.train_model import run_model
 from src.models.save_model import parse_filename
 
 # Inicializa la clase que reune los metadatos
 MiLinaje = Linaje_raw() # extract y load
-
+# ===============================
+CURRENT_DIR = os.getcwd()
+# ===============================s
 # Tasks de Luigi
 
 class Create_Tables_Schemas(PostgresQuery):
@@ -65,8 +71,8 @@ class Create_Tables_Schemas(PostgresQuery):
 
 class downloadDataS3(luigi.Task):
 
-    def requires(self):
-        return Create_Tables_Schemas()
+    #def requires(self):
+    #    return Create_Tables_Schemas()
 
     #Definimos los URL base para poder actualizarlo automaticamente despues
     BASE_URL="https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_"
@@ -156,27 +162,13 @@ class downloadDataS3(luigi.Task):
                         os.system('rm data.csv')
                         #EL_rawdata()
 
+        os.system('PGPASSWORD=$MY_PASS psql -U $MY_USER -h $MY_HOST -d $MY_DB -c ./src/utils/sql/crear_ritalight.sql')
         os.system('echo OK > Tarea_EL.txt')
 
     def output(self):
         # Ruta en donde se guarda el archivo solicitado
         output_path = "Tarea_EL.txt"
         return luigi.LocalTarget(output_path)
-
-class Create_Rita_Light(PostgresQuery): # Agregar al requires del siguiente task
-    '''
-    Creamos esquemas y tablas para metadatos, asi como raw, clean y semantic
-    '''
-    # Sobreescribe credenciales de constructor de task
-    user = MY_USER
-    password = MY_PASS
-    database = MY_DB
-    host = MY_HOST
-    table = "metadatos"
-
-    # Lee query y lo ejecuta
-    file_dir = "./src/utils/sql/crear_ritalight.sql"
-    query = open(file_dir, "r").read()
 
 #-----------------------------------------------------------------------------------------------------------------------------
 # Limpiar DATOS
@@ -193,8 +185,8 @@ CACHE = DataLocalStorage()
 
 #Obtenemos raw.rita de la RDS
 class GetDataSet(luigi.Task):
-    def requires(self):
-        return Create_Rita_Light()
+    #def requires(self):
+    #    return Create_Rita_Light()
 
     def output(self):
         dir = CURRENT_DIR + "/target/gets_data.txt"
@@ -326,7 +318,7 @@ class RunModel(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return CreateModelBucket(self.bucname)
+        return GetFEData()
 
     def output(self):
         objetivo = self.obj
@@ -367,11 +359,11 @@ class RunAllTargets(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return RunTargetA(self.bucname, self.numIt, self.numPCA, self.model), \
+        return CreateModelBucket(self.bucname), \
+         RunTargetA(self.bucname, self.numIt, self.numPCA, self.model), \
          RunTargetB(self.bucname,self.numIt, self.numPCA, self.model), \
          RunTargetC(self.bucname,self.numIt, self.numPCA, self.model), \
-         RunTargetD(self.bucname,self.numIt, self.numPCA, self.model), \
-         CreateModelBucket(self.bucname)
+         RunTargetD(self.bucname,self.numIt, self.numPCA, self.model)
 
     def output(self):
         dir = CURRENT_DIR + "/target/run_all_models.txt"
@@ -389,7 +381,7 @@ class RunTargetA(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return CreateModelBucket(self.bucname)
+        return GetFEData()
 
     def output(self):
         objetivo = TARGET_A
@@ -417,7 +409,7 @@ class RunTargetB(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return CreateModelBucket(self.bucname)
+        return GetFEData()
 
     def output(self):
         objetivo = TARGET_B
@@ -445,7 +437,7 @@ class RunTargetC(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return CreateModelBucket(self.bucname)
+        return GetFEData()
 
     def output(self):
         objetivo = TARGET_C
@@ -474,7 +466,7 @@ class RunTargetD(luigi.Task):
     model = luigi.Parameter()
 
     def requires(self):
-        return CreateModelBucket(self.bucname)
+        return GetFEData()
 
     def output(self):
         objetivo = TARGET_D

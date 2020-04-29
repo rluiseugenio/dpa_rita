@@ -41,7 +41,7 @@ from src import (
 def get_data(luigi=True):
     config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
     connection = pg.connect(config_psyco)
-    pdf = pd.read_sql_query('select * from semantic.rita',con=connection)
+    pdf = pd.read_sql_query('select * from semantic.rita;',con=connection)
     spark = SparkSession \
     .builder \
     .appName("Python Spark SQL basic example") \
@@ -77,18 +77,18 @@ def get_data(luigi=True):
                          StructField('deststatename', StringType(), True),
                          StructField('destwac', IntegerType(), True),
                          StructField('crsdeptime', StringType(), True),
-                                                   StructField('deptime', StringType(), True),
+                         StructField('deptime', StringType(), True),
                          StructField('depdelay', FloatType(), True),
                          StructField('depdelayminutes', FloatType(), True),
                          StructField('depdel15', FloatType(), True),
-                         StructField('departuredelaygroups', FloatType(), True),
+                         StructField('departuredelaygroups', IntegerType(), True),
                          StructField('deptimeblk', StringType(), True),
                          StructField('taxiout', FloatType(), True),
-                         StructField('wheelsoff', FloatType(), True),
-                         StructField('wheelson', FloatType(), True),
+                         StructField('wheelsoff', IntegerType(), True),
+                         StructField('wheelson', IntegerType(), True),
                          StructField('taxiin', FloatType(), True),
                          StructField('crsarrtime', IntegerType(), True),
-                         StructField('arrtime', FloatType(), True),
+                         StructField('arrtime', IntegerType(), True),
                          StructField('arrdelay', FloatType(), True),
                          StructField('arrdelayminutes', FloatType(), True),
                          StructField('arrdel15', FloatType(), True),
@@ -289,7 +289,7 @@ def prepare_data(df):
 def run_model(objetivo, model_name, hyperparams, luigi= False, test_split = 0.2):
     df = get_data(False)
 
-    # Drop constant variables 
+    # Drop constant variables
     cnt = df.agg(*(f.countDistinct(c).alias(c) for c in df.columns)).first()
     df = df.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
 
@@ -412,3 +412,7 @@ def remove_constant():
     cnt = df_train.agg(*(f.countDistinct(c).alias(c) for c in df_train.columns)).first()
     df_test =  df_test.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
     df_train =  df_train.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
+
+
+
+get_data()

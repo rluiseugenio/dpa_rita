@@ -25,7 +25,7 @@ from zipfile import ZipFile
 
 ###librerias para clean
 from pyspark.sql import SparkSession
-from src.features.build_features import clean, crear_features, init_data_luigi, init_data_clean_luigi
+from src.features.build_features import clean, crear_features
 
 ###  Imports desde directorio de proyecto dpa_rita
 ## Credenciales
@@ -176,45 +176,18 @@ class downloadDataS3(luigi.Task):
 # Limpiar DATOS
 CURRENT_DIR = os.getcwd()
 
-class DataLocalStorage():
-    def __init__(self, df_clean= None):
-        self.df_clean =df_clean
-
-    def get_data(self):
-        return self.df_clean
-
-CACHE = DataLocalStorage()
-
-#Obtenemos raw.rita de la RDS
-class GetDataSet(luigi.Task):
-    #def requires(self):
-    #    return Create_Rita_Light()
-
-    def output(self):
-        dir = CURRENT_DIR + "/target/gets_data.txt"
-        return luigi.local_target.LocalTarget(dir)
-
-    def run(self):
-
-        df_clean = init_data_luigi()
-        CACHE.df_clean = df_clean
-
-        z = "Obtiene Datos"
-        with self.output().open('w') as output_file:
-            output_file.write(z)
 #Limpiamos los datos
 class GetCleanData(luigi.Task):
 
     def requires(self):
-        return GetDataSet(), downloadDataS3()
+        return  downloadDataS3()
 
     def output(self):
         dir = CURRENT_DIR + "/target/data_clean.txt"
         return luigi.local_target.LocalTarget(dir)
 
     def run(self):
-        df_clean = init_data_luigi() #CACHE.get_data()
-        CACHE.df_clean = clean(df_clean)
+        clean()
 
         z = "Limpia Datos"
         with self.output().open('w') as output_file:
@@ -225,34 +198,6 @@ class GetCleanData(luigi.Task):
 # Crear caracteristicas DATOS
 CURRENT_DIR = os.getcwd()
 
-class DataCleanLocalStorage():
-    def _init_(self, df_semantic= None):
-        self.df_semantic =df_semantic
-
-    def get_data(self):
-        return self.df_semantic
-
-CACHE = DataCleanLocalStorage()
-
-#Obtenemos clean.rita de la RDS
-class GetCleanDataSet(luigi.Task):
-
-    def requires(self):
-
-        return GetCleanData()
-
-    def output(self):
-        dir = CURRENT_DIR + "/target/gets_clean_data.txt"
-        return luigi.local_target.LocalTarget(dir)
-
-    def run(self):
-        df_util = init_data_clean_luigi()
-        CACHE.df_semantic = df_util
-
-        z = "ObtieneDatosClean"
-        with self.output().open('w') as output_file:
-            output_file.write(z)
-
 
 #metadata FE
 MiLinajeSemantic = Linaje_semantic()
@@ -261,16 +206,14 @@ MiLinajeSemantic = Linaje_semantic()
 class GetFEData(luigi.Task):
 
     def requires(self):
-        return GetCleanDataSet()
+        return GetCleanData()
 
     def output(self):
         dir = CURRENT_DIR + "/target/data_semantic.txt"
         return luigi.local_target.LocalTarget(dir)
 
     def run(self):
-        df_util = init_data_clean_luigi() #CACHE.get_clean_data()
-        CACHE.df_semantic = crear_features(df_util)
-        CACHE.df_semantic.write.csv('semantic')
+        df_util = crear_features()#CACHE.get_clean_data()
 
         MiLinajeSemantic.ip_ec2 = str(df_util.count())
         MiLinajeSemantic.fecha =  str(datetime.now())
@@ -286,8 +229,8 @@ class GetFEData(luigi.Task):
         print(MiLinajeSemantic.to_upsert())
         semantic_metadata(MiLinajeSemantic.to_upsert())
         ## Inserta archivo y elimina csv
-        os.system('bash ./src/utils/inserta_semantic_rita_to_rds.sh')
-        os.system('rm semantic.csv')
+        #os.system('bash ./src/utils/inserta_semantic_rita_to_rds.sh')
+        #os.system('rm semantic.csv')
 
         z = "CreaFeaturesDatos"
         with self.output().open('w') as output_file:
@@ -335,13 +278,12 @@ class RunModel(luigi.Task):
         return luigi.contrib.s3.S3Target(path=output_path)
 
     def run(self):
-        df_semantic = CACHE.get_data()
         objetivo = self.obj
         model_name = self.model
         hyperparams = {"iter": int(self.numIt),
                         "pca": int(self.numPCA)}
 
-        run_model(df_semantic, objetivo, model_name, hyperparams, True)
+        run_model(objetivo, model_name, hyperparams, True)
 
 
 # =======================================================

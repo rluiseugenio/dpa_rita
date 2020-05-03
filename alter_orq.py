@@ -186,115 +186,6 @@ class Load(luigi.Task):
 		os.system('rm *.csv')
 		os.system('echo OK > load_ok.txt')
 
-class downloadDataS3(luigi.Task):
-
-	#def requires(self):
-	#    return Create_Tables_Schemas()
-
-	#Definimos los URL base para poder actualizarlo automaticamente despues
-	BASE_URL="https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_"
-
-	# Recolectamos fecha y usuario para metadatos a partir de fecha actual
-	MiLinaje.fecha =  datetime.now()
-	MiLinaje.usuario = getpass.getuser()
-
-	def run(self):
-
-		# Obtiene anio y mes correspondiente fecha actual de ejecucion del script
-		now = datetime.now()
-		current_year = now.year
-		current_month = now.month
-
-		# Obtiene anio y mes base (tres anios hacia atras)
-		base_year = current_year - 0
-		base_month = current_month
-
-		# Recolectamos IP para metadatos
-		MiLinaje.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
-
-		for anio in reversed(range(base_year,current_year+1)):
-			for mes in reversed(range(1,12+1)):
-
-				# Recolectamos parametros de mes y anio de solicitud descarga a API Rita para metadatos
-				MiLinaje.year = str(anio)
-				MiLinaje.month = str(mes)
-
-				# Verificamos si en metadatos ya hay registro de esta anio y mes
-				# En caso contario, se intenta descarga
-
-				#URL para hacer peticion a API rita en anio y mes indicado
-				url_act = self.BASE_URL+str(anio)+"_"+str(mes)+".zip" #url actualizado
-				tam = EL_verif_query(url_act,anio,mes)
-
-				if tam == 0:
-
-					#Leemos los datos de la API en binario, relativos al archivo en formato zip del periodo en cuestion
-
-					r=requests.get(url_act)
-
-					if r.status_code == 200:
-
-						print("Carga: " +str(anio)+" - "+str(mes))
-
-						data=r.content # Peticion a la API de Rita, en binario
-
-						## Escribimos los archivos que se consultan al API Rita en S3
-						# Autenticación en S3 con boto3
-						ses = boto3.session.Session(profile_name='dpa', region_name='us-east-1')
-						s3_resource = ses.resource('s3')
-						obj = s3_resource.Bucket("test-aws-boto")
-						print(ses)
-
-						# Escribimos el archivo al bucket, usando el binario
-						output_path = "RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip"
-						obj.put_object(Key=output_path,Body=r.content)
-
-						# Recolectamos nombre del .zip y path con el que se guardara consulta a
-						# API de Rita en S3 para metadatos
-						MiLinaje.ruta_s3 = "s3://test-aws-boto/"+"RITA/YEAR="+str(anio)+"/"
-						MiLinaje.nombre_archivo =  str(anio)+"_"+str(mes)+".zip"
-
-						# Recolectamos tamano del archivo recien escrito en S3 para metadatos
-						ses = boto3.session.Session(profile_name="dpa", region_name='us-east-1')
-						s3 = ses.resource('s3')
-						bucket_name = "test-aws-boto"
-						my_bucket = s3.Bucket(bucket_name)
-						MiLinaje.tamano_zip = my_bucket.Object(key="RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip").content_length
-
-						# Recolectamos tatus para metadatos
-						MiLinaje.task_status = "Successful"
-
-						# Insertamos metadatos a DB
-						EL_metadata(MiLinaje.to_upsert())
-
-						# Insertamos datos de consulta hacia esquema raw
-						## lectura del zip consultado
-						zf = ZipFile(BytesIO(r.content))
-						## extraemos csv y lo renombramos
-						DATA_CSV='On_Time_Reporting_Carrier_On_Time_Performance_(1987_present)_'+str(anio)+"_"+str(mes)+'.csv'
-						zf.extract(DATA_CSV)
-						os.rename(DATA_CSV,'data.csv')
-						## Inserta archivo y elimina
-						""" AQUI HAY QUE CAMBIAR """
-						#file_name = "./../../data/datos_ejemplo.csv"
-						file_name = "datos_ejemplo.csv"
-						table_name = "raw.rita"
-						save_rds(file_name, table_name) # inserta data.csv en esquema raw y tabla rita
-						""" AQUI HAY QUE CAMBIAR """
-
-						os.system('rm data.csv')
-						#EL_rawdata()
-
-		# Crea raw.rita_light
-		#rita_light_query()
-
-		os.system('echo OK > Tarea_EL.txt')
-
-	def output(self):
-		# Ruta en donde se guarda el archivo solicitado
-		output_path = "Tarea_EL.txt"
-		return luigi.LocalTarget(output_path)
-
 #-----------------------------------------------------------------------------------------------------------------------------
 # Limpiar DATOS
 CURRENT_DIR = os.getcwd()
@@ -303,7 +194,7 @@ CURRENT_DIR = os.getcwd()
 class GetCleanData(luigi.Task):
 
 	def requires(self):
-		return  downloadDataS3()
+		return  Load()
 
 	def output(self):
 		dir = CURRENT_DIR + "/target/data_clean.txt"

@@ -152,8 +152,8 @@ class Load(luigi.Task):
     '''
     Carga hacia RDS los datos de la carpeta data
     '''
-    #def requires(self):
-        #return Extract()
+    def requires(self):
+        return Extract()
 
     def run(self):
         # Unzips de archivos csv

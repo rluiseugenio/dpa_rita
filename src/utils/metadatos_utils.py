@@ -3,7 +3,9 @@ import pandas as pd
 import luigi
 import psycopg2
 
-
+import io
+import psycopg2
+import psycopg2.extras
 from src import(
 MY_USER,
 MY_PASS,
@@ -64,31 +66,28 @@ def Insert_to_RDS(data_file, nombre_esquema, nombre_tabla):
     '''
     Funcion para insertar metadatos a una tabla y esquema del RDS desde un data_file (por ejemplo, un csv)
     '''
-	import io
-	import psycopg2
-	import psycopg2.extras
 
-	conn = psycopg2.connect(database= MY_DB,
-		user=MY_USER,
-		password=MY_PASS,
-		host=MY_HOST,
-		port='5432')
+    conn = psycopg2.connect(database= MY_DB,
+    	user=MY_USER,
+    	password=MY_PASS,
+    	host=MY_HOST,
+    	port='5432')
 
 
-	with conn.cursor() as cursor:
-		print('nombre_tabla: ' + nombre_tabla)
+    with conn.cursor() as cursor:
+    	print('nombre_tabla: ' + nombre_tabla)
 
-		#Query
-		sql_statement = f"copy "+ nombre_esquema + "." + nombre_tabla + " from stdin with csv delimiter as ','"
-		print(sql_statement)
-		buffer = io.StringIO()
+    	#Query
+    	sql_statement = f"copy "+ nombre_esquema + "." + nombre_tabla + " from stdin with csv delimiter as ','"
+    	print(sql_statement)
+    	buffer = io.StringIO()
 
-		with open(data_file,'r') as data:
-			buffer.write(data.read())
-			buffer.seek(0)
-			cursor.copy_expert(sql_statement, file=buffer)
+    	with open(data_file,'r') as data:
+    		buffer.write(data.read())
+    		buffer.seek(0)
+    		cursor.copy_expert(sql_statement, file=buffer)
 
-	return print("Insertion in "+ nombre_esquema + "." + nombre_tabla + " is done!!")
+    return print("Insertion in "+ nombre_esquema + "." + nombre_tabla + " is done!!")
 
 
 
@@ -136,6 +135,8 @@ def EL_verif_query(url,anio,mes):
     Funcion para verificar si cierto month y year ya estan en metadatos.extract
     considerando el tamanio resultante de un query
     '''
+    import psycopg2
+    import psycopg2.extras
     # Conexion y cursor para query
     connection = psycopg2.connect(user = MY_USER, # Usuario RDS
                                  password = MY_PASS, # password de usuario de RDS
@@ -157,7 +158,7 @@ def EL_verif_query(url,anio,mes):
     return tam
 
 
-def rita_light_query(url,anio,mes):
+def rita_light_query():
     '''
     Crea una base raw de rita para prueba
     '''
@@ -170,13 +171,14 @@ def rita_light_query(url,anio,mes):
     cursor = connection.cursor()
 
     # Query para verificacion a la base de datos
-    postgreSQL_select_Query = "CREATE TABLE raw.rita_light AS SELECT * FROM raw.rita LIMIT 1000;"
+    postgreSQL_select_Query = """CREATE TABLE raw.rita_light AS (SELECT * FROM raw.rita LIMIT 1000);"""
     cursor.execute(postgreSQL_select_Query)
+    connection.commit()
     cursor.close()
     connection.close()
     #print("PostgreSQL connection is closed")
 
-    return print("raw.rita ha sido creada")
+    return print("raw.rita_light ha sido creada")
 
 
 def EL_metadata(record_to_insert):
@@ -196,7 +198,7 @@ def EL_metadata(record_to_insert):
      year, month, usuario, ip_ec2, tamano_zip, nombre_archivo, ruta_s3, \
      task_status) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s ) """
     cursor.execute(postgres_insert_query, record_to_insert)
-    connection .commit()
+    connection.commit()
     cursor.close()
     connection.close()
 
@@ -224,7 +226,7 @@ def EL_rawdata():
     #cursor.copy_from(f, 'raw.rita', sep=",")
     postgres_insert_query = """copy raw.rita FROM 'data.csv' WITH CSV HEADER;"""
     cursor.execute(postgres_insert_query)
-    connection .commit()
+    connection.commit()
     #
     cursor.close()
     connection.close()
@@ -248,7 +250,7 @@ def clean_metadata_rds(record_to_insert):
      usuario, ip_ec2, num_columnas_modificadas, num_filas_modificadas, variables_limpias, \
      task_status) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s) """
     cursor.execute(postgres_insert_query, record_to_insert)
-    connection .commit()
+    connection.commit()
     cursor.close()
     connection.close()
 
@@ -290,7 +292,7 @@ def semantic_metadata(record_to_insert):
     # Query para insertar metadatos
     postgres_insert_query = """ INSERT INTO metadatos.semantic  VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) """
     cursor.execute(postgres_insert_query, record_to_insert)
-    connection .commit()
+    connection.commit()
     cursor.close()
     connection.close()
 

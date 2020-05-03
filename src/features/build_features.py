@@ -12,7 +12,12 @@ from datetime import date, datetime
 import getpass
 import socket
 import requests
+import psycopg2
+import os
+import re
+from pyspark.sql.functions import UserDefinedFunction
 
+from pyspark.sql.types import *
 from src import (
     MY_USER ,
     MY_PASS ,
@@ -22,10 +27,11 @@ from src import (
 )
 
 
-def clean(df):
+def clean():
     #====================================================================
     # Task: Pasar a minusculas los nombres de columnas
     #====================================================================
+    df = get_raw_data()
 
     # Inicializa clase para reunir metadatos
     MiLinaje_clean = Linaje_clean_data()
@@ -69,7 +75,7 @@ def clean(df):
 
     base = df.select(df.year,df.quarter, df.month, df.dayofmonth, df.dayofweek, df.flightdate, df.reporting_airline, df.dot_id_reporting_airline, df.iata_code_reporting_airline, df.tail_number, df.flight_number_reporting_airline, df.originairportid, df.originairportseqid, df.origincitymarketid, df.origin, df.origincityname, df.originstate, df.originstatefips, df.originstatename, df.originwac, df.destairportid, df.destairportseqid, df.destcitymarketid, df.dest, df.destcityname, df.deststate, df.deststatefips, df.deststatename, df.destwac, df.crsdeptime, df.deptime, df.depdelay, df.depdelayminutes, df.depdel15, df.departuredelaygroups, df.deptimeblk, df.taxiout, df.wheelsoff, df.wheelson, df.taxiin, df.crsarrtime, df.arrtime, df.arrdelay, df.arrdelayminutes, df.arrdel15, df.arrivaldelaygroups, df.arrtimeblk, df.cancelled, df.diverted, df.crselapsedtime, df.actualelapsedtime, df.airtime, df.flights, df.distance, df.distancegroup, df.divairportlandings )
 
-    n1 = len(df.columns)
+    n1 = len(base.columns)
 
     # Metadadatos de columas o registros modificados
     MiLinaje_clean.num_columnas_modificadas = n1 - n0
@@ -107,7 +113,7 @@ def clean(df):
 
     base = base.withColumn('rangoatrasohoras', f.when(f.col('cancelled') == 1, "cancelled").when(f.col('depdelayminutes') < 90, "0-1.5").when((f.col('depdelayminutes') > 90) & (f.col('depdelayminutes')<210), "1.5-3.5").otherwise("3.5-"))
 
-    n1 = len(df.columns)
+    n1 = len(base.columns)
 
     # Metadadatos de columas o registros modificados
     MiLinaje_clean.num_columnas_modificadas = n1 - n0
@@ -175,9 +181,43 @@ def clean(df):
     # Subimos los metadatos al RDS
     clean_metadata_rds(MiLinaje_clean.to_upsert())
 
+    base.show(2)
+    print((base.count(), len(base.columns)))
+    # Guardamos los DATOS
+    save_rds(base,"clean.rita")
     return base
 
-def get_data():
+
+def save_rds(base, table_name):
+    #base.coalesce(1).write.option("header", "false").csv("aux.csv")
+    df_pandas = base.toPandas()
+    if table_name == "semantic.rita":
+        df_pandas = df_pandas.replace(to_replace = "", value ="null")
+        df_pandas = df_pandas.replace(to_replace = "None", value ="null")
+    df_pandas.iloc[1:].to_csv('aux.csv', index = False, header = False, na_rep = "null")
+    # ---------------------------
+    # Copy to postgres
+    connection = psycopg2.connect(user=MY_USER , # Usuario RDS
+                                 password=MY_PASS, # password de usuario de RDS
+                                 host=MY_HOST ,#"127.0.0.1", # cambiar por el endpoint adecuado
+                                 port=MY_PORT, # cambiar por el puerto
+                                 database=MY_DB ) # Nombre de la base de datos
+    cursor = connection.cursor()
+
+    file_name = "aux.csv"
+    f = open(file_name, 'r')
+    cursor.copy_from(f, table_name, sep=',', null = "null")
+    f.close()
+
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+    #Delete auxilary file
+    os.remove("aux.csv")
+
+
+def get_raw_data():
 
    schema = StructType([StructField('year', StringType(), True),
 					 StructField('quarter', StringType(), True),
@@ -298,16 +338,11 @@ def get_data():
    df = spark.createDataFrame(pdf, schema=schema)
    return df
 
-def init_data_luigi():
-    df = get_data()
-    return df
 
 
 
 #FEATURE ENGINEERING ------------------------------------------
 def get_clean_data():
-
-
     clean_rita = StructType([StructField('year', StringType(), True),
                              StructField('quarter', StringType(), True),
                              StructField('month', StringType(), True),
@@ -368,28 +403,31 @@ def get_clean_data():
                             ])
     config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
     connection = pg.connect(config_psyco)
-    pdf = pd.read_sql_query('select * from clean.rita',con=connection)
+    pdf = pd.read_sql_query('select * from clean.rita limit 1000;',con=connection)
     spark = SparkSession.builder.config('spark.driver.extraClassPath', 'postgresql-9.4.1207.jar').getOrCreate()
     df = spark.createDataFrame(pdf, schema=clean_rita)
 
     return df
 
 
-def init_data_clean_luigi():
-    df = get_clean_data()
-    return df
-
-
-def crear_features(base):
+def crear_features():
 
     from pyspark.sql import functions as f
 
+    base = get_clean_data()
+    udf = UserDefinedFunction(lambda x: re.sub('""','0',str(x)), StringType())
+    base = base.select(*[udf(column).alias(column) for column in base.columns])
+
     base = base.withColumn('findesemana', f.when(f.col('dayofweek') == 5, 1).when(f.col('dayofweek') == 6, 1).when(f.col('dayofweek') == 7, 1).otherwise(0))
-
     base = base.withColumn('quincena', f.when(f.col('dayofmonth') == 15, 1).when(f.col('dayofmonth') == 14, 1).when(f.col('dayofmonth') == 16, 1).when(f.col('dayofmonth') == 29, 1).when(f.col('dayofmonth') == 30, 1).when(f.col('dayofmonth') == 31, 1).when(f.col('dayofmonth') == 1, 1).when(f.col('dayofmonth') == 2, 1).when(f.col('dayofmonth') == 3, 1).otherwise(0))
-
-    base = base.withColumn('dephour',f.when(f.length('crsdeptime')==3,f.col('crsdeptime').substr(0,1).cast("float")).otherwise(f.col('crsdeptime').substr(0,2).cast("float")) )
-
+    #base = base.withColumn('dephour',f.when(f.length('crsdeptime')==3,f.col('crsdeptime').substr(0,1).cast("float")).otherwise(f.col('crsdeptime').substr(0,2).cast("float")) )
+    base = base.withColumn('dephour',  f.when(f.col('dayofweek') == 5, 1).otherwise(0))
     base = base.withColumn('seishoras', f.when(f.col('dephour') == 6, 1).when(f.col('dephour') == 12, 1).when(f.col('dephour') == 18, 1).when(f.col('dephour') == 0, 1).otherwise(0))
 
-    return(base)
+    save_rds(base,"semantic.rita")
+    return base
+
+
+
+
+#crear_features()

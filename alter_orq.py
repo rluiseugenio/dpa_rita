@@ -1,10 +1,13 @@
 # PYTHONPATH='.' AWS_PROFILE=educate1 luigi --module alter_orq downloadDataS3 --local-scheduler
 
 # PARA UN MODELO
-#PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunModel --local-scheduler  --bucname models-dpa --numIt 2 --numPCA 3  --model LR --obj cancelled
+#PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunModel --local-scheduler  --bucname models-dpa --numIt 2 --numPCA 3  --model LR --obj 0-1.5
 
 # PARA TODOS LOS MODELOS
 # PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunAllTargets --local-scheduler  --bucname models-dpa --numIt 1 --numPCA 2  --model LR
+
+# CENTRAL scheduler
+#PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunAllTargets  --bucname models-dpa --numIt 1 --numPCA 2  --model LR
 
 ###  Librerias necesarias
 import luigi
@@ -25,7 +28,7 @@ from zipfile import ZipFile
 
 ###librerias para clean
 from pyspark.sql import SparkSession
-from src.features.build_features import clean, crear_features, init_data_luigi, init_data_clean_luigi
+from src.features.build_features import clean, crear_features
 
 ###  Imports desde directorio de proyecto dpa_rita
 ## Credenciales
@@ -39,7 +42,7 @@ MY_DB,
 
 ## Utilidades
 from src.utils.s3_utils import create_bucket
-from src.utils.db_utils import create_db, execute_sql
+from src.utils.db_utils import create_db, execute_sql, save_rds
 from src.utils.ec2_utils import create_ec2
 from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query
 from src.utils.db_utils import execute_sql
@@ -158,12 +161,18 @@ class downloadDataS3(luigi.Task):
                         zf.extract(DATA_CSV)
                         os.rename(DATA_CSV,'data.csv')
                         ## Inserta archivo y elimina
-                        Insert_to_RDS("data.csv", "raw", "rita") # inserta data.csv en esquema raw y tabla rita
+                        """ AQUI HAY QUE CAMBIAR """
+                        #file_name = "./../../data/datos_ejemplo.csv"
+                        file_name = "datos_ejemplo.csv"
+                        table_name = "raw.rita"
+                        save_rds(file_name, table_name) # inserta data.csv en esquema raw y tabla rita
+                        """ AQUI HAY QUE CAMBIAR """
+
                         os.system('rm data.csv')
                         #EL_rawdata()
 
         # Crea raw.rita_light
-        rita_light_query()
+        #rita_light_query()
 
         os.system('echo OK > Tarea_EL.txt')
 
@@ -176,45 +185,18 @@ class downloadDataS3(luigi.Task):
 # Limpiar DATOS
 CURRENT_DIR = os.getcwd()
 
-class DataLocalStorage():
-    def __init__(self, df_clean= None):
-        self.df_clean =df_clean
-
-    def get_data(self):
-        return self.df_clean
-
-CACHE = DataLocalStorage()
-
-#Obtenemos raw.rita de la RDS
-class GetDataSet(luigi.Task):
-    #def requires(self):
-    #    return Create_Rita_Light()
-
-    def output(self):
-        dir = CURRENT_DIR + "/target/gets_data.txt"
-        return luigi.local_target.LocalTarget(dir)
-
-    def run(self):
-
-        df_clean = init_data_luigi()
-        CACHE.df_clean = df_clean
-
-        z = "Obtiene Datos"
-        with self.output().open('w') as output_file:
-            output_file.write(z)
 #Limpiamos los datos
 class GetCleanData(luigi.Task):
 
     def requires(self):
-        return GetDataSet(), downloadDataS3()
+        return  downloadDataS3()
 
     def output(self):
         dir = CURRENT_DIR + "/target/data_clean.txt"
         return luigi.local_target.LocalTarget(dir)
 
     def run(self):
-        df_clean = init_data_luigi() #CACHE.get_data()
-        CACHE.df_clean = clean(df_clean)
+        clean()
 
         z = "Limpia Datos"
         with self.output().open('w') as output_file:
@@ -225,34 +207,6 @@ class GetCleanData(luigi.Task):
 # Crear caracteristicas DATOS
 CURRENT_DIR = os.getcwd()
 
-class DataCleanLocalStorage():
-    def _init_(self, df_semantic= None):
-        self.df_semantic =df_semantic
-
-    def get_data(self):
-        return self.df_semantic
-
-CACHE = DataCleanLocalStorage()
-
-#Obtenemos clean.rita de la RDS
-class GetCleanDataSet(luigi.Task):
-
-    def requires(self):
-
-        return GetCleanData()
-
-    def output(self):
-        dir = CURRENT_DIR + "/target/gets_clean_data.txt"
-        return luigi.local_target.LocalTarget(dir)
-
-    def run(self):
-        df_util = init_data_clean_luigi()
-        CACHE.df_semantic = df_util
-
-        z = "ObtieneDatosClean"
-        with self.output().open('w') as output_file:
-            output_file.write(z)
-
 
 #metadata FE
 MiLinajeSemantic = Linaje_semantic()
@@ -261,16 +215,14 @@ MiLinajeSemantic = Linaje_semantic()
 class GetFEData(luigi.Task):
 
     def requires(self):
-        return GetCleanDataSet()
+        return GetCleanData()
 
     def output(self):
         dir = CURRENT_DIR + "/target/data_semantic.txt"
         return luigi.local_target.LocalTarget(dir)
 
     def run(self):
-        df_util = init_data_clean_luigi() #CACHE.get_clean_data()
-        CACHE.df_semantic = crear_features(df_util)
-        CACHE.df_semantic.write.csv('semantic')
+        df_util = crear_features()#CACHE.get_clean_data()
 
         MiLinajeSemantic.ip_ec2 = str(df_util.count())
         MiLinajeSemantic.fecha =  str(datetime.now())
@@ -286,8 +238,8 @@ class GetFEData(luigi.Task):
         print(MiLinajeSemantic.to_upsert())
         semantic_metadata(MiLinajeSemantic.to_upsert())
         ## Inserta archivo y elimina csv
-        os.system('bash ./src/utils/inserta_semantic_rita_to_rds.sh')
-        os.system('rm semantic.csv')
+        #os.system('bash ./src/utils/inserta_semantic_rita_to_rds.sh')
+        #os.system('rm semantic.csv')
 
         z = "CreaFeaturesDatos"
         with self.output().open('w') as output_file:

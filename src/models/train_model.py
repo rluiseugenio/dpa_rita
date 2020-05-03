@@ -41,7 +41,7 @@ from src import (
 def get_data(luigi=True):
     config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
     connection = pg.connect(config_psyco)
-    pdf = pd.read_sql_query('select * from semantic.rita',con=connection)
+    pdf = pd.read_sql_query('select * from semantic.rita;',con=connection)
     spark = SparkSession \
     .builder \
     .appName("Python Spark SQL basic example") \
@@ -77,18 +77,18 @@ def get_data(luigi=True):
                          StructField('deststatename', StringType(), True),
                          StructField('destwac', IntegerType(), True),
                          StructField('crsdeptime', StringType(), True),
-                                                   StructField('deptime', StringType(), True),
+                         StructField('deptime', StringType(), True),
                          StructField('depdelay', FloatType(), True),
                          StructField('depdelayminutes', FloatType(), True),
                          StructField('depdel15', FloatType(), True),
-                         StructField('departuredelaygroups', FloatType(), True),
+                         StructField('departuredelaygroups', IntegerType(), True),
                          StructField('deptimeblk', StringType(), True),
                          StructField('taxiout', FloatType(), True),
-                         StructField('wheelsoff', FloatType(), True),
-                         StructField('wheelson', FloatType(), True),
+                         StructField('wheelsoff', IntegerType(), True),
+                         StructField('wheelson', IntegerType(), True),
                          StructField('taxiin', FloatType(), True),
                          StructField('crsarrtime', IntegerType(), True),
-                         StructField('arrtime', FloatType(), True),
+                         StructField('arrtime', IntegerType(), True),
                          StructField('arrdelay', FloatType(), True),
                          StructField('arrdelayminutes', FloatType(), True),
                          StructField('arrdel15', FloatType(), True),
@@ -108,7 +108,10 @@ def get_data(luigi=True):
                          StructField('quincena', FloatType(), True),
                          StructField('dephour', FloatType(), True),
                          StructField('seishoras', FloatType(), True)
+
                         ]))
+    df.head(2)
+    print((df.count(), len(df.columns)))
     return df
 
 
@@ -162,8 +165,14 @@ def get_data_types(df):
         data_types[str(entry.dataType)].append(entry.name)
     return data_types
 
-
+#
 def create_pipeline(df, ignore):
+    """
+        todo:
+        1. Con más observaciones volver a usar el OneHotEncoder
+            - Agregar a los stages
+            - Agregar a los features del VectorAssembler
+    """
     # Esto lo ponemos aqui para poder modificar las
     #variables de los estimadores/transformadores
     data_types = get_data_types(df)
@@ -206,8 +215,9 @@ def create_pipeline(df, ignore):
     # ============= VECTOR ASESEMBLER ================
     from pyspark.ml.feature import VectorAssembler
 
-    features =  numericals_double_imputed \
-              + [var + "_one_hot" for var in strings_used]
+    features =  numericals_double_imputed + \
+                numericals_int_imputed
+    #          + [var + "_one_hot" for var in strings_used]
     stage_assembler = VectorAssembler(inputCols = features, outputCol= "assem_features")
 
     # ==================== SCALER =======================
@@ -216,11 +226,11 @@ def create_pipeline(df, ignore):
                                   outputCol="scaled_features", withStd=True, withMean=True)
 
     # ================== PIPELINE ===================
-    stages= stage_string + stage_one_hot +  [             # Categorical Data
-                               stage_imputer_double,
-                               stage_imputer_int,        # Data Imputation
-                               stage_assembler,          # Assembling data
-                               stage_scaler]
+     #stage_string +  stage_one_hot +  [             # Categorical Data
+    stages= [stage_imputer_double,
+           stage_imputer_int,        # Data Imputation
+           stage_assembler,          # Assembling data
+           stage_scaler]
 
     ## Tenemos que regesar el df porque las variables int las combierte en double
     print(stages)
@@ -279,6 +289,7 @@ def prepare_data(df):
 def run_model(objetivo, model_name, hyperparams, luigi= False, test_split = 0.2):
     df = get_data(False)
 
+    # Drop constant variables
     cnt = df.agg(*(f.countDistinct(c).alias(c) for c in df.columns)).first()
     df = df.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
 
@@ -391,3 +402,17 @@ def add_meta_data(objetivo, model_name,hyperparams, log,train_time, test_split, 
              json.dumps(hyperparams),
              AUROC, AUPR, precision, recall, f1, train_time, test_split, train_nrows)
     insert_query(query, values)
+
+def remove_constant():
+    """ Not used """
+    # Borramos las variables constantes
+    cnt = df_test.agg(*(f.countDistinct(c).alias(c) for c in df_test.columns)).first()
+    df_test =  df_test.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
+    df_train =  df_train.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
+    cnt = df_train.agg(*(f.countDistinct(c).alias(c) for c in df_train.columns)).first()
+    df_test =  df_test.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
+    df_train =  df_train.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
+
+
+
+get_data()

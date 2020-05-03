@@ -180,10 +180,10 @@ def save_rds(file_name, table_name):
 
     # Copy to postgres
     connection = psycopg2.connect(user=MY_USER , # Usuario RDS
-                                 password="baserita00", # password de usuario de RDS
-                                 host="postgres.c3btsavuxyna.us-east-1.rds.amazonaws.com" ,#"127.0.0.1", # cambiar por el endpoint adecuado
+                                 password=MY_PASS, # password de usuario de RDS
+                                 host=MY_HOST,#"127.0.0.1", # cambiar por el endpoint adecuado
                                  port=MY_PORT, # cambiar por el puerto
-                                 database=MY_DB ) # Nombre de la base de datos
+                                 database=MY_DB) # Nombre de la base de datos
     cursor = connection.cursor()
 
     df = pd.read_csv(file_name)

@@ -149,42 +149,47 @@ class Extract(luigi.Task):
 		return luigi.LocalTarget(output_path)
 
 class Load(luigi.Task):
-	'''
-	Carga hacia RDS los datos de la carpeta data
-	'''
-	#def requires(self):
-		#return  Extract()
+    '''
+    Carga hacia RDS los datos de la carpeta data
+    '''
+    #def requires(self):
+        #return Extract()
 
-	def run(self):
-		# Unzips de archivos csv
-		dir_name = "./src/data/" # directorio de zip
-		extension_zip = ".zip"
+    def run(self):
+        # Unzips de archivos csv
 
-		for item in os.listdir(dir_name): # loop sobre archivos
-			if item.endswith(extension_zip): # revisa extension  ".zip"
+        dir_name = "./src/data/" # directorio de zip
+        extension_zip = ".zip"
 
-				# Con archivo crea objeto zip y lo extrar
-				zip_ref = ZipFile(dir_name+item) # create zipfile object
-				zip_ref.extractall(dir_name) # extraccion al directorio
-				zip_ref.close()
-				# Elimina archivos residuales
-				#os.remove(dir_name+item) # zip
-				#os.remove(dir_name+'readme.html') # readme.html
+        for item in os.listdir(dir_name):
+            if item.endswith(extension_zip):
+                #
+                # Con archivo crea objeto zip y lo extrae
+                zip_ref = ZipFile(dir_name+item) # create zipfile object
+                zip_ref.extractall(dir_name) # extraccion al directorio
+                zip_ref.close()
+                # Elimina archivos residuales
+                os.remove(dir_name+item)
+                #os.remove(dir_name+'readme.html')
 
-		#Subimos de archivos csv
-		extension_csv = ".csv"
-		for item in os.listdir(dir_name): # loop sobre archivos
-			if item.endswith(extension_csv): # revisa extension  ".csv"
+        #Subimos de archivos csv
+        extension_csv = ".csv"
 
-				table_name = "raw.rita"
-				try:
-					print(item)
-					save_rds(dir_name+item, table_name)
-				except:
-					print("Error en carga de "+item)
+        for item in os.listdir(dir_name):
+            if item.endswith(extension_csv):
+                table_name = "raw.rita"
 
-		os.system('rm *.csv')
-		os.system('echo OK > load_ok.txt')
+                try:
+                    print(item)
+                    save_rds(dir_name+item, table_name)
+                    os.remove(dir_name+item)
+                except:
+                    print("Error en carga de "+item)
+
+    def output(self):
+        # Ruta en donde se guarda el target del task
+        output_path = "load_ok.txt"
+        return luigi.LocalTarget(output_path)
 
 #-----------------------------------------------------------------------------------------------------------------------------
 # Limpiar DATOS
@@ -194,7 +199,7 @@ CURRENT_DIR = os.getcwd()
 class GetCleanData(luigi.Task):
 
 	def requires(self):
-		return  Load()
+		return Load()
 
 	def output(self):
 		dir = CURRENT_DIR + "/target/data_clean.txt"

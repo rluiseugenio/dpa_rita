@@ -5,6 +5,8 @@ import sys
 import random
 import time
 import psycopg2
+import pandas as pd
+from io import StringIO
 
 from src.utils.log_utils import setup_logging
 logger = setup_logging(__name__, "utils.rds_objects2")
@@ -174,8 +176,36 @@ def execute_sql(file_dir):
 
 
 
+def save_rds(file_name, table_name):
+
+    # Copy to postgres
+    connection = psycopg2.connect(user=MY_USER , # Usuario RDS
+                                 password="baserita00", # password de usuario de RDS
+                                 host="postgres.c3btsavuxyna.us-east-1.rds.amazonaws.com" ,#"127.0.0.1", # cambiar por el endpoint adecuado
+                                 port=MY_PORT, # cambiar por el puerto
+                                 database=MY_DB ) # Nombre de la base de datos
+    cursor = connection.cursor()
+
+    df = pd.read_csv(file_name)
+    records = df.values.tolist()
+    buffer = StringIO()
+    for line in records:
+        buffer.write('~'.join([repr(x) for x in line]) + '\n')
+
+    buffer.seek(0)
+
+    cursor.copy_from(buffer, table_name, null='NaN', sep ='~' )
+    connection.commit()
+    cursor.close()
+    connection.close()
 
 
+
+
+#file_name = "./../../data/datos_ejemplo.csv"
+#file_name = "datos_ejemplo.csv"
+#table_name = "raw.rita"
+#save_rds(file_name, table_name)
 #==============================================================
 # DE AQUI PARA ABAJO SON PRUEBAS (BASURA)
 #response=rds_client.describe_security_groups()

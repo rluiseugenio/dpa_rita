@@ -1,10 +1,13 @@
 # PYTHONPATH='.' AWS_PROFILE=educate1 luigi --module alter_orq downloadDataS3 --local-scheduler
 
 # PARA UN MODELO
-#PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunModel --local-scheduler  --bucname models-dpa --numIt 2 --numPCA 3  --model LR --obj cancelled
+#PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunModel --local-scheduler  --bucname models-dpa --numIt 2 --numPCA 3  --model LR --obj 0-1.5
 
 # PARA TODOS LOS MODELOS
 # PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunAllTargets --local-scheduler  --bucname models-dpa --numIt 1 --numPCA 2  --model LR
+
+# CENTRAL scheduler
+#PYTHONPATH='.' AWS_PROFILE=dpa luigi --module alter_orq  RunAllTargets  --bucname models-dpa --numIt 1 --numPCA 2  --model LR
 
 ###  Librerias necesarias
 import luigi
@@ -39,7 +42,7 @@ MY_DB,
 
 ## Utilidades
 from src.utils.s3_utils import create_bucket
-from src.utils.db_utils import create_db, execute_sql
+from src.utils.db_utils import create_db, execute_sql, save_rds
 from src.utils.ec2_utils import create_ec2
 from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query
 from src.utils.db_utils import execute_sql
@@ -158,7 +161,13 @@ class downloadDataS3(luigi.Task):
                         zf.extract(DATA_CSV)
                         os.rename(DATA_CSV,'data.csv')
                         ## Inserta archivo y elimina
-                        Insert_to_RDS("data.csv", "raw", "rita") # inserta data.csv en esquema raw y tabla rita
+                        """ AQUI HAY QUE CAMBIAR """
+                        #file_name = "./../../data/datos_ejemplo.csv"
+                        file_name = "datos_ejemplo.csv"
+                        table_name = "raw.rita"
+                        save_rds(file_name, table_name) # inserta data.csv en esquema raw y tabla rita
+                        """ AQUI HAY QUE CAMBIAR """
+
                         os.system('rm data.csv')
                         #EL_rawdata()
 

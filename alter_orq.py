@@ -44,7 +44,7 @@ MY_DB,
 from src.utils.s3_utils import create_bucket
 from src.utils.db_utils import create_db, execute_sql, save_rds
 from src.utils.ec2_utils import create_ec2
-from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_load,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query
+from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_load,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query,Linaje_load
 from src.utils.db_utils import execute_sql
 from src.models.train_model import run_model
 from src.models.save_model import parse_filename

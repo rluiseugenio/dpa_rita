@@ -56,104 +56,102 @@ CURRENT_DIR = os.getcwd()
 # ===============================s
 # Tasks de Luigi
 
-class Extract(luigi.Task):
-	'''
-	Descarga en zip los datos de Rita (encarpeta data)
-	'''
-	#def requires(self):
-	#    return Create_Tables_Schemas()
+class Extraction(luigi.Task):
+    '''
+    Descarga en zip los datos de Rita (encarpeta data)
+    '''
+    # texto para formarm URL de rita
+    BASE_URL="https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_"
 
-	#Definimos los URL base para poder actualizarlo automaticamente despues
-	BASE_URL="https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_"
+    # Recolectamos fecha y usuario para metadatos a partir de fecha actual
+    MiLinaje.fecha =  datetime.now()
+    MiLinaje.usuario = getpass.getuser()
 
-	# Recolectamos fecha y usuario para metadatos a partir de fecha actual
-	MiLinaje.fecha =  datetime.now()
-	MiLinaje.usuario = getpass.getuser()
+    def run(self):
+        # Obtiene anio y mes correspondiente fecha actual de ejecucion del script
+        now = datetime.now()
+        current_year = now.year
+        current_month = now.month
 
-	def run(self):
+        # Obtiene anio y mes base (tres anios hacia atras)
+        base_year = current_year - 0
+        base_month = current_month
 
-		# Obtiene anio y mes correspondiente fecha actual de ejecucion del script
-		now = datetime.now()
-		current_year = now.year
-		current_month = now.month
+        # Recolectamos IP para metadatos
+        MiLinaje.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
 
-		# Obtiene anio y mes base (tres anios hacia atras)
-		base_year = current_year - 0
-		base_month = current_month
+        for anio in range(base_year,current_year+1):
+            for mes in range(1,12+1):
 
-		# Recolectamos IP para metadatos
-		MiLinaje.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
+                # Recolectamos parametros de mes y anio de solicitud descarga a API Rita para metadatos
+                MiLinaje.year = str(anio)
+                MiLinaje.month = str(mes)
 
-		for anio in range(base_year,current_year+1):
-			for mes in range(1,12+1):
+                # check para no hacer peticiones fuera de la fecha actual
+                if (anio <= current_year) & (mes <= current_month-3):
+                    #URL para hacer peticion a API rita en anio y mes indicado
+                    url_act = self.BASE_URL+str(anio)+"_"+str(mes)+".zip"
 
-				# Recolectamos parametros de mes y anio de solicitud descarga a API Rita para metadatos
-				MiLinaje.year = str(anio)
-				MiLinaje.month = str(mes)
+                    #tam = EL_verif_query(url_act,anio,mes)
+                    tam=0
 
-				# Verificamos si en metadatos ya hay registro de esta anio y mes
-				# En caso contario, se intenta descarga
+                    if tam==0:
 
-				if (anio <= current_year) & (mes <= current_month):
+                        #Descargamos los datos desde la API, en formato zip del periodo en cuestion
+                        try:
+                            print("Inicia descarga de "+str(anio)+"_"+str(mes)+".zip")
+                            comando_descarga = 'wget ' + url_act + " -P " + "./src/data/"
+                            os.system(comando_descarga)
+                        except:
 
-					#URL para hacer peticion a API rita en anio y mes indicado
-					url_act = self.BASE_URL+str(anio)+"_"+str(mes)+".zip" #url actualizado
-					tam = EL_verif_query(url_act,anio,mes)
+                            pass
 
-					# Intentamos descargar los datos
-					r=requests.get(url_act)
+                        ##Escribimos el archivo descargado al bucket
+                        # Autenticación en S3 con boto3
+                        ses = boto3.session.Session(profile_name='dpa', region_name='us-east-1')
+                        s3_resource = ses.resource('s3')
+                        obj = s3_resource.Bucket("test-aws-boto")
+                        print(ses)
 
-					if tam == 0 & r.status_code == 200:
-						#Descargamos los datos desde la API, en formato zip del periodo en cuestion
+                        #Escritura
+                        output_path = "RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip"
+                        dir_name="./src/data/"
+                        name_to_zip = "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_"
 
-						print("Carga: " +str(anio)+" - "+str(mes))
+                        obj.upload_file(dir_name+name_to_zip+str(anio)+"_"+str(mes)+".zip", output_path)
 
-						## Escribimos los archivos que se consultan al API Rita en S3
-						# Autenticación en S3 con boto3
-						#ses = boto3.session.Session(profile_name='dpa', region_name='us-east-1')
-						#s3_resource = ses.resource('s3')
-						#obj = s3_resource.Bucket("test-aws-boto")
-						#print(ses)
+                        # Recolectamos nombre del .zip y path con el que se guardara consulta a
+                        # API de Rita en S3 para metadatos
+                        MiLinaje.ruta_s3 = "s3://test-aws-boto/"+"RITA/YEAR="+str(anio)+"/"
+                        MiLinaje.nombre_archivo =  str(anio)+"_"+str(mes)+".zip"
 
-						# Escribimos el archivo al bucket, usando el binario
-						#output_path = "RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip"
-						#obj.put_object(Key=output_path,Body=r.content)
+                        # Recolectamos tamano del archivo recien escrito en S3 para metadatos
+                        ses = boto3.session.Session(profile_name="dpa", region_name='us-east-1')
+                        s3 = ses.resource('s3')
+                        bucket_name = "test-aws-boto"
+                        my_bucket = s3.Bucket(bucket_name)
+                        MiLinaje.tamano_zip = my_bucket.Object(key="RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip").content_length
 
-						# Recolectamos nombre del .zip y path con el que se guardara consulta a
-						# API de Rita en S3 para metadatos
-						MiLinaje.ruta_s3 = "s3://test-aws-boto/"+"RITA/YEAR="+str(anio)+"/"
-						MiLinaje.nombre_archivo =  str(anio)+"_"+str(mes)+".zip"
+                        # Recolectamos status para metadatos
+                        MiLinaje.task_status = "Successful"
 
-						# Escribimos el zip a data
-						with open(str(anio)+"_"+str(mes)+".zip", 'wb') as f:
-							f.write(r.content)
+                        # Insertamos metadatos a DB
+                        EL_metadata(MiLinaje.to_upsert())
 
-						# Recolectamos tamano del archivo recien escrito en S3 para metadatos
-						#ses = boto3.session.Session(profile_name="dpa", region_name='us-east-1')
-						#s3 = ses.resource('s3')
-						#bucket_name = "test-aws-boto"
-						#my_bucket = s3.Bucket(bucket_name)
-						#MiLinaje.tamano_zip = my_bucket.Object(key="RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip").content_length
 
-						# Recolectamos tatus para metadatos
-						MiLinaje.task_status = "Successful"
+        os.system('echo OK > extract_ok.txt')
 
-						# Insertamos metadatos a DB
-						EL_metadata(MiLinaje.to_upsert())
-
-		os.system('echo OK > ./data/extract_ok.txt')
-
-	def output(self):
-		# Ruta en donde se guarda el archivo solicitado
-		output_path = "./data/extract_ok.txt"
-		return luigi.LocalTarget(output_path)
+    def output(self):
+        # Ruta en donde se guarda el target del task
+        output_path = "extract_ok.txt"
+        return luigi.LocalTarget(output_path)
 
 class Load(luigi.Task):
     '''
     Carga hacia RDS los datos de la carpeta data
     '''
     def requires(self):
-        return Extract()
+        return Extraction()
 
     def run(self):
         # Unzips de archivos csv
@@ -185,6 +183,8 @@ class Load(luigi.Task):
                     os.remove(dir_name+item)
                 except:
                     print("Error en carga de "+item)
+
+		os.system('echo OK > load_ok.txt')
 
     def output(self):
         # Ruta en donde se guarda el target del task

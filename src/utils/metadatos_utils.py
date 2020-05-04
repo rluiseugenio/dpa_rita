@@ -40,6 +40,24 @@ class Linaje_raw():
          self.ip_ec2, self.tamano_zip, self.nombre_archivo, self.ruta_s3,\
           self.task_status)
 
+## Clase para reunir los metadatos de la etapa load (tabla metadatos.load)
+class Linaje_load():
+    def __init__(self, fecha=0, usuario=0, ip_ec2=0,\
+     tamano_csv=0, nombre_archivo=0, num_columnas=0,num_renglones=0):
+        self.fecha = fecha # time stamp
+        self.nombre_task = self.__class__.__name__#nombre_task
+        self.usuario = usuario # Usuario de la maquina de GNU/Linux que corre la instancia
+        self.ip_ec2 = ip_ec2
+        self.tamano_csv = tamano_csv
+        self.nombre_archivo = nombre_archivo
+        self.num_columnas = num_columnas
+        self.num_renglones = num_renglones
+
+    def to_upsert(self):
+        return (self.fecha, self.nombre_task, self.usuario,\
+         self.ip_ec2, self.tamano_csv, self.nombre_archivo, self.num_columnas,\
+          self.num_renglones)
+
 # Clase para reunir los metadatos de la etapa de limpieza de datos (tabla metadatos.clean)
 class Linaje_clean_data():
     def __init__(self, fecha=0, nombre_task=0, usuario=0, ip_clean=0, num_columnas_modificadas=0,num_filas_modificadas=0, variables_limpias=0, task_status=0):
@@ -205,9 +223,9 @@ def EL_metadata(record_to_insert):
     return print("Metadadata Insertion Done - PostgreSQL connection is closed")
 
 
-def EL_rawdata():
+def EL_load(record_to_insert):
     '''
-    Funcion auxiliar para insertar a raw.rita (no usada por problemas de permisos en RDS)
+    Funcion auxiliar para insertar a metadatos.load
     '''
     # Conexion y cursor para query
     connection = psycopg2.connect(user = MY_USER, # Usuario RDS
@@ -217,21 +235,16 @@ def EL_rawdata():
                                  database=MY_DB) # Nombre de la base de datos
     cursor = connection.cursor()
 
-    # Query para insertar datos a raw
-    #csv_file_name = 'data.csv'
-    #sql = "COPY raw.rita FROM STDIN DELIMITER ',' CSV HEADER"
-    #cursor.copy_expert(sql, open(csv_file_name, "r"))
-
-    #f = open('data.csv', 'r')
-    #cursor.copy_from(f, 'raw.rita', sep=",")
-    postgres_insert_query = """copy raw.rita FROM 'data.csv' WITH CSV HEADER;"""
-    cursor.execute(postgres_insert_query)
+    # Query para insertar metadatos
+    postgres_insert_query = """ INSERT INTO metadatos.load (fecha, nombre_task,\
+     usuario, ip_ec2, tamano_csv, nombre_archivo, num_columnas, \
+     num_renglones) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s) """
+    cursor.execute(postgres_insert_query, record_to_insert)
     connection.commit()
-    #
     cursor.close()
     connection.close()
 
-    return print("Raw.Rita insertion Done - PostgreSQL connection is closed")
+    return print("metadatos.load insertion Done - PostgreSQL connection is closed")
 
 def clean_metadata_rds(record_to_insert):
     '''

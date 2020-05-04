@@ -21,6 +21,22 @@ CREATE TABLE IF NOT EXISTS metadatos.extract(
 );
 
 GRANT ALL ON  metadatos.extract to postgres;
+
+---- Crea tabla metadatos.load
+--DROP TABLE IF EXISTS metadatos.extract;
+
+CREATE TABLE IF NOT EXISTS metadatos.load(
+  fecha VARCHAR,
+  nombre_task VARCHAR,
+  usuario VARCHAR,
+  ip_ec2 VARCHAR,
+  tamano_csv VARCHAR,
+  nombre_archivo VARCHAR,
+  num_columnas VARCHAR,
+  num_renglones VARCHAR
+);
+
+GRANT ALL ON  metadatos.load to postgres;
 --- Crea tabla metadatos.clean
 
 --DROP TABLE IF EXISTS metadatos.clean;

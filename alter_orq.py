@@ -20,7 +20,7 @@ import getpass # Usada para obtener el usuario
 from io import BytesIO
 import socket #import publicip
 import requests
-import os
+import os, subprocess, ast
 import pandas as pd
 import psycopg2
 from psycopg2 import extras
@@ -44,7 +44,7 @@ MY_DB,
 from src.utils.s3_utils import create_bucket
 from src.utils.db_utils import create_db, execute_sql, save_rds
 from src.utils.ec2_utils import create_ec2
-from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_rawdata,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query
+from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_load,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query
 from src.utils.db_utils import execute_sql
 from src.models.train_model import run_model
 from src.models.save_model import parse_filename
@@ -146,14 +146,23 @@ class Extraction(luigi.Task):
         output_path = "extract_ok.txt"
         return luigi.LocalTarget(output_path)
 
+MiLinaje = Linaje_load()
+
 class Load(luigi.Task):
     '''
     Carga hacia RDS los datos de la carpeta data
     '''
-    def requires(self):
-        return Extraction()
+    #def requires(self):
+        #return Extract()
+
+    # Recolectamos fecha y usuario para metadatos a partir de fecha actual
+    MiLinaje.fecha =  datetime.now()
+    MiLinaje.usuario = getpass.getuser()
 
     def run(self):
+        # Ip metadatos
+        MiLinaje.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
+
         # Unzips de archivos csv
 
         dir_name = "./src/data/" # directorio de zip
@@ -177,14 +186,28 @@ class Load(luigi.Task):
             if item.endswith(extension_csv):
                 table_name = "raw.rita"
 
+                MiLinaje.nombre_archivo = item
+
+                # Numero de columnas y renglones para metadatos
+                comando_col = "awk -F, '{ print NF; exit }' " + dir_name + item
+                comando_row = "wc -l " + dir_name + item + "| awk '{ print $1 }' "
+                output_c = subprocess.check_output(comando_col, shell=True)
+                MiLinaje.num_columnas = ast.literal_eval(output_c.decode("ascii"))
+                output_r = subprocess.check_output(comando_row, shell=True)
+                MiLinaje.num_renglones = ast.literal_eval(output_r.decode("ascii"))
+
+                MiLinaje.tamano_csv = Path(dir_name+item).stat().st_size
+
                 try:
                     print(item)
                     save_rds(dir_name+item, table_name)
                     os.remove(dir_name+item)
+
+                    EL_load(MiLinaje.to_upsert())
                 except:
                     print("Error en carga de "+item)
 
-		os.system('echo OK > load_ok.txt')
+        os.system('echo "ok" >load_ok.txt')
 
     def output(self):
         # Ruta en donde se guarda el target del task

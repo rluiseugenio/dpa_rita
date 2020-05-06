@@ -84,8 +84,8 @@ class Extraction(luigi.Task):
             for mes in range(1,12+1):
 
                 # Recolectamos parametros de mes y anio de solicitud descarga a API Rita para metadatos
-                MiLinaje.year = str(anio)
-                MiLinaje.month = str(mes)
+                MiLinajeExt.year = str(anio)
+                MiLinajeExt.month = str(mes)
 
                 # check para no hacer peticiones fuera de la fecha actual
                 if (anio <= current_year) & (mes <= current_month-3):
@@ -122,8 +122,8 @@ class Extraction(luigi.Task):
 
                         # Recolectamos nombre del .zip y path con el que se guardara consulta a
                         # API de Rita en S3 para metadatos
-                        MiLinaje.ruta_s3 = "s3://test-aws-boto/"+"RITA/YEAR="+str(anio)+"/"
-                        MiLinaje.nombre_archivo =  str(anio)+"_"+str(mes)+".zip"
+                        MiLinajeExt.ruta_s3 = "s3://test-aws-boto/"+"RITA/YEAR="+str(anio)+"/"
+                        MiLinajeExt.nombre_archivo =  str(anio)+"_"+str(mes)+".zip"
 
                         # Recolectamos tamano del archivo recien escrito en S3 para metadatos
                         ses = boto3.session.Session(profile_name="dpa", region_name='us-east-1')

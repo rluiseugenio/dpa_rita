@@ -25,7 +25,7 @@ import pandas as pd
 import psycopg2
 from psycopg2 import extras
 from zipfile import ZipFile
-
+from pathlib import Path
 ###librerias para clean
 from pyspark.sql import SparkSession
 from src.features.build_features import clean, crear_features
@@ -196,10 +196,10 @@ class Load(luigi.Task):
                 # Numero de columnas y renglones para metadatos
                 comando_col = "awk -F, '{ print NF; exit }' " + dir_name + item
                 comando_row = "wc -l " + dir_name + item + "| awk '{ print $1 }' "
-                output_c = subprocess.check_output(comando_col, shell=True)
-                MiLinaje.num_columnas = ast.literal_eval(output_c.decode("ascii"))
-                output_r = subprocess.check_output(comando_row, shell=True)
-                MiLinaje.num_renglones = ast.literal_eval(output_r.decode("ascii"))
+                #output_c = subprocess.check_output(comando_col, shell=True)
+                #MiLinaje.num_columnas = ast.literal_eval(output_c.decode("ascii"))
+                #output_r = subprocess.check_output(comando_row, shell=True)
+                #MiLinaje.num_renglones = ast.literal_eval(output_r.decode("ascii"))
 
                 MiLinaje.tamano_csv = Path(dir_name+item).stat().st_size
 

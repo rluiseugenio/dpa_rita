@@ -175,6 +175,32 @@ def EL_verif_query(url,anio,mes):
 
     return tam
 
+def load_verif_query():
+    '''
+    Funcion para verificar si cierto month y year ya estan en metadatos.extract
+    considerando el tamanio resultante de un query
+    '''
+    import psycopg2
+    import psycopg2.extras
+    # Conexion y cursor para query
+    connection = psycopg2.connect(user = MY_USER, # Usuario RDS
+                                 password = MY_PASS, # password de usuario de RDS
+                                 host = MY_HOST,# endpoint
+                                 port="5432", # cambiar por el puerto
+                                 database=MY_DB) # Nombre de la base de datos
+    cursor = connection.cursor()
+
+    # Query para verificacion a la base de datos
+    postgreSQL_select_Query = """SELECT count(*) from metadatos.load;"""
+    cursor.execute(postgreSQL_select_Query)
+    #print("Query de verificacion "+str(anio)+"/"+"str(mes)")
+    select_Query = cursor.fetchall()
+    tam = len(select_Query)
+    cursor.close()
+    connection.close()
+
+    return tam
+
 
 def rita_light_query():
     '''

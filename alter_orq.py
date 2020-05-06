@@ -44,7 +44,7 @@ MY_DB,
 from src.utils.s3_utils import create_bucket
 from src.utils.db_utils import create_db, execute_sql, save_rds
 from src.utils.ec2_utils import create_ec2
-from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_load,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query,Linaje_load
+from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_load,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query,Linaje_load,load_verif_query
 from src.utils.db_utils import execute_sql
 from src.models.train_model import run_model
 from src.models.save_model import parse_filename
@@ -182,6 +182,10 @@ class Load(luigi.Task):
         #Subimos de archivos csv
         extension_csv = ".csv"
 
+        #Cantidad de renglones en metadatos.load
+        tam0 = load_verif_query()
+        cantidad_csv_insertados=0
+
         for item in os.listdir(dir_name):
             if item.endswith(extension_csv):
                 table_name = "raw.rita"
@@ -204,8 +208,12 @@ class Load(luigi.Task):
                     os.remove(dir_name+item)
 
                     EL_load(MiLinaje.to_upsert())
+                    cantidad_csv_insertados=cantidad_csv_insertados+1
                 except:
                     print("Error en carga de "+item)
+
+        #Cantidad de renglones en metadatos.load
+        tam1 = load_verif_query()
 
         os.system('echo "ok" >load_ok.txt')
 

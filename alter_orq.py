@@ -50,7 +50,7 @@ from src.models.train_model import run_model
 from src.models.save_model import parse_filename
 
 # Inicializa la clase que reune los metadatos
-MiLinaje = Linaje_raw() # extract y load
+MiLinajeExt = Linaje_raw() # extract y load
 # ===============================
 CURRENT_DIR = os.getcwd()
 # ===============================s
@@ -64,8 +64,8 @@ class Extraction(luigi.Task):
     BASE_URL="https://transtats.bts.gov/PREZIP/On_Time_Reporting_Carrier_On_Time_Performance_1987_present_"
 
     # Recolectamos fecha y usuario para metadatos a partir de fecha actual
-    MiLinaje.fecha =  datetime.now()
-    MiLinaje.usuario = getpass.getuser()
+    MiLinajeExt.fecha =  datetime.now()
+    MiLinajeExt.usuario = getpass.getuser()
 
     def run(self):
         # Obtiene anio y mes correspondiente fecha actual de ejecucion del script
@@ -78,7 +78,7 @@ class Extraction(luigi.Task):
         base_month = current_month
 
         # Recolectamos IP para metadatos
-        MiLinaje.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
+        MiLinajeExt.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
 
         for anio in range(base_year,current_year+1):
             for mes in range(1,12+1):
@@ -130,13 +130,14 @@ class Extraction(luigi.Task):
                         s3 = ses.resource('s3')
                         bucket_name = "test-aws-boto"
                         my_bucket = s3.Bucket(bucket_name)
-                        MiLinaje.tamano_zip = my_bucket.Object(key="RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip").content_length
+                        MiLinajeExt.tamano_zip = my_bucket.Object(key="RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip").content_length
 
                         # Recolectamos status para metadatos
-                        MiLinaje.task_status = "Successful"
+                        MiLinajeExt.task_status = "Successful"
 
                         # Insertamos metadatos a DB
-                        EL_metadata(MiLinaje.to_upsert())
+                        print(MiLinajeExt.to_upsert())
+                        EL_metadata(MiLinajeExt.to_upsert())
 
 
         os.system('echo OK > extract_ok.txt')

@@ -482,7 +482,7 @@ class RunTargetD(luigi.Task):
 						"pca": int(self.numPCA)}
 
 		run_model(objetivo, model_name, hyperparams, True)
-		
+
 # --------------------------------------------------------------------------------------------------------------
 # Pruebas unitarias de extract y load
 
@@ -505,16 +505,18 @@ class Extraction_Test(luigi.Task):
         MetadatosExtractTesting.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
 
         try:
-            os.system('python -m marbles testing/test_api_rita.py')
+            os.system('python -m marbles testing/test_api_rita.py &> log_extract_test.txt')
             os.system('rm *.csv')
+            MetadatosExtractTesting.task_status = open('log_extract_test.txt','r').read()
+            os.system("rm log_extract_test.txt")
         except:
-            MetadatosExtractTesting.task_status = "Failure"
+            pass
 
         # Insertamos metadatos a DB
         EL_testing_extract(MetadatosExtractTesting.to_upsert())
         print(MetadatosExtractTesting.to_upsert())
 
-        os.system("echo 'ok' > Extract_testing_ok.txt")
+        #os.system("echo 'ok' > Extract_testing_ok.txt")
 
     def output(self):
         # Ruta en donde se guarda el target del task
@@ -528,7 +530,7 @@ class Load_Test(luigi.Task):
 
  	def requires(self):
  		return Extraction_Test()
-        
+
     # Recolectamos fecha y usuario para metadatos a partir de fecha actual
     MetadatosLoadTesting.fecha =  datetime.now()
     MetadatosLoadTesting.usuario = getpass.getuser()
@@ -544,19 +546,20 @@ class Load_Test(luigi.Task):
         MetadatosLoadTesting.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
 
         try:
-            os.system('python -m marbles testing/test_absent_hearders.py')
+            os.system('python -m marbles testing/test_absent_hearders.py &> log_load_test.txt')
             os.system('rm *.csv')
+            MetadatosLoadTesting.task_status = open('log_load_test.txt','r').read()
+            os.system("rm log_load_test.txt")
         except:
-            MetadatosLoadTesting.task_status = "Failure"
+            pass
 
         # Insertamos metadatos a DB
         EL_testing_load(MetadatosLoadTesting.to_upsert())
         print(MetadatosLoadTesting.to_upsert())
 
-        os.system("echo 'ok' > Load_testing_ok.txt")
+        #os.system("echo 'ok' > Load_testing_ok.txt")
 
     def output(self):
         # Ruta en donde se guarda el target del task
         output_path = "Load_testing_ok.txt"
         return luigi.LocalTarget(output_path)
-

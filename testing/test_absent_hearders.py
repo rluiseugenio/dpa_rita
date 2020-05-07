@@ -87,7 +87,7 @@ class TestingHeaders(unittest.TestCase):
         # Obtiene el numero de columnas del archivo recien descargado
         df = pd.read_csv('On_Time_Reporting_Carrier_On_Time_Performance_(1987_present)_'+str(anio)+'_'+str(mes)+'.csv',low_memory=False)
         n=1
-        df.drop(df.head(n).index,inplace=True) # quita los primeros n renglones
+        #df.drop(df.head(n).index,inplace=True) # quita los primeros n renglones
         numero_renglones = df.shape[0]
 
         import psycopg2

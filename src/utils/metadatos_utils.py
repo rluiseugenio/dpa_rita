@@ -316,7 +316,7 @@ def EL_testing_extract(record_to_insert):
 
     # Query para insertar metadatos
     postgres_insert_query = """ INSERT INTO metadatos.testing_extract ( fecha,\
-    nombre_task, usuario, ip_clean, year, month, task_status) VALUES ( %s, %s, %s, %s, %s,%s, %s) """
+    nombre_task, usuario, ip_ec2, year, month, task_status) VALUES ( %s, %s, %s, %s, %s,%s, %s) """
     cursor.execute(postgres_insert_query, record_to_insert)
     connection.commit()
     cursor.close()
@@ -338,7 +338,7 @@ def EL_testing_load(record_to_insert):
 
     # Query para insertar metadatos
     postgres_insert_query = """ INSERT INTO metadatos.testing_load ( fecha,\
-    nombre_task, usuario, ip_clean, year, month, task_status) VALUES ( %s, %s, %s, %s, %s,%s, %s) """
+    nombre_task, usuario, ip_ec2, year, month, task_status) VALUES ( %s, %s, %s, %s, %s,%s, %s) """
     cursor.execute(postgres_insert_query, record_to_insert)
     connection.commit()
     cursor.close()

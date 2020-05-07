@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS metadatos.testing_extract(
 
 GRANT ALL ON  metadatos.testing_extract to postgres;
 
--- Crea tabla metadatos.testing_extract
+-- Crea tabla metadatos.testing_load
 
 CREATE TABLE IF NOT EXISTS metadatos.testing_load(
   fecha VARCHAR,

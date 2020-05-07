@@ -194,12 +194,9 @@ class Load(luigi.Task):
                 MiLinaje.nombre_archivo = item
 
                 # Numero de columnas y renglones para metadatos
-                comando_col = "awk -F, '{ print NF; exit }' " + dir_name + item
-                comando_row = "wc -l " + dir_name + item + "| awk '{ print $1 }' "
-                #output_c = subprocess.check_output(comando_col, shell=True)
-                #MiLinaje.num_columnas = ast.literal_eval(output_c.decode("ascii"))
-                #output_r = subprocess.check_output(comando_row, shell=True)
-                #MiLinaje.num_renglones = ast.literal_eval(output_r.decode("ascii"))
+                df = pd.read_csv(dir_name + item, low_memory=False)
+                MiLinaje.num_columnas = df.shape[1]
+                MiLinaje.num_renglones = df.shape[0]
 
                 MiLinaje.tamano_csv = Path(dir_name+item).stat().st_size
 

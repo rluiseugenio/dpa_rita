@@ -48,6 +48,8 @@ from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL
 from src.utils.db_utils import execute_sql
 from src.models.train_model import run_model
 from src.models.save_model import parse_filename
+from src.utils.metadatos_utils import Linaje_extract_testing, EL_testing_extract
+from src.utils.metadatos_utils import Linaje_load_testing, EL_testing_load
 
 # Inicializa la clase que reune los metadatos
 MiLinajeExt = Linaje_raw() # extract y load

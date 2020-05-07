@@ -5,6 +5,9 @@ import unittest
 from datetime import date, datetime
 import os
 
+#from db_utils import execute_query
+#from metadatos_utils import load_verif_query
+
 class TestingCoherence(unittest.TestCase):
     '''
     Prueba para conocer si la ingesta de datos considera el mes actual desde el

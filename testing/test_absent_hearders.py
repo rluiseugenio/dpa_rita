@@ -5,12 +5,6 @@ import unittest
 from datetime import date, datetime
 import os
 
-MY_USER="postgres"
-MY_PASS="cusbQnXvCyTHbK7LJGnV"
-MY_HOST="postgres.ctruwx4duee9.us-east-1.rds.amazonaws.com"
-MY_PORT=5432
-MY_DB="postgres"
-
 #from db_utils import execute_query
 #from metadatos_utils import load_verif_query
 

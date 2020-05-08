@@ -58,6 +58,10 @@ CURRENT_DIR = os.getcwd()
 # ===============================s
 # Tasks de Luigi
 
+# ======================================================
+# Etapa Extract
+# ======================================================
+
 class Extraction(luigi.Task):
     '''
     Descarga en zip los datos de Rita (encarpeta data)
@@ -141,33 +145,7 @@ class Extraction(luigi.Task):
                         print(MiLinajeExt.to_upsert())
                         EL_metadata(MiLinajeExt.to_upsert())
 
-
-        os.system('echo OK > extract_ok.txt')
-
-    def output(self):
-        # Ruta en donde se guarda el target del task
-        output_path = "extract_ok.txt"
-        return luigi.LocalTarget(output_path)
-
-MiLinaje = Linaje_load()
-
-class Load(luigi.Task):
-    '''
-    Carga hacia RDS los datos de la carpeta data
-    '''
-    def requires(self):
-        return Extraction()
-
-    # Recolectamos fecha y usuario para metadatos a partir de fecha actual
-    MiLinaje.fecha =  datetime.now()
-    MiLinaje.usuario = getpass.getuser()
-
-    def run(self):
-        # Ip metadatos
-        MiLinaje.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
-
-        # Unzips de archivos csv
-
+        # Unzips de archivos zip recien descargados
         dir_name = "./src/data/" # directorio de zip
         extension_zip = ".zip"
 
@@ -180,14 +158,88 @@ class Load(luigi.Task):
                 zip_ref.close()
                 # Elimina archivos residuales
                 os.remove(dir_name+item)
+                try:
+                    os.remove(dir_name+'readme.html')
+                except:
+                    pass
                 #os.remove(dir_name+'readme.html')
+
+        os.system('echo OK > extract_ok.txt')
+
+    def output(self):
+        # Ruta en donde se guarda el target del task
+        output_path = "extract_ok.txt"
+        return luigi.LocalTarget(output_path)
+
+# ======================================================
+# Prueba unitaria de la etapa load
+# ======================================================
+
+from testing.test_absent_hearders import TestingHeaders
+MetadatosLoadTesting = Linaje_load_testing()
+
+class Load_Testing(luigi.Task):
+    '''
+    Prueba unitaria de estructura de archivos descargados
+    '''
+    def requires(self):
+        return Extraction()
+
+    # Recolectamos fecha y usuario para metadatos a partir de fecha actual
+    MetadatosLoadTesting.fecha =  datetime.now()
+    MetadatosLoadTesting.usuario = getpass.getuser()
+
+    def run(self):
+        # Obtiene anio y mes correspondiente fecha actual de ejecucion del script
+        now = datetime.now()
+
+        # Recolectamos parametros de mes y anio de solicitud descarga a API Rita para metadatos_utils
+        MetadatosLoadTesting.year = now.year
+        MetadatosLoadTesting.month = now.month
+
+        unit_test_load = TestingHeaders()
+        unit_test_load.test_create_resource()
+
+    def output(self):
+        return
+
+@Load_Testing.event_handler(Event.SUCCESS)
+def on_success(self):
+    MetadatosLoadTesting.ip_ec2 = ""
+    MetadatosLoadTesting.task_status ="Successful"
+    print(MetadatosLoadTesting.to_upsert())
+    EL_testing_load(MetadatosLoadTesting.to_upsert())
+
+@Load_Testing.event_handler(Event.FAILURE)
+def on_failure(self,exception):
+    MetadatosLoadTesting.ip_ec2 = "Archivo csv con distinta estructura de columnas"
+    MetadatosLoadTesting.task_status ="Failure"
+    print(MetadatosLoadTesting.to_upsert())
+    EL_testing_load(MetadatosLoadTesting.to_upsert())
+
+# ======================================================
+# Etapa Load
+# ======================================================
+
+MiLinaje = Linaje_load()
+
+class Load(luigi.Task):
+    '''
+    Carga hacia RDS los datos de la carpeta data
+    '''
+    def requires(self):
+        return Load_Testing()
+
+    # Recolectamos fecha y usuario para metadatos a partir de fecha actual
+    MiLinaje.fecha =  datetime.now()
+    MiLinaje.usuario = getpass.getuser()
+
+    def run(self):
+        # Ip metadatos
+        MiLinaje.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
 
         #Subimos de archivos csv
         extension_csv = ".csv"
-
-        #Cantidad de renglones en metadatos.load
-        # tam0 = load_verif_query()
-        # cantidad_csv_insertados=0
 
         for item in os.listdir(dir_name):
             if item.endswith(extension_csv):
@@ -482,99 +534,3 @@ class RunTargetD(luigi.Task):
 						"pca": int(self.numPCA)}
 
 		run_model(objetivo, model_name, hyperparams, True)
-
-# --------------------------------------------------------------------------------------------------------------
-# Pruebas unitarias de extract y load
-
-MetadatosExtractTesting = Linaje_extract_testing()
-
-class Extraction_Test(luigi.Task):
-
-    # Recolectamos fecha y usuario para metadatos a partir de fecha actual
-    MetadatosExtractTesting.fecha =  datetime.now()
-    MetadatosExtractTesting.usuario = getpass.getuser()
-
-    def run(self):
-        anio = 2020
-        mes = 2
-        # Recolectamos parametros de mes y anio de solicitud descarga a API Rita para metadatos_utils
-        MetadatosExtractTesting.year = str(anio)
-        MetadatosExtractTesting.month = str(mes)
-
-        # Ip metadatos
-        MetadatosExtractTesting.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
-
-        try:
-            os.system('rm -r __pycache__/')
-        except:
-            pass
-
-        try:
-            os.system('python -m marbles testing/test_api_rita.py')
-            #os.system('rm *.csv')
-            #MetadatosExtractTesting.task_status = open('log_extract_test.txt','r').read()
-            #os.system("rm log_extract_test.txt")
-        except:
-            pass
-
-        # Insertamos metadatos a DB
-        EL_testing_extract(MetadatosExtractTesting.to_upsert())
-        print(MetadatosExtractTesting.to_upsert())
-
-        #os.system("echo 'ok' > Extract_testing_ok.txt")
-
-    def output(self):
-        # Ruta en donde se guarda el target del task
-        output_path = "Extract_testing_ok.txt"
-        return luigi.LocalTarget(output_path)
-
-
-MetadatosLoadTesting = Linaje_load_testing()
-
-class Load_Test(luigi.Task):
-
-    #def requires(self):
-    #    return Extraction_Test()
-
-    # Recolectamos fecha y usuario para metadatos a partir de fecha actual
-    MetadatosLoadTesting.fecha =  datetime.now()
-    MetadatosLoadTesting.usuario = getpass.getuser()
-
-    def run(self):
-        anio = 2020
-        mes = 2
-        # Recolectamos parametros de mes y anio de solicitud descarga a API Rita para metadatos_utils
-        MetadatosLoadTesting.year = str(anio)
-        MetadatosLoadTesting.month = str(mes)
-
-        try:
-            os.system('rm -r __pycache__/')
-        except:
-            pass
-
-        try:
-            os.system('rm *csv')
-        except:
-            pass
-
-        # Ip metadatos
-        MetadatosLoadTesting.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
-
-        try:
-            os.system('python -m marbles testing/test_absent_hearders.py')
-            #os.system('rm *.csv')
-            #MetadatosLoadTesting.task_status = open('log_load_test.txt','r').read()
-            #os.system("rm log_load_test.txt")
-        except:
-            pass
-
-        # Insertamos metadatos a DB
-        EL_testing_load(MetadatosLoadTesting.to_upsert())
-        print(MetadatosLoadTesting.to_upsert())
-
-        #os.system("echo 'ok' > Load_testing_ok.txt")
-
-    def output(self):
-        # Ruta en donde se guarda el target del task
-        output_path = "Load_testing_ok.txt"
-        return luigi.LocalTarget(output_path)

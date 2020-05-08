@@ -46,7 +46,7 @@ from src.utils.db_utils import create_db, execute_sql, save_rds
 from src.utils.ec2_utils import create_ec2
 from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_load,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query,Linaje_load,load_verif_query
 from src.utils.db_utils import execute_sql
-from src.models.train_model import run_model
+#from src.models.train_model import run_model
 from src.models.save_model import parse_filename
 from src.utils.metadatos_utils import Linaje_extract_testing, EL_testing_extract
 from src.utils.metadatos_utils import Linaje_load_testing, EL_testing_load
@@ -528,8 +528,8 @@ MetadatosLoadTesting = Linaje_load_testing()
 
 class Load_Test(luigi.Task):
 
- 	def requires(self):
- 		return Extraction_Test()
+    def requires(self):
+        return Extraction_Test()
 
     # Recolectamos fecha y usuario para metadatos a partir de fecha actual
     MetadatosLoadTesting.fecha =  datetime.now()

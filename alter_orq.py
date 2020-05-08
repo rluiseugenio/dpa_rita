@@ -114,17 +114,17 @@ class Extraction(luigi.Task):
 
                         #Escribimos el archivo descargado al bucket
                         #Autenticación en S3 con boto3
-                        ses = boto3.session.Session(profile_name='dpa', region_name='us-east-1')
-                        s3_resource = ses.resource('s3')
-                        obj = s3_resource.Bucket("test-aws-boto")
-                        print(ses)
+                        #ses = boto3.session.Session(profile_name='dpa', region_name='us-east-1')
+                        #s3_resource = ses.resource('s3')
+                        #obj = s3_resource.Bucket("test-aws-boto")
+                        #print(ses)
 
                         #Escritura
                         output_path = "RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip"
                         dir_name="./src/data/"
                         name_to_zip = "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_"
 
-                        obj.upload_file(dir_name+name_to_zip+str(anio)+"_"+str(mes)+".zip", output_path)
+                        #obj.upload_file(dir_name+name_to_zip+str(anio)+"_"+str(mes)+".zip", output_path)
 
                         # Recolectamos nombre del .zip y path con el que se guardara consulta a
                         # API de Rita en S3 para metadatos
@@ -132,11 +132,11 @@ class Extraction(luigi.Task):
                         MiLinajeExt.nombre_archivo =  str(anio)+"_"+str(mes)+".zip"
 
                         #Recolectamos tamano del archivo recien escrito en S3 para metadatos
-                        ses = boto3.session.Session(profile_name="dpa", region_name='us-east-1')
-                        s3 = ses.resource('s3')
-                        bucket_name = "test-aws-boto"
-                        my_bucket = s3.Bucket(bucket_name)
-                        MiLinajeExt.tamano_zip = my_bucket.Object(key="RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip").content_length
+                        #ses = boto3.session.Session(profile_name="dpa", region_name='us-east-1')
+                        #s3 = ses.resource('s3')
+                        #bucket_name = "test-aws-boto"
+                        #my_bucket = s3.Bucket(bucket_name)
+                        #MiLinajeExt.tamano_zip = my_bucket.Object(key="RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip").content_length
 
                         # Recolectamos status para metadatos
                         MiLinajeExt.task_status = "Successful"
@@ -200,8 +200,11 @@ class Load_Testing(luigi.Task):
         unit_test_load = TestingHeaders()
         unit_test_load.test_create_resource()
 
+        os.system('echo "ok"> testing_load_ok.txt')
+
     def output(self):
-        return
+        output_path='testing_load_ok.txt'
+        return luigi.LocalTarget(output_path)
 
 @Load_Testing.event_handler(Event.SUCCESS)
 def on_success(self):
@@ -240,6 +243,7 @@ class Load(luigi.Task):
 
         #Subimos de archivos csv
         extension_csv = ".csv"
+        dir_name="./src/data/"
 
         for item in os.listdir(dir_name):
             if item.endswith(extension_csv):

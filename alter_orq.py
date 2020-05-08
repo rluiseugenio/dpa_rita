@@ -108,8 +108,8 @@ class Extraction(luigi.Task):
 
                             pass
 
-                        ##Escribimos el archivo descargado al bucket
-                        # Autenticación en S3 con boto3
+                        #Escribimos el archivo descargado al bucket
+                        #Autenticación en S3 con boto3
                         ses = boto3.session.Session(profile_name='dpa', region_name='us-east-1')
                         s3_resource = ses.resource('s3')
                         obj = s3_resource.Bucket("test-aws-boto")
@@ -127,7 +127,7 @@ class Extraction(luigi.Task):
                         MiLinajeExt.ruta_s3 = "s3://test-aws-boto/"+"RITA/YEAR="+str(anio)+"/"
                         MiLinajeExt.nombre_archivo =  str(anio)+"_"+str(mes)+".zip"
 
-                        # Recolectamos tamano del archivo recien escrito en S3 para metadatos
+                        #Recolectamos tamano del archivo recien escrito en S3 para metadatos
                         ses = boto3.session.Session(profile_name="dpa", region_name='us-east-1')
                         s3 = ses.resource('s3')
                         bucket_name = "test-aws-boto"
@@ -155,8 +155,8 @@ class Load(luigi.Task):
     '''
     Carga hacia RDS los datos de la carpeta data
     '''
-    #def requires(self):
-        #return Extract()
+    def requires(self):
+        return Extraction()
 
     # Recolectamos fecha y usuario para metadatos a partir de fecha actual
     MiLinaje.fecha =  datetime.now()
@@ -186,8 +186,8 @@ class Load(luigi.Task):
         extension_csv = ".csv"
 
         #Cantidad de renglones en metadatos.load
-        tam0 = load_verif_query()
-        cantidad_csv_insertados=0
+        # tam0 = load_verif_query()
+        # cantidad_csv_insertados=0
 
         for item in os.listdir(dir_name):
             if item.endswith(extension_csv):
@@ -208,12 +208,12 @@ class Load(luigi.Task):
                     os.remove(dir_name+item)
 
                     EL_load(MiLinaje.to_upsert())
-                    cantidad_csv_insertados=cantidad_csv_insertados+1
+                    #cantidad_csv_insertados=cantidad_csv_insertados+1
                 except:
-                    print("Error en carga de "+item)
+                    print("Carga de "+item)
 
         #Cantidad de renglones en metadatos.load
-        tam1 = load_verif_query()
+        # tam1 = load_verif_query()
 
         os.system('echo "ok" >load_ok.txt')
 
@@ -505,10 +505,15 @@ class Extraction_Test(luigi.Task):
         MetadatosExtractTesting.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
 
         try:
-            os.system('python -m marbles testing/test_api_rita.py &> log_extract_test.txt')
-            os.system('rm *.csv')
-            MetadatosExtractTesting.task_status = open('log_extract_test.txt','r').read()
-            os.system("rm log_extract_test.txt")
+            os.system('rm -r __pycache__/')
+        except:
+            pass
+
+        try:
+            os.system('python -m marbles testing/test_api_rita.py')
+            #os.system('rm *.csv')
+            #MetadatosExtractTesting.task_status = open('log_extract_test.txt','r').read()
+            #os.system("rm log_extract_test.txt")
         except:
             pass
 
@@ -528,8 +533,8 @@ MetadatosLoadTesting = Linaje_load_testing()
 
 class Load_Test(luigi.Task):
 
-    def requires(self):
-        return Extraction_Test()
+    #def requires(self):
+    #    return Extraction_Test()
 
     # Recolectamos fecha y usuario para metadatos a partir de fecha actual
     MetadatosLoadTesting.fecha =  datetime.now()
@@ -542,14 +547,24 @@ class Load_Test(luigi.Task):
         MetadatosLoadTesting.year = str(anio)
         MetadatosLoadTesting.month = str(mes)
 
+        try:
+            os.system('rm -r __pycache__/')
+        except:
+            pass
+
+        try:
+            os.system('rm *csv')
+        except:
+            pass
+
         # Ip metadatos
         MetadatosLoadTesting.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
 
         try:
-            os.system('python -m marbles testing/test_absent_hearders.py &> log_load_test.txt')
-            os.system('rm *.csv')
-            MetadatosLoadTesting.task_status = open('log_load_test.txt','r').read()
-            os.system("rm log_load_test.txt")
+            os.system('python -m marbles testing/test_absent_hearders.py')
+            #os.system('rm *.csv')
+            #MetadatosLoadTesting.task_status = open('log_load_test.txt','r').read()
+            #os.system("rm log_load_test.txt")
         except:
             pass
 

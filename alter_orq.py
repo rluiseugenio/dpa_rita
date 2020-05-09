@@ -46,8 +46,10 @@ from src.utils.db_utils import create_db, execute_sql, save_rds
 from src.utils.ec2_utils import create_ec2
 from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_load,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query,Linaje_load,load_verif_query
 from src.utils.db_utils import execute_sql
-from src.models.train_model import run_model
+#from src.models.train_model import run_model
 from src.models.save_model import parse_filename
+from src.utils.metadatos_utils import Linaje_extract_testing, EL_testing_extract
+from src.utils.metadatos_utils import Linaje_load_testing, EL_testing_load
 
 # Inicializa la clase que reune los metadatos
 MiLinajeExt = Linaje_raw() # extract y load
@@ -55,6 +57,10 @@ MiLinajeExt = Linaje_raw() # extract y load
 CURRENT_DIR = os.getcwd()
 # ===============================s
 # Tasks de Luigi
+
+# ======================================================
+# Etapa Extract
+# ======================================================
 
 class Extraction(luigi.Task):
     '''
@@ -106,31 +112,31 @@ class Extraction(luigi.Task):
 
                             pass
 
-                        ##Escribimos el archivo descargado al bucket
-                        # Autenticación en S3 con boto3
-                        ses = boto3.session.Session(profile_name='dpa', region_name='us-east-1')
-                        s3_resource = ses.resource('s3')
-                        obj = s3_resource.Bucket("test-aws-boto")
-                        print(ses)
+                        #Escribimos el archivo descargado al bucket
+                        #Autenticación en S3 con boto3
+                        #ses = boto3.session.Session(profile_name='dpa', region_name='us-east-1')
+                        #s3_resource = ses.resource('s3')
+                        #obj = s3_resource.Bucket("test-aws-boto")
+                        #print(ses)
 
                         #Escritura
                         output_path = "RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip"
                         dir_name="./src/data/"
                         name_to_zip = "On_Time_Reporting_Carrier_On_Time_Performance_1987_present_"
 
-                        obj.upload_file(dir_name+name_to_zip+str(anio)+"_"+str(mes)+".zip", output_path)
+                        #obj.upload_file(dir_name+name_to_zip+str(anio)+"_"+str(mes)+".zip", output_path)
 
                         # Recolectamos nombre del .zip y path con el que se guardara consulta a
                         # API de Rita en S3 para metadatos
                         MiLinajeExt.ruta_s3 = "s3://test-aws-boto/"+"RITA/YEAR="+str(anio)+"/"
                         MiLinajeExt.nombre_archivo =  str(anio)+"_"+str(mes)+".zip"
 
-                        # Recolectamos tamano del archivo recien escrito en S3 para metadatos
-                        ses = boto3.session.Session(profile_name="dpa", region_name='us-east-1')
-                        s3 = ses.resource('s3')
-                        bucket_name = "test-aws-boto"
-                        my_bucket = s3.Bucket(bucket_name)
-                        MiLinajeExt.tamano_zip = my_bucket.Object(key="RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip").content_length
+                        #Recolectamos tamano del archivo recien escrito en S3 para metadatos
+                        #ses = boto3.session.Session(profile_name="dpa", region_name='us-east-1')
+                        #s3 = ses.resource('s3')
+                        #bucket_name = "test-aws-boto"
+                        #my_bucket = s3.Bucket(bucket_name)
+                        #MiLinajeExt.tamano_zip = my_bucket.Object(key="RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip").content_length
 
                         # Recolectamos status para metadatos
                         MiLinajeExt.task_status = "Successful"
@@ -139,33 +145,7 @@ class Extraction(luigi.Task):
                         print(MiLinajeExt.to_upsert())
                         EL_metadata(MiLinajeExt.to_upsert())
 
-
-        os.system('echo OK > extract_ok.txt')
-
-    def output(self):
-        # Ruta en donde se guarda el target del task
-        output_path = "extract_ok.txt"
-        return luigi.LocalTarget(output_path)
-
-MiLinaje = Linaje_load()
-
-class Load(luigi.Task):
-    '''
-    Carga hacia RDS los datos de la carpeta data
-    '''
-    #def requires(self):
-        #return Extract()
-
-    # Recolectamos fecha y usuario para metadatos a partir de fecha actual
-    MiLinaje.fecha =  datetime.now()
-    MiLinaje.usuario = getpass.getuser()
-
-    def run(self):
-        # Ip metadatos
-        MiLinaje.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
-
-        # Unzips de archivos csv
-
+        # Unzips de archivos zip recien descargados
         dir_name = "./src/data/" # directorio de zip
         extension_zip = ".zip"
 
@@ -178,14 +158,92 @@ class Load(luigi.Task):
                 zip_ref.close()
                 # Elimina archivos residuales
                 os.remove(dir_name+item)
+                try:
+                    os.remove(dir_name+'readme.html')
+                except:
+                    pass
                 #os.remove(dir_name+'readme.html')
+
+        os.system('echo OK > extract_ok.txt')
+
+    def output(self):
+        # Ruta en donde se guarda el target del task
+        output_path = "extract_ok.txt"
+        return luigi.LocalTarget(output_path)
+
+# ======================================================
+# Prueba unitaria de la etapa load
+# ======================================================
+
+from testing.test_absent_hearders import TestingHeaders
+MetadatosLoadTesting = Linaje_load_testing()
+
+class Load_Testing(luigi.Task):
+    '''
+    Prueba unitaria de estructura de archivos descargados
+    '''
+    def requires(self):
+        return Extraction()
+
+    # Recolectamos fecha y usuario para metadatos a partir de fecha actual
+    MetadatosLoadTesting.fecha =  datetime.now()
+    MetadatosLoadTesting.usuario = getpass.getuser()
+
+    def run(self):
+        # Obtiene anio y mes correspondiente fecha actual de ejecucion del script
+        now = datetime.now()
+
+        # Recolectamos parametros de mes y anio de solicitud descarga a API Rita para metadatos_utils
+        MetadatosLoadTesting.year = now.year
+        MetadatosLoadTesting.month = now.month
+
+        unit_test_load = TestingHeaders()
+        unit_test_load.test_create_resource()
+
+        os.system('echo "ok"> testing_load_ok.txt')
+
+    def output(self):
+        output_path='testing_load_ok.txt'
+        return luigi.LocalTarget(output_path)
+
+@Load_Testing.event_handler(Event.SUCCESS)
+def on_success(self):
+    MetadatosLoadTesting.ip_ec2 = ""
+    MetadatosLoadTesting.task_status ="Successful"
+    print(MetadatosLoadTesting.to_upsert())
+    EL_testing_load(MetadatosLoadTesting.to_upsert())
+
+@Load_Testing.event_handler(Event.FAILURE)
+def on_failure(self,exception):
+    MetadatosLoadTesting.ip_ec2 = "Archivo csv con distinta estructura de columnas"
+    MetadatosLoadTesting.task_status ="Failure"
+    print(MetadatosLoadTesting.to_upsert())
+    EL_testing_load(MetadatosLoadTesting.to_upsert())
+
+# ======================================================
+# Etapa Load
+# ======================================================
+
+MiLinaje = Linaje_load()
+
+class Load(luigi.Task):
+    '''
+    Carga hacia RDS los datos de la carpeta data
+    '''
+    def requires(self):
+        return Load_Testing()
+
+    # Recolectamos fecha y usuario para metadatos a partir de fecha actual
+    MiLinaje.fecha =  datetime.now()
+    MiLinaje.usuario = getpass.getuser()
+
+    def run(self):
+        # Ip metadatos
+        MiLinaje.ip_ec2 = str(socket.gethostbyname(socket.gethostname()))
 
         #Subimos de archivos csv
         extension_csv = ".csv"
-
-        #Cantidad de renglones en metadatos.load
-        tam0 = load_verif_query()
-        cantidad_csv_insertados=0
+        dir_name="./src/data/"
 
         for item in os.listdir(dir_name):
             if item.endswith(extension_csv):
@@ -194,12 +252,9 @@ class Load(luigi.Task):
                 MiLinaje.nombre_archivo = item
 
                 # Numero de columnas y renglones para metadatos
-                comando_col = "awk -F, '{ print NF; exit }' " + dir_name + item
-                comando_row = "wc -l " + dir_name + item + "| awk '{ print $1 }' "
-                #output_c = subprocess.check_output(comando_col, shell=True)
-                #MiLinaje.num_columnas = ast.literal_eval(output_c.decode("ascii"))
-                #output_r = subprocess.check_output(comando_row, shell=True)
-                #MiLinaje.num_renglones = ast.literal_eval(output_r.decode("ascii"))
+                df = pd.read_csv(dir_name + item, low_memory=False)
+                MiLinaje.num_columnas = df.shape[1]
+                MiLinaje.num_renglones = df.shape[0]
 
                 MiLinaje.tamano_csv = Path(dir_name+item).stat().st_size
 
@@ -209,12 +264,12 @@ class Load(luigi.Task):
                     os.remove(dir_name+item)
 
                     EL_load(MiLinaje.to_upsert())
-                    cantidad_csv_insertados=cantidad_csv_insertados+1
+                    #cantidad_csv_insertados=cantidad_csv_insertados+1
                 except:
-                    print("Error en carga de "+item)
+                    print("Carga de "+item)
 
         #Cantidad de renglones en metadatos.load
-        tam1 = load_verif_query()
+        # tam1 = load_verif_query()
 
         os.system('echo "ok" >load_ok.txt')
 

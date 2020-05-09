@@ -27,7 +27,7 @@ class Test_Columns_Case(unittest.TestCase, mixins.CategoricalMixins):
 
     '''
 
-	def test_that_all_ranges_are_present(self):
+	def test_that_all_columns_are_present(self):
 
 
 		df_clean = clean().limit(10)

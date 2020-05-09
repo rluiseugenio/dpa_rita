@@ -137,13 +137,13 @@ Uno o más de los siguientes tipos de transformación pueden ser necesarios para
 
 Para facilitar el entendimiento del proceso recién descrito, presentamos un diagrama que describe las actividades a realizar en cada una de las etapas del ETL.
 
-![Diagrama de flujo del ETL](images/etl3.png?raw=true "Title")
+![Diagrama de flujo del ETL](reports/figures/etl3.png?raw=true "Title")
 (https://drive.google.com/file/d/1aYgxZ5BnPjNXAMo6qNAPVHjWbP7cOrB9/view?usp=sharing)
 (https://www.draw.io/#G17QEIJYjJwGIPJViHqTRJg0UPf8I40m2j)
 
 EL hasta el momento
 
-![Diagrama de flujo del EL](images/EL.png?raw=true "Title")
+![Diagrama de flujo del EL](reports/figures/EL.png?raw=true "Title")
 
 ## 5. Implicaciones éticas del proyecto
 
@@ -173,6 +173,8 @@ Como consecuencia, la métrica que nos interesa es **False Positive Parity** por
 
 Escogimos esta métrica ya que necesitamos que el modelo sea bueno detectando la etiqueta positiva y no hay (mucho) costo en introducir falsos negativos al sistema. El costo de un falso negativo es que usuarios esperen en el aeropuerto a su vuelo retrasado y este sería el status-quo sin el modelo o producto de datos. Asimismo, esta es la métrica adecuada porque  la variable target no es subjetiva. Si un vuelo se retrasa sabemos exactamente cuánto se retrasó y no depende de la persepción del usuario.
 
+![False Positive Parity Distancia](reports/figures/fpr_distance.png?raw=true "Title")
+![False Positive Parity Originwac](reports/figures/fpr_origin.png?raw=true "Title")
 
 ## 7. Contenido la carpeta
 

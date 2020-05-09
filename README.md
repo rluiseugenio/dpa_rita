@@ -53,7 +53,7 @@ El siguiente paso fue realizar el ETL;
 
 * Transform:
 
-EL siguiente proceso es el modeling 
+EL siguiente proceso es el modeling
 
 Descripción detallada del ETL
 ___
@@ -161,7 +161,20 @@ Al respecto, se identifican posibles implicaciones éticas del producto de datos
 * Dañar su estabilidad económica y empleos,
 * Aumentar quejas injustificadas del servicio.
 
-## 6. Contenido la carpeta
+
+## 6. Fairness y bias
+Tomando en cuenta las implicaciones éticas, seleccionamos dos variables protegidas.
+La primera es **originwac** que es la variable que agrupa los aeropuertos de origen por zonas geográficas en Estados Unidos. La variable es protegida porque no queremos que el modelo discrimine por la zone de provencia de los vuelos. Por ejemplo, de los vuelos de sur de Estados Unidos.
+Adicionalmente, la segunda variable protegida es la **distancia** al ser una variable continua la dividiremos en quartiles para el análisis. El objetivo es que el modelo haga predicciones justas sin importar que el vuelo sea corto o largo.
+
+En nuestro modelo intentamos predecir el retraso de un vuelo. Las consecuencias negativas de decir que un vuelo se va a retrasar y que no se retrase (falso positivo) son muchas más graves que decir que un vuelo no se va a retrasar y que se retrase (falso negativo). Es decir, que un usuario espere tiempo extra en el aeropuerto es menos grave que no llegué a su vuelo porque “pensó” que se iba a retrasar. Es por eso que nos interesan los falsos positivos más que los falsos negativos.
+
+Como consecuencia, la métrica que nos interesa es **False Positive Parity** porque queremos que todas las zonas geográficas de Estados Unidos y grupos de distancia tengan el mismo FPR (false positive rate). Es decir, nos equivocamos en las mismas proporciones para etiquetas positivas que eran negativas.
+
+Escogimos esta métrica ya que necesitamos que el modelo sea bueno detectando la etiqueta positiva y no hay (mucho) costo en introducir falsos negativos al sistema. El costo de un falso negativo es que usuarios esperen en el aeropuerto a su vuelo retrasado y este sería el status-quo sin el modelo o producto de datos. Asimismo, esta es la métrica adecuada porque  la variable target no es subjetiva. Si un vuelo se retrasa sabemos exactamente cuánto se retrasó y no depende de la persepción del usuario.
+
+
+## 7. Contenido la carpeta
 
 | # | Carpeta                       | Descripción  |
 |---|-----------------------------------|--------|

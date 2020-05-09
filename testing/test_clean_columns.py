@@ -20,16 +20,14 @@ MY_DB,
 )
 
 class Test_Columns_Case(unittest.TestCase, mixins.CategoricalMixins):
+	
     '''
     
     Verifica que la cantidad de columnas en clean.rita 
     sean las esperadas
 
     '''
-
-	def test_that_all_columns_are_present(self):
-
-
+	def test_that_all_columns_are_present(self):		
 		df_clean = clean().limit(10)
 		clean_rita	= get_clean_data().limit(10)
 		self.assertEqual(len(df_clean.columns), len(clean_rita.columns))

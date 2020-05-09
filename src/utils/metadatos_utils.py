@@ -2,7 +2,7 @@ from luigi.contrib.postgres import CopyToTable
 import pandas as pd
 import luigi
 import psycopg2
-
+import marbles
 import io
 import psycopg2
 import psycopg2.extras
@@ -104,7 +104,63 @@ class Linaje_load_testing():
     def to_upsert(self):
         return (self.fecha, self.nombre_task, self.usuario,\
          self.ip_ec2, self.year, self.month, self.task_status)
-  
+
+
+# Clase para reunir los metadatos del testing de semantic
+class Linaje_semantic1_testing():
+    def __init__(self, fecha=0, nombre_task=0, usuario=0, msg_error=0, year=0, month=0, task_status=0):
+        self.fecha = fecha # time stamp
+        self.nombre_task = self.__class__.__name__#nombre_task
+        self.usuario = usuario # Usuario de la maquina de GNU/Linux que corre la instancia
+        self.msg_error = msg_error #Corresponde a la dirección IP desde donde se ejecuto la tarea
+        self.year = year
+        self.month = month
+        self.task_status = "Failure" # estatus de ejecución: Fallido, exitoso, etc.
+
+    def to_upsert(self):
+        return (self.fecha, self.nombre_task, self.usuario,\
+         self.msg_error, self.year, self.month, self.task_status)
+
+
+# Clase 2 para reunir los metadatos del testing de semantic
+class Linaje_semantic2_testing():
+    def __init__(self, fecha=0, nombre_task=0, usuario=0, msg_error=0, year=0, month=0, task_status=0):
+        self.fecha = fecha # time stamp
+        self.nombre_task = self.__class__.__name__#nombre_task
+        self.usuario = usuario # Usuario de la maquina de GNU/Linux que corre la instancia
+        self.msg_error = msg_error #Corresponde a la dirección IP desde donde se ejecuto la tarea
+        self.year = year
+        self.month = month
+        self.task_status = "Failure" # estatus de ejecución: Fallido, exitoso, etc.
+
+    def to_upsert(self):
+        return (self.fecha, self.nombre_task, self.usuario,\
+         self.msg_error, self.year, self.month, self.task_status)
+#Función auxiliar para insertar los metadatos de la prueba unitaria
+def FE_testing_semantic(record_to_insert):
+    '''
+    Funcion auxiliar para insertar a metadatos.testing_semantic
+    '''
+    # Conexion y cursor para query
+    connection = psycopg2.connect(user = MY_USER, # Usuario RDS
+                                 password = MY_PASS, # password de usuario de RDS
+                                 host = MY_HOST,# endpoint
+                                 port="5432", # cambiar por el puerto
+                                 database=MY_DB) # Nombre de la base de datos
+    cursor = connection.cursor()
+
+    # Query para insertar metadatos
+    query="CREATE TABLE IF NOT EXISTS metadatos.testing_semantic(  fecha VARCHAR,  nombre_task VARCHAR,  usuario VARCHAR,  msg_error VARCHAR,  year VARCHAR,  month VARCHAR,  task_status VARCHAR);GRANT ALL ON  metadatos.testing_semantic to postgres;"
+    cursor.execute(query)
+    postgres_insert_query = """ INSERT INTO metadatos.testing_semantic ( fecha,\
+    nombre_task, usuario, msg_error, year, month, task_status) VALUES ( %s, %s, %s, %s, %s,%s, %s) """
+    cursor.execute(postgres_insert_query, record_to_insert)
+    connection.commit()
+    cursor.close()
+    connection.close()
+
+    return print("metadatos.testing_semantic insertion Done - PostgreSQL connection is closed")
+
 # ==========================================
 # Funciones para insertar metadatos a RDS
 # ==========================================

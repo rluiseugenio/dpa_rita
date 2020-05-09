@@ -81,6 +81,22 @@ CREATE TABLE IF NOT EXISTS metadatos.testing_load(
 
 GRANT ALL ON  metadatos.testing_load to postgres;
 
+
+-- Crea tabla metadatos.testing_semantic
+
+CREATE TABLE IF NOT EXISTS metadatos.testing_semantic(
+  fecha VARCHAR,
+  nombre_task VARCHAR,
+  usuario VARCHAR,
+  msg_error VARCHAR,
+  year VARCHAR,
+  month VARCHAR,
+  task_status VARCHAR
+);
+
+GRANT ALL ON  metadatos.testing_semantic to postgres;
+
+
 --- Crea tabla metadatos.semantic
 
 --DROP TABLE IF EXISTS metadatos.semantic;

@@ -171,9 +171,12 @@ En nuestro modelo intentamos predecir el retraso de un vuelo. Las consecuencias 
 
 Como consecuencia, la métrica que nos interesa es **False Positive Parity** porque queremos que todas las zonas geográficas de Estados Unidos y grupos de distancia tengan el mismo FPR (false positive rate). Es decir, nos equivocamos en las mismas proporciones para etiquetas positivas que eran negativas.
 
-Escogimos esta métrica ya que necesitamos que el modelo sea bueno detectando la etiqueta positiva y no hay (mucho) costo en introducir falsos negativos al sistema. El costo de un falso negativo es que usuarios esperen en el aeropuerto a su vuelo retrasado y este sería el status-quo sin el modelo o producto de datos. Asimismo, esta es la métrica adecuada porque  la variable target no es subjetiva. Si un vuelo se retrasa sabemos exactamente cuánto se retrasó y no depende de la persepción del usuario.
+Escogimos esta métrica ya que necesitamos que el modelo sea bueno detectando la etiqueta positiva y no hay (mucho) costo en introducir falsos negativos al sistema. El costo de un falso negativo es que usuarios esperen en el aeropuerto a su vuelo retrasado y este sería el status-quo sin el modelo o producto de datos. Asimismo, esta es la métrica adecuada porque  la variable target no es subjetiva. Si un vuelo se retrasa sabemos exactamente cuánto se retrasó y no depende de la percepción del usuario.
 
 ![False Positive Parity Distancia](reports/figures/fpr_distance.png?raw=true "Title")
+
+
+
 ![False Positive Parity Originwac](reports/figures/fpr_origin.png?raw=true "Title")
 
 ## 7. Contenido la carpeta

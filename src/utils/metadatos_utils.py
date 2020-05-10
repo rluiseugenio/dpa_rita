@@ -448,7 +448,8 @@ def C_testing_clean_columns(record_to_insert):
                                  database=MY_DB) # Nombre de la base de datos
     cursor = connection.cursor()
 
-    # Query para insertar metadatos
+    query="CREATE TABLE IF NOT EXISTS metadatos.testing_clean_columns(  fecha VARCHAR,  nombre_task VARCHAR,usuario VARCHAR,  ip_ec2 VARCHAR, task_status VARCHAR);GRANT ALL ON  metadatos.testing_clean_columns to postgres;"
+    cursor.execute(query)
     postgres_insert_query = """ INSERT INTO metadatos.testing_clean_columns ( fecha,\
     nombre_task, usuario, ip_ec2, task_status) VALUES ( %s, %s, %s, %s, %s) """
     cursor.execute(postgres_insert_query, record_to_insert)
@@ -470,7 +471,8 @@ def C_testing_clean_rangos(record_to_insert):
                                  database=MY_DB) # Nombre de la base de datos
     cursor = connection.cursor()
 
-    # Query para insertar metadatos
+    query="CREATE TABLE IF NOT EXISTS metadatos.testing_clean_rangos(  fecha VARCHAR,  nombre_task VARCHAR,usuario VARCHAR,  ip_ec2 VARCHAR, task_status VARCHAR);GRANT ALL ON  metadatos.testing_clean_rangos to postgres;"
+    cursor.execute(query)
     postgres_insert_query = """ INSERT INTO metadatos.testing_clean_rangos ( fecha,\
     nombre_task, usuario, ip_ec2, task_status) VALUES ( %s, %s, %s, %s, %s) """
     cursor.execute(postgres_insert_query, record_to_insert)

@@ -1,5 +1,15 @@
 import luigi.contrib.postgres
-from tasks.load import Load
+#from tasks.load import Load
+
+###  Imports desde directorio de proyecto dpa_rita
+## Credenciales
+from src import(
+MY_USER,
+MY_PASS,
+MY_HOST,
+MY_PORT,
+MY_DB,
+)
 
 # ======================================================
 # Metadatos de etapa load

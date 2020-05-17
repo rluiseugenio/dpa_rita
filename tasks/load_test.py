@@ -29,7 +29,7 @@ MY_DB,
 ## Utilidades
 from src.utils.metadatos_utils import Linaje_load_testing, EL_testing_load
 
-from task.metadatos_extract import Metadata_Extract
+#from task.metadatos_extract import Metadata_Extract
 # ======================================================
 # Prueba unitaria de la etapa load
 # ======================================================
@@ -42,7 +42,7 @@ class Load_Testing(luigi.Task):
     Prueba unitaria de estructura de archivos descargados
     '''
     def requires(self):
-        return Metadata_Extract()
+        return Metadata_Extract3()
 
     # Recolectamos fecha y usuario para metadatos a partir de fecha actual
     MetadatosLoadTesting.fecha =  datetime.now()

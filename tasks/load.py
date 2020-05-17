@@ -28,10 +28,11 @@ MY_DB,
 )
 
 ## Utilidades
+from tasks.load_test import Load_Testing
 from src.utils.db_utils import save_rds
 from src.utils.metadatos_utils import Linaje_load
 
-from tasks.load_test import Load_Testing
+#from tasks.load_test import Load_Testing
 # ======================================================
 # Etapa load
 # ======================================================

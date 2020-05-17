@@ -1,7 +1,20 @@
 import luigi.contrib.postgres
 from tasks.extract import Extraction
+#from tasks.extract import Extraction
 
-class Metadata_Extract(luigi.contrib.postgres.CopyToTable):
+###  Imports desde directorio de proyecto dpa_rita
+## Credenciales
+from src import(
+MY_USER,
+MY_PASS,
+MY_HOST,
+MY_PORT,
+MY_DB,
+)
+
+meta_extract = []
+
+class Metadata_Extract3(luigi.contrib.postgres.CopyToTable):
     '''
     Task de luigi para insertar renglones en renglones en tabla de metadatos
     de la extraccion y load de metadatos a S3

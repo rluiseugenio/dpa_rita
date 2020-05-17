@@ -73,19 +73,19 @@ from tasks.metadatos_extract import Metadata_Extract
 from tasks.load_test import Load_Testing
 from tasks.load import Load
 from task.metadatos_load import Metadata_Load
-from tasks.clean_column_testing import CleanColumn_Testing
-from tasks.clean_rango_testing import CleanRango_Testing
-from tasks.clean import GetCleanData
-from tasks.semantic_column_testing import Semantic_Testing_col
-from tasks.semantic_type_testing import Semantic_Testing
-from tasks.semantic import GetFEData
-from tasks.bucket import CreateModelBucket
-from tasks.modeling import RunModel
-from tasks.all_targets import RunAllTargets
-from tasks.target_a import RunTargetA
-from tasks.target_b import RunTargetB
-from tasks.target_c import RunTargetC
-from tasks.target_d import RunTargetD
+# from tasks.clean_column_testing import CleanColumn_Testing
+# from tasks.clean_rango_testing import CleanRango_Testing
+# from tasks.clean import GetCleanData
+# from tasks.semantic_column_testing import Semantic_Testing_col
+# from tasks.semantic_type_testing import Semantic_Testing
+# from tasks.semantic import GetFEData
+# from tasks.bucket import CreateModelBucket
+# from tasks.modeling import RunModel
+# from tasks.all_targets import RunAllTargets
+# from tasks.target_a import RunTargetA
+# from tasks.target_b import RunTargetB
+# from tasks.target_c import RunTargetC
+# from tasks.target_d import RunTargetD
 
 
 

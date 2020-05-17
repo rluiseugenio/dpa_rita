@@ -1,5 +1,5 @@
 import luigi.contrib.postgres
-#from tasks.extract import Extraction
+from tasks.extract import Extraction
 
 class Metadata_Extract(luigi.contrib.postgres.CopyToTable):
     '''

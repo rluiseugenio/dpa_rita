@@ -31,7 +31,6 @@ MY_DB,
 from src.utils.db_utils import save_rds
 from src.utils.metadatos_utils import Linaje_load
 
-from tasks.extract import Extraction
 from tasks.load_test import Load_Testing
 # ======================================================
 # Etapa load

@@ -29,7 +29,7 @@ MY_DB,
 ## Utilidades
 from src.utils.metadatos_utils import Linaje_load_testing, EL_testing_load
 
-#from tasks.extract import Extraction
+from task.metadatos_extract import Metadata_Extract
 # ======================================================
 # Prueba unitaria de la etapa load
 # ======================================================

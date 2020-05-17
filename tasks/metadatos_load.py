@@ -1,4 +1,5 @@
 import luigi.contrib.postgres
+from tasks.load import Load
 
 # ======================================================
 # Metadatos de etapa load

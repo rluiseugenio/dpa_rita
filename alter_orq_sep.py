@@ -69,8 +69,10 @@ from testing.test_semantic_column_types import TestSemanticColumnsTypes
 
 # Dependencias de Tasks previos =======
 from tasks.extract import Extraction
+from tasks.metadatos_extract import Metadata_Extract
 from tasks.load_test import Load_Testing
 from tasks.load import Load
+from task.metadatos_load import Metadata_Load
 from tasks.clean_column_testing import CleanColumn_Testing
 from tasks.clean_rango_testing import CleanRango_Testing
 from tasks.clean import GetCleanData

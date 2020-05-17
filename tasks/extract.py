@@ -52,16 +52,14 @@ from src.utils.metadatos_utils import Linaje_extract_testing, EL_testing_extract
 from src.utils.metadatos_utils import Linaje_load_testing, EL_testing_load
 from src.utils.metadatos_utils import Linaje_semantic1_testing, Linaje_semantic2_testing, FE_testing_semantic
 
-# Inicializa la clase que reune los metadatos
+# Inicializa la clase que reune los metadatos
 MiLinajeExt = Linaje_raw() # extract y load
-# ===============================
-CURRENT_DIR = os.getcwd()
-# ===============================s
-# Tasks de Luigi
 
 # ======================================================
 # Etapa Extract
 # ======================================================
+
+meta_extract = [] # arreglo para reunir tuplas de metadatos 
 
 class Extraction(luigi.Task):
     '''
@@ -95,7 +93,7 @@ class Extraction(luigi.Task):
                 MiLinajeExt.month = str(mes)
 
                 # check para no hacer peticiones fuera de la fecha actual
-                if (anio <= current_year) & (mes <= current_month-4):
+                if (anio <= current_year) & (mes <= current_month-3):
                     #URL para hacer peticion a API rita en anio y mes indicado
                     url_act = self.BASE_URL+str(anio)+"_"+str(mes)+".zip"
 
@@ -110,7 +108,6 @@ class Extraction(luigi.Task):
                             comando_descarga = 'wget ' + url_act + " -P " + "./src/data/"
                             os.system(comando_descarga)
                         except:
-
                             pass
 
                         #Escribimos el archivo descargado al bucket
@@ -140,11 +137,12 @@ class Extraction(luigi.Task):
                         #MiLinajeExt.tamano_zip = my_bucket.Object(key="RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip").content_length
 
                         # Recolectamos status para metadatos
-                        MiLinajeExt.task_status = "Successful"
+                        MiLinajeExt.task_status = "Successfull"
 
                         # Insertamos metadatos a DB
                         print(MiLinajeExt.to_upsert())
-                        EL_metadata(MiLinajeExt.to_upsert())
+                        meta_extract.append(MiLinajeExt.to_upsert())
+                        #EL_metadata(MiLinajeExt.to_upsert())
 
         # Unzips de archivos zip recien descargados
         dir_name = "./src/data/" # directorio de zip
@@ -163,7 +161,7 @@ class Extraction(luigi.Task):
                     os.remove(dir_name+'readme.html')
                 except:
                     pass
-                #os.remove(dir_name+'readme.html')
+                 #os.remove(dir_name+'readme.html')
 
         os.system('echo OK > target/extract_ok.txt')
 

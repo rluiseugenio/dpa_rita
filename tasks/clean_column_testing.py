@@ -73,7 +73,7 @@ class CleanColumn_Testing(luigi.Task):
     Prueba unitaria de número de columnas correctas en clean.rita
     '''
     def requires(self):
-        return Load()
+        return Metadata_Load()
 
     # Recolectamos fecha y usuario para metadatos a partir de fecha actual
     MetadatosCleanColumnTesting.fecha =  datetime.now()

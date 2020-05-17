@@ -78,7 +78,7 @@ from tasks.extract import Extraction
 from tasks.metadatos_extract import Metadata_Extract3
 from tasks.load_test import Load_Testing
 from tasks.load import Load
-from tasks.metadatos_load import Metadata_Load
+from tasks.metadatos_load import Metadata_Load1
 # from tasks.clean_column_testing import CleanColumn_Testing
 # from tasks.clean_rango_testing import CleanRango_Testing
 # from tasks.semantic_column_testing import Semantic_Testing_col
@@ -94,7 +94,7 @@ from tasks.metadatos_load import Metadata_Load
 
 # Listas auxiliares
 meta_extract = [] # arreglo para reunir tuplas de metadatos
-load_extract = [] # arreglo para reunir tuplas de metadatos
+meta_load = [] # arreglo para reunir tuplas de metadatos
 
 
 

@@ -1,5 +1,5 @@
 import luigi.contrib.postgres
-#from tasks.load import Load
+from tasks.load import Load
 
 ###  Imports desde directorio de proyecto dpa_rita
 ## Credenciales
@@ -15,7 +15,7 @@ MY_DB,
 # Metadatos de etapa load
 # ======================================================
 
-class Metadata_Load(luigi.contrib.postgres.CopyToTable):
+class Metadata_Load1 (luigi.contrib.postgres.CopyToTable):
     '''
     Task de luigi para insertar renglones en renglones en tabla de metadatos
     de load

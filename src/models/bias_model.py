@@ -4,6 +4,7 @@ from aequitas.bias import Bias
 from aequitas.fairness import Fairness
 from aequitas.plotting import Plot
 from aequitas.preprocessing import preprocess_input_df
+from datetime import date, datetime
 
 import pandas as pd
 import seaborn as sns
@@ -22,15 +23,31 @@ def get_bias_stats():
     best_s3 +  "';"
     predictions = get_dataframe(query)
     df = preprocess_df(predictions)
+    bias_result = get_fpr_disparity(df, "distance")
 
-    g = Group()
-    xtab, _ = g.get_crosstabs(df)
-    #  group selection based on sample majority (across each attribute)
-    majority_bdf = b.get_disparity_major_group(xtab, original_df=df, mask_significance=True)
-    results = majority_bdf[['attribute_name', 'attribute_value'] +  calculated_disparities + disparity_significance]
-    #Falta extraer lo que queremos. No sé qué queramos
-    return results
+    today = date.today()
+    d1 = today.strftime("%d%m%Y")
 
+    metadata = [d1]+ [best_s3] + bias_result
+    return metadata
+
+def get_fpr_disparity(df, protected_attribute):
+     g = Group()
+     xtab, _ = g.get_crosstabs(df)
+
+     b = Bias()
+     bdf = b.get_disparity_predefined_groups(xtab, original_df=df, ref_groups_dict={'originwac':'91.0','distance':'110.00-862.00' }, alpha=0.05, mask_significance=True)
+     calculated_disparities = b.list_disparities(bdf)
+     disparity_significance = b.list_significance(bdf)
+     majority_bdf = b.get_disparity_major_group(xtab, original_df=df, mask_significance=True)
+     results = majority_bdf[['attribute_name', 'attribute_value'] + \
+     calculated_disparities + disparity_significance]
+
+     res_distance = results[results.attribute_name ==protected_attribute]
+     values= res_distance.attribute_value.tolist()
+     disparity = res_distance.fpr_disparity.tolist()
+     bias_result = values + disparity
+     return bias_result
 
 def preprocess_df(df_pandas, cheat = 1):
     if cheat:
@@ -44,20 +61,6 @@ def preprocess_df(df_pandas, cheat = 1):
     df, _ = preprocess_input_df(df_pandas)
     return df
 
-def add_metadata_fairness(objetivo, model_name,hyperparams, log,train_time, test_split, train_nrows):
-    AUROC = log['AUROC']
-    AUPR = log['AUPR']
-    precision = log['precision']
-    recall = log['recall']
-    f1 =log['F1 Measure']
-    today = date.today()
-    d1 = today.strftime("%d%m%Y")
 
-    query = """ INSERT INTO metadatos.fairness (fecha, objetivo, model_name, hyperparams, AUROC, AUPR, precision, recall, f1, train_time, test_split, train_nrows ) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s  ) """
-    values = (d1,
-             objetivo, model_name,
-             json.dumps(hyperparams),
-             AUROC, AUPR, precision, recall, f1, train_time, test_split, train_nrows)
-    #insert_query(query, values)
 
-#get_bias_stats()
+#print(get_bias_stats())

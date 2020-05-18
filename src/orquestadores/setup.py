@@ -1,6 +1,7 @@
 '''
 RESTART:
 aws s3 rm s3://models-dpa --recursive
+drop from metadata.bias
 '''
 
 import luigi

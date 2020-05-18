@@ -1,55 +1,38 @@
+'''
+SIMPLE
+PYTHONPATH='.' AWS_PROFILE=dpa luigi --module bias SaveMetadataBias --local-scheduler
+'''
+from datetime import date, datetime
+from io import StringIO
+from luigi import Event, Task, build # Utilidades para acciones tras un task exitoso o fallido
+from luigi.contrib.postgres import CopyToTable,PostgresQuery
+import os
+import luigi
+import luigi.contrib.s3
 
-class LocalHelper():
-    def __init__(self, values = "None"):
-        self.values = values
+import pandas as pd
 
-metadata = LocalHelper()
+from src.orquestadores.modelling import RunModelSimple
+from src.models.bias_model import get_bias_stats
+from src import (
+    MY_USER ,
+    MY_PASS ,
+    MY_HOST ,
+    MY_PORT,
+    MY_DB
+)
 
-class SaveMetadataBias(CopyToTable):
+class EvaluateBias(PostgresQuery):
+
     def requires(self):
-        return EvaluateBias()
+        return RunModelSimple()
 
-    x = luigi.IntParameter()
-
-    # Lectura de archivo de credenciales
     user = MY_USER
     password = MY_PASS
     database = MY_DB
     host = MY_HOST
+    table ='metadatos.bias'
+    #update_id = "45" #Para que vuelva a correr
 
-    table = 'metadatos.bias'
-
-    columns = [("x", "VARCHAR"),
-               ("y", "VARCHAR")]
-
-    def rows(self):
-        z = str(self.x + self.x)
-        print("########### ", z)
-        r = [("test 1", z), ("test 2","45")]
-        for element in r:
-            yield element
-
-
-class EvaluateBias(luigi.Task):
-
-	def requires(self):
-		return RunModelSimple()
-
-	def output(self):
-		objetivo = self.obj
-		model_name = self.model
-		hyperparams = {"iter": int(self.numIt),
-						"pca": int(self.numPCA)}
-
-		output_path = parse_filename(objetivo, model_name, hyperparams)
-		output_path = "s3://" + str(self.bucname) +  output_path[1:] + ".model.zip"
-
-		return luigi.contrib.s3.S3Target(path=output_path)
-
-	def run(self):
-		objetivo = self.obj
-		model_name = self.model
-		hyperparams = {"iter": int(self.numIt),
-						"pca": int(self.numPCA)}
-
-		run_model(objetivo, model_name, hyperparams, True)
+    data_list =  get_bias_stats()
+    query = "insert into metadatos.bias values "  + str(tuple(data_list))

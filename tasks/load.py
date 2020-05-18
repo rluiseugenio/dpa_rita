@@ -75,7 +75,7 @@ class Load(luigi.Task):
                 try:
                     print(item)
                     save_rds(dir_name+item, table_name)
-                    #os.remove(dir_name+item)
+                    os.remove(dir_name+item)
 
                     meta_load.append(MiLinaje.to_upsert())
                 except:

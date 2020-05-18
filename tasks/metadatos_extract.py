@@ -16,7 +16,7 @@ MY_DB,
 
 meta_extract = []
 
-class Metadata_Extract4(luigi.contrib.postgres.CopyToTable):
+class Metadata_Extract(luigi.contrib.postgres.CopyToTable):
     '''
     Task de luigi para insertar renglones en renglones en tabla de metadatos
     de la extraccion y load de metadatos a S3

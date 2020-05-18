@@ -42,7 +42,7 @@ class Load_Testing(luigi.Task):
     Prueba unitaria de estructura de archivos descargados
     '''
     def requires(self):
-        return Metadata_Extract3()
+        return Metadata_Extract()
 
     # Recolectamos fecha y usuario para metadatos a partir de fecha actual
     MetadatosLoadTesting.fecha =  datetime.now()

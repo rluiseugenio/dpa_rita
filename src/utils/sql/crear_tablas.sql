@@ -138,6 +138,7 @@ CREATE TABLE IF NOT EXISTS metadatos.models(
   fecha VARCHAR,
   objetivo VARCHAR,
   model_name VARCHAR,
+  s3_name VARCHAR,
   hyperparams VARCHAR,
   AUROC VARCHAR,
   AUPR VARCHAR,

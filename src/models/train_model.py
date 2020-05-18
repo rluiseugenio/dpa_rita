@@ -1,13 +1,11 @@
 
-
-from src.features.build_features import clean
-from src.utils.db_utils import execute_sql,insert_query
-from src.models.save_model import save_upload
+from src.utils.db_utils import execute_sql,insert_query, save_rds_pandas
+from src.models.save_model import save_upload, parse_filename
 
 from datetime import date, datetime
 from pyspark.sql import SparkSession
 from pyspark.sql.types import IntegerType, DoubleType
-from pyspark.sql.functions import monotonically_increasing_id, countDistinct, approxCountDistinct, when
+from pyspark.sql.functions import monotonically_increasing_id, countDistinct, approxCountDistinct, when, lit
 
 from pyspark.ml.feature import OneHotEncoder, StringIndexer, Imputer, VectorAssembler, StandardScaler, PCA
 from pyspark.ml import Pipeline
@@ -41,7 +39,7 @@ from src import (
 def get_data(luigi=True):
     config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
     connection = pg.connect(config_psyco)
-    pdf = pd.read_sql_query('select * from semantic.rita;',con=connection)
+    pdf = pd.read_sql_query('select * from semantic.rita limit 1000;',con=connection)
     spark = SparkSession \
     .builder \
     .appName("Python Spark SQL basic example") \
@@ -81,14 +79,14 @@ def get_data(luigi=True):
                          StructField('depdelay', FloatType(), True),
                          StructField('depdelayminutes', FloatType(), True),
                          StructField('depdel15', FloatType(), True),
-                         StructField('departuredelaygroups', IntegerType(), True),
+                         StructField('departuredelaygroups', FloatType(), True),
                          StructField('deptimeblk', StringType(), True),
                          StructField('taxiout', FloatType(), True),
-                         StructField('wheelsoff', IntegerType(), True),
-                         StructField('wheelson', IntegerType(), True),
+                         StructField('wheelsoff',FloatType(), True),
+                         StructField('wheelson', FloatType(), True),
                          StructField('taxiin', FloatType(), True),
                          StructField('crsarrtime', IntegerType(), True),
-                         StructField('arrtime', IntegerType(), True),
+                         StructField('arrtime', FloatType(), True),
                          StructField('arrdelay', FloatType(), True),
                          StructField('arrdelayminutes', FloatType(), True),
                          StructField('arrdel15', FloatType(), True),
@@ -114,28 +112,6 @@ def get_data(luigi=True):
     print((df.count(), len(df.columns)))
     return df
 
-
-def get_data_viejo(luigi=True):
-    #El parametro luigi es True si se corre en luigi (y docker)
-    import os
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    print(dir_path)
-
-    if luigi:
-        direccion =  "/home/data/raw/prueba.csv"
-    else:
-        direccion = "./../data/raw/prueba.csv"
-
-
-    spark = SparkSession \
-        .builder \
-        .appName("Python Spark SQL basic example") \
-        .config("spark.some.config.option", "some-value") \
-        .getOrCreate()
-
-    df = spark.read.csv(direccion, header="true", inferSchema="true").limit(20000)
-    df = clean(df)
-    return df
 
 
 def imputa_categoricos(df, ignore,data_types):
@@ -165,7 +141,7 @@ def get_data_types(df):
         data_types[str(entry.dataType)].append(entry.name)
     return data_types
 
-#
+
 def create_pipeline(df, ignore):
     """
         todo:
@@ -341,6 +317,26 @@ def run_model(objetivo, model_name, hyperparams, luigi= False, test_split = 0.2)
     # -------------------
     add_meta_data(objetivo, model_name,hyperparams, log,train_time, test_split, train_nrows)
 
+    # Guarda en RDS predictions test para fairness y bias
+    save_train_predictions(prediction, objetivo, model_name, hyperparams)
+
+    return prediction, df_test
+
+def save_train_predictions(prediction, objetivo, model_name, hyperparams):
+    s3_name = parse_filename(objetivo, model_name, hyperparams)
+    s3_name = s3_name[2:]
+
+    vars_bias = ['prediction', 'originwac', 'label', 'distance']
+    df_bias = prediction.select([c for c in prediction.columns if c in vars_bias])
+    df_bias=df_bias.withColumnRenamed("prediction", "score").withColumnRenamed("label", "label_value")
+    df_bias = df_bias.withColumn('s3_name', lit(s3_name))
+
+    df_pandas = df_bias.toPandas()
+
+    save_rds_pandas(df_pandas, "predictions.train")
+    return 0
+    #add_metadata_fairness
+
 
 
 def evaluate(predictionAndLabels):
@@ -388,6 +384,9 @@ def evaluate(predictionAndLabels):
 
 
 def add_meta_data(objetivo, model_name,hyperparams, log,train_time, test_split, train_nrows):
+    s3_name = parse_filename(objetivo, model_name, hyperparams)
+    s3_name = s3_name[2:]
+
     AUROC = log['AUROC']
     AUPR = log['AUPR']
     precision = log['precision']
@@ -396,23 +395,21 @@ def add_meta_data(objetivo, model_name,hyperparams, log,train_time, test_split, 
     today = date.today()
     d1 = today.strftime("%d%m%Y")
 
-    query = """ INSERT INTO metadatos.models (fecha, objetivo, model_name, hyperparams, AUROC, AUPR, precision, recall, f1, train_time, test_split, train_nrows ) VALUES ( %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s  ) """
+    query = """ INSERT INTO metadatos.models (fecha, objetivo, model_name, s3_name, hyperparams, AUROC, AUPR, precision, recall, f1, train_time,  test_split, train_nrows )   VALUES ( %s, %s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s  ) """
     values = (d1,
-             objetivo, model_name,
+             objetivo, model_name, s3_name,
              json.dumps(hyperparams),
              AUROC, AUPR, precision, recall, f1, train_time, test_split, train_nrows)
     insert_query(query, values)
 
-def remove_constant():
-    """ Not used """
-    # Borramos las variables constantes
-    cnt = df_test.agg(*(f.countDistinct(c).alias(c) for c in df_test.columns)).first()
-    df_test =  df_test.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
-    df_train =  df_train.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
-    cnt = df_train.agg(*(f.countDistinct(c).alias(c) for c in df_train.columns)).first()
-    df_test =  df_test.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
-    df_train =  df_train.drop(*[c for c in cnt.asDict() if cnt[c] == 1])
 
+def main():
+    '''Para pruebas'''
+    objetivo = "0-1.5"
+    model_name = "LR"
+    hyperparams = {"iter": 1,
+                  "pca": 1}
 
+    prediction, df_test = run_model(objetivo, model_name, hyperparams, luigi= False, test_split = 0.2)
 
-get_data()
+#main()

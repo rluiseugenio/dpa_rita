@@ -78,7 +78,7 @@ from tasks.extract import Extraction
 from tasks.metadatos_extract import Metadata_Extract
 from tasks.load_test import Load_Testing
 from tasks.load import Load
-from tasks.metadatos_load import Metadata_Load1
+from tasks.metadatos_load import Metadata_Load
 from tasks.clean_column_testing import CleanColumn_Testing
 from tasks.clean_rango_testing import CleanRango_Testing
 from tasks.semantic_column_testing import Semantic_Testing_col

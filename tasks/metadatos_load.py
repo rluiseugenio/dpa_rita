@@ -19,7 +19,7 @@ MY_DB,
 # Metadatos de etapa load
 # ======================================================
 
-class Metadata_Load1 (luigi.contrib.postgres.CopyToTable):
+class Metadata_Load(luigi.contrib.postgres.CopyToTable):
     '''
     Task de luigi para insertar renglones en renglones en tabla de metadatos
     de load

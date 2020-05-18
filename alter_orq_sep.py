@@ -75,7 +75,7 @@ from src.utils.metadatos_utils import Linaje_semantic1_testing, Linaje_semantic2
 
 # Dependencias de Tasks previos =======
 from tasks.extract import Extraction
-from tasks.metadatos_extract import Metadata_Extract3
+from tasks.metadatos_extract import Metadata_Extract4
 from tasks.load_test import Load_Testing
 from tasks.load import Load
 from tasks.metadatos_load import Metadata_Load1

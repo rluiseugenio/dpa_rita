@@ -1,4 +1,8 @@
 import luigi.contrib.postgres
+from pathlib import Path
+import pandas as pd
+import os
+
 from tasks.load import Load
 
 ###  Imports desde directorio de proyecto dpa_rita
@@ -48,9 +52,14 @@ class Metadata_Load1 (luigi.contrib.postgres.CopyToTable):
         # Funcion para insertar renglones en tabla
 
         # Renglon o renglones (separados por coma) a ser insertado
-        r = meta_load # lista para insertar metadatos definida en load
+        for data_file in Path('metadata').glob('*.csv'):
+            with open(data_file, 'r') as csv_file:
+                reader = pd.read_csv(csv_file, header=None)
 
-        # Insertamos renglones en tabla
-        for element in r:
-            yield element
+                # Insertamos renglones en tabla
+                for element in reader.itertuples(index=False):
+                    yield element
+
+                os.system('rm metadata/*.csv')
+
         print('\n--- Carga de metadatos de load realizada con exito ---\n')

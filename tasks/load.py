@@ -28,11 +28,11 @@ MY_DB,
 )
 
 ## Utilidades
-from tasks.load_test import Load_Testing
+#from tasks.load_test import *
 from src.utils.db_utils import save_rds
 from src.utils.metadatos_utils import Linaje_load
 
-#from tasks.load_test import Load_Testing
+from tasks.load_test import Load_Testing
 # ======================================================
 # Etapa load
 # ======================================================
@@ -81,6 +81,8 @@ class Load(luigi.Task):
                 except:
                     print("Carga de "+item)
 
+        df = pd.DataFrame(meta_load, columns=["fecha","nombre_task","usuario","ip_ec2","tamano_csv","nombre_archivo","num_columnas","num_renglones"])
+        df.to_csv("metadata/load_metadata.csv",index=False,header=False)
 
         os.system('echo "ok" >target/load_ok.txt')
 

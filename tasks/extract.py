@@ -126,6 +126,12 @@ class Extraction(luigi.Task):
                         meta_extract.append(MiLinajeExt.to_upsert())
                         #EL_metadata(MiLinajeExt.to_upsert())
 
+        # Escritura de csv para carga de metadatos
+        df = pd.DataFrame(meta_extract, columns=["fecha","nombre_task","year","month","usuario","ip_ec2","tamano_zip","nombre_archivo","ruta_s3","task_status"])
+        df.to_csv("metadata/extract_metadata.csv",index=False,header=False)
+
+        os.system('echo "ok" >target/load_ok.txt')
+
         # Unzips de archivos zip recien descargados
         dir_name = "./src/data/" # directorio de zip
         extension_zip = ".zip"
@@ -143,7 +149,6 @@ class Extraction(luigi.Task):
                     os.remove(dir_name+'readme.html')
                 except:
                     pass
-                 #os.remove(dir_name+'readme.html')
 
         os.system('echo OK > target/extract_ok.txt')
 

@@ -1,5 +1,7 @@
 import luigi.contrib.postgres
-from tasks.extract import Extraction
+import os, subprocess, ast
+import pandas as pd
+from tasks.extract import * #Extraction
 #from tasks.extract import Extraction
 
 ###  Imports desde directorio de proyecto dpa_rita
@@ -14,7 +16,7 @@ MY_DB,
 
 meta_extract = []
 
-class Metadata_Extract3(luigi.contrib.postgres.CopyToTable):
+class Metadata_Extract4(luigi.contrib.postgres.CopyToTable):
     '''
     Task de luigi para insertar renglones en renglones en tabla de metadatos
     de la extraccion y load de metadatos a S3
@@ -49,9 +51,14 @@ class Metadata_Extract3(luigi.contrib.postgres.CopyToTable):
         # Funcion para insertar renglones en tabla
 
         # Renglon o renglones (separados por coma) a ser insertado
-        r = meta_extract # arreglo definio en extract
+        for data_file in Path('metadata').glob('*.csv'):
+            with open(data_file, 'r') as csv_file:
+                reader = pd.read_csv(csv_file, header=None)
 
-        # Insertamos renglones en tabla
-        for element in r:
-            yield element
+                # Insertamos renglones en tabla
+                for element in reader.itertuples(index=False):
+                    yield element
+
+                os.system('rm metadata/*.csv')
+
         print('\n---Fin de  carga de metadatos de extract ---\n')

@@ -156,6 +156,48 @@ def show_select(query):
     except (Exception, psycopg2.Error) as error :
         print ("Error while fetching data from PostgreSQL", error)
 
+def get_select(query):
+    try:
+        connection = psycopg2.connect(user=MY_USER , # Usuario RDS
+                                     password=MY_PASS, # password de usuario de RDS
+                                     host=MY_HOST ,#"127.0.0.1", # cambiar por el endpoint adecuado
+                                     port=MY_PORT, # cambiar por el puerto
+                                     database=MY_DB ) # Nombre de la base de datos
+        cursor = connection.cursor()
+        cursor.execute(query)
+        records = cursor.fetchall()
+
+        cursor.close()
+        connection.close()
+        return records
+        print("PostgreSQL connection is closed")
+
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while fetching data from PostgreSQL", error)
+
+def get_dataframe(query):
+    try:
+        connection = psycopg2.connect(user=MY_USER , # Usuario RDS
+                                     password=MY_PASS, # password de usuario de RDS
+                                     host=MY_HOST ,#"127.0.0.1", # cambiar por el endpoint adecuado
+                                     port=MY_PORT, # cambiar por el puerto
+                                     database=MY_DB ) # Nombre de la base de datos
+        cursor = connection.cursor()
+
+        cursor.execute(query)
+
+        #print("Selecting rows from table using cursor.fetchall")
+        records = cursor.fetchall()
+        df = pd.DataFrame(records)
+        col_names =  [i[0] for i in cursor.description]
+        df.columns = col_names
+        cursor.close()
+        connection.close()
+        #print("PostgreSQL connection is closed")
+        return df
+    except (Exception, psycopg2.Error) as error :
+        print ("Error while fetching data from PostgreSQL", error)
+
 
 def execute_sql(file_dir):
     try:
@@ -200,7 +242,27 @@ def save_rds(file_name, table_name):
     connection.close()
 
 
+def save_rds_pandas(df,table_name):
 
+    # Copy to postgres
+    connection = psycopg2.connect(user=MY_USER , # Usuario RDS
+                                 password=MY_PASS, # password de usuario de RDS
+                                 host=MY_HOST,#"127.0.0.1", # cambiar por el endpoint adecuado
+                                 port=MY_PORT, # cambiar por el puerto
+                                 database=MY_DB) # Nombre de la base de datos
+    cursor = connection.cursor()
+
+    records = df.values.tolist()
+    buffer = StringIO()
+    for line in records:
+        buffer.write('~'.join([str(x) for x in line]) + '\n')
+
+    buffer.seek(0)
+
+    cursor.copy_from(buffer, table_name, null='NaN', sep ='~' )
+    connection.commit()
+    cursor.close()
+    connection.close()
 
 #file_name = "./../../data/datos_ejemplo.csv"
 #file_name = "datos_ejemplo.csv"

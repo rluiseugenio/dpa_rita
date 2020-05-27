@@ -96,6 +96,8 @@ from tasks.target_d import RunTargetD
 # Listas auxiliares
 meta_extract = [] # arreglo para reunir tuplas de metadatos
 meta_load = [] # arreglo para reunir tuplas de metadatos
+meta_clean = [] # arreglo para reunir tuplas de metadatos
+meta_semantic = [] # arreglo para reunir tuplas de metadatos
 
 
 

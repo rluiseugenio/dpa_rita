@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import os
 
-from tasks.load import Load
+from tasks.clean import GetCleanData
 
 ###  Imports desde directorio de proyecto dpa_rita
 ## Credenciales

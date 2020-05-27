@@ -29,6 +29,7 @@ from pathlib import Path
 ###librerias para clean
 from pyspark.sql import SparkSession
 from src.features.build_features import clean, crear_features
+import marbles.core
 
 ###  Imports desde directorio de proyecto dpa_rita
 ## Credenciales

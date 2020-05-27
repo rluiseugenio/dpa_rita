@@ -52,7 +52,7 @@ from src.models.train_model import run_model
 from src.models.save_model import parse_filename
 
 #Pruebas unitarias Load
-from testing.load_test import Load_Testing
+#from tasks.load_test import Load_Testing
 from testing.test_absent_hearders import TestingHeaders
 
 #Metadata Clean Testing

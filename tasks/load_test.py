@@ -15,9 +15,6 @@ import psycopg2
 from psycopg2 import extras
 from zipfile import ZipFile
 from pathlib import Path
-###librerias para clean
-from pyspark.sql import SparkSession
-from src.features.build_features import clean, crear_features
 
 ###  Imports desde directorio de proyecto dpa_rita
 ## Credenciales
@@ -30,23 +27,14 @@ MY_DB,
 )
 
 ## Utilidades
-from src.utils.s3_utils import create_bucket
-from src.utils.db_utils import create_db, execute_sql, save_rds
-from src.utils.ec2_utils import create_ec2
-from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_load,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query,Linaje_load,load_verif_query
-from src.utils.db_utils import execute_sql
-#from src.models.train_model import run_model
-from src.models.save_model import parse_filename
-from src.utils.metadatos_utils import Linaje_extract_testing, EL_testing_extract
 from src.utils.metadatos_utils import Linaje_load_testing, EL_testing_load
-from src.utils.metadatos_utils import Linaje_semantic1_testing, Linaje_semantic2_testing, FE_testing_semantic
 
-from tasks.extract import Extraction
+#from task.metadatos_extract import * #Metadata_Extract
 # ======================================================
 # Prueba unitaria de la etapa load
 # ======================================================
 
-from testing.test_absent_hearders import TestingHeaders
+#from testing.test_absent_hearders import TestingHeaders
 MetadatosLoadTesting = Linaje_load_testing()
 
 class Load_Testing(luigi.Task):
@@ -54,7 +42,7 @@ class Load_Testing(luigi.Task):
     Prueba unitaria de estructura de archivos descargados
     '''
     def requires(self):
-        return Extraction()
+        return Metadata_Extract()
 
     # Recolectamos fecha y usuario para metadatos a partir de fecha actual
     MetadatosLoadTesting.fecha =  datetime.now()
@@ -77,6 +65,7 @@ class Load_Testing(luigi.Task):
         output_path='target/testing_load_ok.txt'
         return luigi.LocalTarget(output_path)
 
+# Decoradores para escribir metadatos de la prueba (aun si falla)
 @Load_Testing.event_handler(Event.SUCCESS)
 def on_success(self):
     MetadatosLoadTesting.ip_ec2 = ""

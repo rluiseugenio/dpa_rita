@@ -27,41 +27,21 @@ from psycopg2 import extras
 from zipfile import ZipFile
 from pathlib import Path
 ###librerias para clean
-from pyspark.sql import SparkSession
-from src.features.build_features import clean, crear_features
+#from pyspark.sql import SparkSession
 
-###  Imports desde directorio de proyecto dpa_rita
-## Credenciales
-from src import(
-MY_USER,
-MY_PASS,
-MY_HOST,
-MY_PORT,
-MY_DB,
-)
-
-## Utilidades
-from src.utils.s3_utils import create_bucket
-from src.utils.db_utils import create_db, execute_sql, save_rds
-from src.utils.ec2_utils import create_ec2
 from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_load,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query,Linaje_load,load_verif_query
-from src.utils.db_utils import execute_sql
-#from src.models.train_model import run_model
 from src.models.save_model import parse_filename
 from src.utils.metadatos_utils import Linaje_extract_testing, EL_testing_extract
 from src.utils.metadatos_utils import Linaje_load_testing, EL_testing_load
-from src.utils.metadatos_utils import Linaje_semantic1_testing, Linaje_semantic2_testing, FE_testing_semantic
 
-# Inicializa la clase que reune los metadatos
+# Inicializa la clase que reune los metadatos
 MiLinajeExt = Linaje_raw() # extract y load
-# ===============================
-CURRENT_DIR = os.getcwd()
-# ===============================s
-# Tasks de Luigi
 
 # ======================================================
 # Etapa Extract
 # ======================================================
+
+meta_extract = [] # arreglo para reunir tuplas de metadatos
 
 class Extraction(luigi.Task):
     '''
@@ -95,7 +75,7 @@ class Extraction(luigi.Task):
                 MiLinajeExt.month = str(mes)
 
                 # check para no hacer peticiones fuera de la fecha actual
-                if (anio <= current_year) & (mes <= current_month-4):
+                if (anio <= current_year) & (mes <= current_month-3):
                     #URL para hacer peticion a API rita en anio y mes indicado
                     url_act = self.BASE_URL+str(anio)+"_"+str(mes)+".zip"
 
@@ -110,7 +90,6 @@ class Extraction(luigi.Task):
                             comando_descarga = 'wget ' + url_act + " -P " + "./src/data/"
                             os.system(comando_descarga)
                         except:
-
                             pass
 
                         #Escribimos el archivo descargado al bucket
@@ -140,11 +119,18 @@ class Extraction(luigi.Task):
                         #MiLinajeExt.tamano_zip = my_bucket.Object(key="RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip").content_length
 
                         # Recolectamos status para metadatos
-                        MiLinajeExt.task_status = "Successful"
+                        MiLinajeExt.task_status = "Successfull"
 
                         # Insertamos metadatos a DB
                         print(MiLinajeExt.to_upsert())
-                        EL_metadata(MiLinajeExt.to_upsert())
+                        meta_extract.append(MiLinajeExt.to_upsert())
+                        #EL_metadata(MiLinajeExt.to_upsert())
+
+        # Escritura de csv para carga de metadatos
+        df = pd.DataFrame(meta_extract, columns=["fecha","nombre_task","year","month","usuario","ip_ec2","tamano_zip","nombre_archivo","ruta_s3","task_status"])
+        df.to_csv("metadata/extract_metadata.csv",index=False,header=False)
+
+        os.system('echo "ok" >target/load_ok.txt')
 
         # Unzips de archivos zip recien descargados
         dir_name = "./src/data/" # directorio de zip
@@ -163,7 +149,6 @@ class Extraction(luigi.Task):
                     os.remove(dir_name+'readme.html')
                 except:
                     pass
-                #os.remove(dir_name+'readme.html')
 
         os.system('echo OK > target/extract_ok.txt')
 

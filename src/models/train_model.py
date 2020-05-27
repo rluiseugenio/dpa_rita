@@ -36,7 +36,7 @@ from src import (
     MY_DB
 )
 
-def get_data(luigi=True):
+def get_data(luigi=False):
     config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
     connection = pg.connect(config_psyco)
     pdf = pd.read_sql_query('select * from semantic.rita limit 1000;',con=connection)
@@ -322,6 +322,7 @@ def run_model(objetivo, model_name, hyperparams, luigi= False, test_split = 0.2)
 
     return prediction, df_test
 
+
 def save_train_predictions(prediction, objetivo, model_name, hyperparams):
     s3_name = parse_filename(objetivo, model_name, hyperparams)
     s3_name = s3_name[2:]
@@ -334,7 +335,6 @@ def save_train_predictions(prediction, objetivo, model_name, hyperparams):
     df_pandas = df_bias.toPandas()
 
     save_rds_pandas(df_pandas, "predictions.train")
-    return 0
     #add_metadata_fairness
 
 

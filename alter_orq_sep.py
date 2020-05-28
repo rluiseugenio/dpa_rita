@@ -100,7 +100,7 @@ meta_extract = [] # arreglo para reunir tuplas de metadatos
 meta_load = [] # arreglo para reunir tuplas de metadatos
 meta_clean = [] # arreglo para reunir tuplas de metadatos
 meta_semantic = [] # arreglo para reunir tuplas de metadatos
-
+CURRENT_DIR = os.getcwd()
 
 
 # =======================================================

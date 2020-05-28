@@ -74,6 +74,7 @@ from tasks.load import Load
 from tasks.clean_column_testing import CleanColumn_Testing
 from tasks.clean_rango_testing import CleanRango_Testing
 from tasks.clean import GetCleanData
+from tasks.metadatos_semantic import Metadata_Semantic
 from tasks.semantic_column_testing import Semantic_Testing_col
 from tasks.semantic_type_testing import Semantic_Testing
 from tasks.semantic import GetFEData

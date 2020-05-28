@@ -116,6 +116,7 @@ class Extraction(luigi.Task):
                         #s3 = ses.resource('s3')
                         #bucket_name = "test-aws-boto"
                         #my_bucket = s3.Bucket(bucket_name)
+                        MiLinajeExt.tamano_zip = os.path.getsize(dir_name+name_to_zip+str(anio)+"_"+str(mes)+".zip")
                         #MiLinajeExt.tamano_zip = my_bucket.Object(key="RITA/YEAR="+str(anio)+"/"+str(anio)+"_"+str(mes)+".zip").content_length
 
                         # Recolectamos status para metadatos

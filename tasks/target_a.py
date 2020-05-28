@@ -77,6 +77,7 @@ from tasks.clean import GetCleanData
 from tasks.semantic_column_testing import Semantic_Testing_col
 from tasks.semantic_type_testing import Semantic_Testing
 from tasks.semantic import GetFEData
+from tasks.metadatos_semantic import Metadata_Semantic
 from tasks.bucket import CreateModelBucket
 from tasks.modeling import RunModel
 from tasks.all_targets import RunAllTargets
@@ -105,7 +106,7 @@ class RunTargetA(luigi.Task):
 	model = luigi.Parameter()
 
 	def requires(self):
-		return GetFEData()
+		return Metadata_Semantic()
 
 	def output(self):
 		objetivo = TARGET_A

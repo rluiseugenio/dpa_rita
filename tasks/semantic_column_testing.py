@@ -70,7 +70,7 @@ from tasks.load import Load
 from tasks.clean_column_testing import CleanColumn_Testing
 from tasks.clean_rango_testing import CleanRango_Testing
 from tasks.clean import GetCleanData
-
+from tasks.metadatos_clean import Metadata_Clean
 
 # ======================================================
 # Pruebas unitarias de la etapa SEMANTIC

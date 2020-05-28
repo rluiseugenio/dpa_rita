@@ -86,6 +86,7 @@ from tasks.metadatos_clean import Metadata_Clean
 from tasks.semantic_column_testing import Semantic_Testing_col
 from tasks.semantic_type_testing import Semantic_Testing
 from tasks.semantic import GetFEData
+from tasks.metadatos_semantic import Metadata_Semantic
 from tasks.bucket import CreateModelBucket
 from tasks.modeling import RunModel
 from tasks.all_targets import RunAllTargets

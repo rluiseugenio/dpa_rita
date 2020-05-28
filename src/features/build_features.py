@@ -31,6 +31,7 @@ def clean():
     #====================================================================
     # Task: Pasar a minusculas los nombres de columnas
     #====================================================================
+    meta_clean = [] # arreglo para reunir tuplas de metadatos
     df = get_raw_data()
 
     # Inicializa clase para reunir metadatos

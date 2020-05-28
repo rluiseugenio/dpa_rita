@@ -100,6 +100,7 @@ class GetFEData(luigi.Task):
 
 	def run(self):
 		df_util = crear_features()#CACHE.get_clean_data()
+		meta_semantic = [] # arreglo para reunir tuplas de metadatos
 
 		MiLinajeSemantic.ip_ec2 = str(df_util.count())
 		MiLinajeSemantic.fecha =  str(datetime.now())

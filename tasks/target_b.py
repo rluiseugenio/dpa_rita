@@ -46,7 +46,7 @@ from src.utils.db_utils import create_db, execute_sql, save_rds
 from src.utils.ec2_utils import create_ec2
 from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_load,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query,Linaje_load,load_verif_query
 from src.utils.db_utils import execute_sql
-#from src.models.train_model import run_model
+from src.models.train_model import run_model
 from src.models.save_model import parse_filename
 
 #Metadata Clean Testing
@@ -77,13 +77,9 @@ from tasks.clean import GetCleanData
 from tasks.semantic_column_testing import Semantic_Testing_col
 from tasks.semantic_type_testing import Semantic_Testing
 from tasks.semantic import GetFEData
+from tasks.metadatos_semantic import Metadata_Semantic
 from tasks.bucket import CreateModelBucket
 from tasks.modeling import RunModel
-from tasks.all_targets import RunAllTargets
-from tasks.target_a import RunTargetA
-
-
-
 
 
 # =======================================================
@@ -97,7 +93,7 @@ TARGET_A = "0-1.5"
 TARGET_B = "1.5-3.5"
 TARGET_C =  "3.5-"
 TARGET_D = "cancelled"
-
+CURRENT_DIR = os.getcwd()
 
 
 class RunTargetB(luigi.Task):
@@ -107,7 +103,7 @@ class RunTargetB(luigi.Task):
 	model = luigi.Parameter()
 
 	def requires(self):
-		return GetFEData()
+		return Metadata_Semantic()
 
 	def output(self):
 		objetivo = TARGET_B
@@ -118,7 +114,7 @@ class RunTargetB(luigi.Task):
 		output_path = parse_filename(objetivo, model_name, hyperparams)
 		output_path = "s3://" + str(self.bucname) +  output_path[1:] + ".model.zip"
 
-		return luigi.contrib.s3.S3Target(path=output_path)
+		return #luigi.contrib.s3.S3Target(path=output_path)
 
 	def run(self):
 		objetivo = TARGET_B

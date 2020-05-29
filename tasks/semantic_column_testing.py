@@ -70,7 +70,7 @@ from tasks.load import Load
 from tasks.clean_column_testing import CleanColumn_Testing
 from tasks.clean_rango_testing import CleanRango_Testing
 from tasks.clean import GetCleanData
-
+from tasks.metadatos_clean import Metadata_Clean
 
 # ======================================================
 # Pruebas unitarias de la etapa SEMANTIC
@@ -85,7 +85,7 @@ class Semantic_Testing_col(luigi.Task):
     Prueba unitaria de estructura de archivos descargados
     '''
     def requires(self):
-        return GetCleanData()
+        return Metadata_Clean()
 
     # Recolectamos fecha y usuario para metadatos a partir de fecha actual
     MetadatosSemanticTesting.fecha =  datetime.now()

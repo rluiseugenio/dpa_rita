@@ -82,9 +82,11 @@ from tasks.metadatos_load import Metadata_Load
 from tasks.clean_column_testing import CleanColumn_Testing
 from tasks.clean_rango_testing import CleanRango_Testing
 from tasks.clean import GetCleanData
+from tasks.metadatos_clean import Metadata_Clean
 from tasks.semantic_column_testing import Semantic_Testing_col
 from tasks.semantic_type_testing import Semantic_Testing
 from tasks.semantic import GetFEData
+from tasks.metadatos_semantic import Metadata_Semantic
 from tasks.bucket import CreateModelBucket
 from tasks.modeling import RunModel
 from tasks.all_targets import RunAllTargets
@@ -96,7 +98,9 @@ from tasks.target_d import RunTargetD
 # Listas auxiliares
 meta_extract = [] # arreglo para reunir tuplas de metadatos
 meta_load = [] # arreglo para reunir tuplas de metadatos
-
+meta_clean = [] # arreglo para reunir tuplas de metadatos
+meta_semantic = [] # arreglo para reunir tuplas de metadatos
+CURRENT_DIR = os.getcwd()
 
 
 # =======================================================

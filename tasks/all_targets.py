@@ -46,7 +46,7 @@ from src.utils.db_utils import create_db, execute_sql, save_rds
 from src.utils.ec2_utils import create_ec2
 from src.utils.metadatos_utils import EL_verif_query, EL_metadata, Linaje_raw,EL_load,clean_metadata_rds,Linaje_clean_data, Linaje_semantic, semantic_metadata, Insert_to_RDS, rita_light_query,Linaje_load,load_verif_query
 from src.utils.db_utils import execute_sql
-#from src.models.train_model import run_model
+from src.models.train_model import run_model
 from src.models.save_model import parse_filename
 
 #Metadata Clean Testing
@@ -74,13 +74,18 @@ from tasks.load import Load
 from tasks.clean_column_testing import CleanColumn_Testing
 from tasks.clean_rango_testing import CleanRango_Testing
 from tasks.clean import GetCleanData
+from tasks.metadatos_semantic import Metadata_Semantic
 from tasks.semantic_column_testing import Semantic_Testing_col
 from tasks.semantic_type_testing import Semantic_Testing
 from tasks.semantic import GetFEData
 from tasks.bucket import CreateModelBucket
 from tasks.modeling import RunModel
+from tasks.target_a import RunTargetA
+from tasks.target_b import RunTargetB
+from tasks.target_c import RunTargetC
+from tasks.target_d import RunTargetD
 
-
+CURRENT_DIR = os.getcwd()
 
 
 # =======================================================
@@ -102,11 +107,11 @@ class RunAllTargets(luigi.Task):
 	model = luigi.Parameter()
 
 	def requires(self):
-		return CreateModelBucket(self.bucname), \
-		 RunTargetA(self.bucname, self.numIt, self.numPCA, self.model), \
-		 RunTargetB(self.bucname,self.numIt, self.numPCA, self.model), \
-		 RunTargetC(self.bucname,self.numIt, self.numPCA, self.model), \
-		 RunTargetD(self.bucname,self.numIt, self.numPCA, self.model)
+		return RunTargetA(self.bucname, self.numIt, self.numPCA, self.model), \
+		RunTargetD(self.bucname,self.numIt, self.numPCA, self.model), \
+		RunTargetB(self.bucname,self.numIt, self.numPCA, self.model), \
+		RunTargetC(self.bucname,self.numIt, self.numPCA, self.model), \
+
 
 	def output(self):
 		dir = CURRENT_DIR + "target/run_all_models.txt"

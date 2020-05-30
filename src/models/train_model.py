@@ -39,7 +39,7 @@ from src import (
 def get_data(luigi=False):
     config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
     connection = pg.connect(config_psyco)
-    pdf = pd.read_sql_query('select * from semantic.rita limit 1000;',con=connection)
+    pdf = pd.read_sql_query('select * from semantic.rita limit 2000;',con=connection)
     spark = SparkSession \
     .builder \
     .appName("Python Spark SQL basic example") \

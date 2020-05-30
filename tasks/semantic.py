@@ -95,7 +95,7 @@ class GetFEData(luigi.Task):
 		return Semantic_Testing()
 
 	def output(self):
-		dir = CURRENT_DIR + "target/data_semantic.txt"
+		dir = "target/data_semantic.txt"
 		return luigi.local_target.LocalTarget(dir)
 
 	def run(self):

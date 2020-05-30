@@ -89,11 +89,8 @@ from tasks.semantic import GetFEData
 from tasks.metadatos_semantic import Metadata_Semantic
 from tasks.bucket import CreateModelBucket
 from tasks.modeling import RunModel
-from tasks.all_targets import RunAllTargets
-from tasks.target_a import RunTargetA
-from tasks.target_b import RunTargetB
-from tasks.target_c import RunTargetC
-from tasks.target_d import RunTargetD
+from src.orquestadores.modelling import RunAllTargets,\
+RunTargetA, RunTargetB, RunTargetC, RunTargetD
 
 # Listas auxiliares
 meta_extract = [] # arreglo para reunir tuplas de metadatos

@@ -75,7 +75,7 @@ class Extraction(luigi.Task):
                 MiLinajeExt.month = str(mes)
 
                 # check para no hacer peticiones fuera de la fecha actual
-                if (anio <= current_year) & (mes <= current_month-2):
+                if (anio <= current_year) & (mes <= current_month-4):
                     #URL para hacer peticion a API rita en anio y mes indicado
                     url_act = self.BASE_URL+str(anio)+"_"+str(mes)+".zip"
 

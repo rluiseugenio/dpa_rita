@@ -1,4 +1,8 @@
-
+'''
+TODOS:
+    - pipeline.save() tiene un bug en Python.
+    - Lo ideal sería guardar el pipeline en vez de reconstruirlo
+'''
 from src.utils.s3_utils import upload_file_to_bucket
 
 import os
@@ -49,6 +53,23 @@ def parse_filename(objetivo, model_name, hyperparams):
 
     return saved_model_name
 
+
+def reverse_parse_filename(saved_model_name):
+    para_string = saved_model_name
+    para_string = para_string.replace("%", " ")
+    para_string = para_string.replace('#', '"')
+    para_string = para_string.replace('&', "}")
+    para_string = para_string.replace('=', "{")
+    para_string = para_string.replace('-', ":")
+    para_string = para_string.replace('$', ",")
+    para_string = para_string.replace('.model.zip', "")
+    res = para_string.split("_")
+    objetivo = res[1]
+    model_name = res[2]
+    hyperparams = json.loads(res[3])
+
+    return objetivo, model_name, hyperparams
+
 def clean(new_saved_model):
     os.remove(new_saved_model)
 
@@ -57,6 +78,7 @@ def clean(new_saved_model):
 
 
 def save_upload(cvModel, objetivo, model_name, hyperparams,bucket_name = "models-dpa"):
+    #trained_model = cvModel.stages[-1]
     trained_model = cvModel.stages[-1]
 
     saved_model_name = parse_filename(objetivo, model_name, hyperparams) + ".model"

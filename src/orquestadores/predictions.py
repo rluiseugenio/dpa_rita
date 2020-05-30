@@ -1,9 +1,8 @@
 '''
 SIMPLE
 PYTHONPATH='.' AWS_PROFILE=dpa luigi --module predictions CreatePredictions --local-scheduler
-
-
 '''
+
 from datetime import date, datetime
 from io import StringIO
 from luigi import Event, Task, build # Utilidades para acciones tras un task exitoso o fallido
@@ -19,6 +18,7 @@ from src.models.predict_model import save_predictions
 from src.utils.db_utils import execute_query
 from src.unit_tests.predict_columns import TestPredictColumns
 from src.unit_tests.predict_types import TestColumnsTypes
+from src.orquestadores.feature_engineering import GetFEData
 
 from src import (
     MY_USER ,
@@ -93,8 +93,8 @@ class PredictTestCols(luigi.Task):
     Prueba unitaria de estructura de archivos descargados
     '''
     task_complete = False
-    #def requires(self):
-    #    return EvaluateBias()
+    def requires(self):
+        return EvaluateBias(), GetFEData()
 
     def run(self):
         try:

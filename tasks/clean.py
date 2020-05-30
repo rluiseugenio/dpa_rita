@@ -83,7 +83,7 @@ class GetCleanData(luigi.Task):
 		return CleanRango_Testing()
 
 	def output(self):
-		dir = CURRENT_DIR + "target/data_clean.txt"
+		dir = "target/data_clean.txt"
 		return luigi.local_target.LocalTarget(dir)
 
 	def run(self):

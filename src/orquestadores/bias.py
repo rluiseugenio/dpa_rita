@@ -1,6 +1,6 @@
 '''
 SIMPLE
-PYTHONPATH='.' AWS_PROFILE=dpa luigi --module bias SaveMetadataBias --local-scheduler
+PYTHONPATH='.' AWS_PROFILE=dpa luigi --module bias EvaluateBias --local-scheduler
 '''
 from datetime import date, datetime
 from io import StringIO

@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590868709430.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1678544245",
+    "id" : "A2769360",
+    "lastKnownWriteTime" : 1590935453,
+    "last_content_update" : 1590935453852,
+    "path" : "~/R/MonitoreoModelos/source/serverInfo.R",
+    "project_path" : "source/serverInfo.R",
+    "properties" : {
+        "cursorPosition" : "16,38",
+        "scrollLine" : "0"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

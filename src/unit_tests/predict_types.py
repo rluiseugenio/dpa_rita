@@ -48,7 +48,7 @@ class TestColumnsTypes(marbles.core.TestCase):
 
 
         df_pandas = df_pred.toPandas()
-        df_pandas.columns = ['flight_number', 'distance','prediction', 's3_name' ]
+        df_pandas.columns = ['flight_number', 'distance','prediction', 's3_name', 'fecha']
         df_pandas = df_pandas.astype(dict_types)
 
         #Descomentar la siguiente línea para que falle la prueba

@@ -26,7 +26,7 @@ def get_bias_stats():
     bias_result = get_fpr_disparity(df, "distance")
 
     today = date.today()
-    d1 = today.strftime("%d%m%Y")
+    d1 = today.strftime("%Y%m%d")
 
     metadata = [d1]+ [best_s3] + bias_result
     return metadata
@@ -35,8 +35,13 @@ def get_fpr_disparity(df, protected_attribute):
      g = Group()
      xtab, _ = g.get_crosstabs(df)
 
+     df_count = df[['distance', 'score']].groupby(['distance']).agg(['count'])
+     get_largest_cat = df_count[('score')].sort_values(['count'], ascending = False).index[0]
+
      b = Bias()
-     bdf = b.get_disparity_predefined_groups(xtab, original_df=df, ref_groups_dict={'originwac':'91.0','distance':'110.00-862.00' }, alpha=0.05, mask_significance=True)
+     bdf = b.get_disparity_predefined_groups(xtab, original_df=df,
+      ref_groups_dict={'originwac':df[:1].originwac[0],'distance':get_largest_cat},
+      alpha=0.05, mask_significance=True)
      calculated_disparities = b.list_disparities(bdf)
      disparity_significance = b.list_significance(bdf)
      majority_bdf = b.get_disparity_major_group(xtab, original_df=df, mask_significance=True)

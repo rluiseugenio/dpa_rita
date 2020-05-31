@@ -1,0 +1,114 @@
+
+                  
+                  /* logo */
+                  .skin-blue .main-header .logo {
+                  background-color: #1A237E;
+                  color: #FFFFFF;
+                  font-weight: bold;
+                  }
+                  
+                  /* logo when hovered*/
+                  .skin-blue .main-header .logo:hover {
+                  background-color: #1A237E;
+                  color: #FFFFFF;
+                  }
+                  
+                  /* navbar (rest of the header) */
+                  .skin-blue .main-header .navbar {
+                  background-color: #FFFFFF;
+                  color: #000000;
+                  }        
+                  
+                  /* main sidebar */
+                  .skin-blue .main-sidebar {
+                  background-color: #FFFFEE;
+                  color: #252B33
+                  }
+                  
+                  /* active selected tab in the sidebarmenu */
+                  .skin-blue .main-sidebar .sidebar .sidebar-menu .active a{
+                  background-color: #455A64;
+                  color: #FFFFFF;
+                  font-weight: bold;
+                  border-left: 0px;
+                  }
+                  
+                  /* other links in the sidebarmenu */
+                  .skin-blue .main-sidebar .sidebar .sidebar-menu a{
+                  background-color: #00BCD5;
+                  color: #FFFFFF;
+                  border-left: 0px;
+                  }
+                  
+                  /* other links in the sidebarmenu when hovered */
+                  .skin-blue .main-sidebar .sidebar .sidebar-menu a:hover{
+                  background-color: #1A237E;
+                  color: #FFFFFF;
+                  }
+                  
+                  /* toggle button*/                    
+                  .skin-blue .main-header .navbar .sidebar-toggle {
+                  background-color: #FFFFFF;
+                  color: #252B33;
+                  }
+                  
+                  
+                  
+                  /* toggle button when hovered  */                    
+                  .skin-blue .main-header .navbar .sidebar-toggle:hover{
+                  background-color: #0000CC;
+                  color: #252B33;
+                  }
+                  
+                  .small-box.bg-aqua { 
+                  background-color: #252B33 !important; color: #FFFFFF !important; 
+                  }
+                  
+                  .glyphicon {
+                  font-size: 18px;
+                  color: #FFFFFF
+                  }
+                  
+                  label.control-label, .selectize-control.single,label { 
+                  display: inline; 
+                  text-align: left; 
+                  vertical-align: left;
+                  color:#252B33;
+                  padding-top: 1px;
+                  }
+                  
+                  label.control-label {
+                  padding-right: 5px;
+                  
+                  }
+                  
+                  .form-group { 
+                  display: block;
+                  padding-top: 1px;
+                  margin-bottom: 5px;
+                  }
+                  
+                  section.sidebar .shiny-input-container {
+                  /* Proper spacing around inputs. */
+                  padding: 5px 8px 0px 8px;
+                  
+                  }
+                  
+                  .selectize-control.single div.item {
+                  padding-right: 10px;
+                  }
+                  
+                  .selectize-dropdown {
+                  width: 470px !important;
+                  }
+                  
+                  .section.sidebar .shiny-input-container {
+                  padding-top:0px;
+                  padding-bottom:0px;
+                  }
+                  
+                  .datepicker {
+                  z-index:99999 !important;}
+                  
+                  
+                  

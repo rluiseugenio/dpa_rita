@@ -1,0 +1,127 @@
+#distancias dado origin wacc --------------
+opciones_bias <- reactive({
+  
+  if(input$wac!=''){
+  dbGetQuery(con2,sprintf("select distinct distance from
+                                      predictions.train 
+                                      where originwac = '%s'",input$wac)) %>% 
+    unique %>% 
+    as_tibble %>% 
+    mutate(label = paste(distance,'Km')) %>% 
+    select(value = distance, label)
+  }
+})
+
+observeEvent(input$wac,{
+  opciones <- opciones_bias()
+  
+  
+  updateSelectizeInput(session = session, 'distBias', 
+                    choices = opciones,
+                    selected = opciones$value[1], server = TRUE)
+})
+
+
+
+#####Reactivos ----------
+#data para bias
+kk_react <- reactive({
+  req(input$wac)
+  req(input$distBias)
+  
+  dbGetQuery(con2,sprintf("select score, label_value, count(*) as count
+             from predictions.train 
+             where originwac='%s'
+             and distance = '%s'
+             group by score, label_value",
+                   input$wac,
+                   input$distBias)) 
+})
+
+bias_react <- reactive({
+  
+  ll <- dbGetQuery(con2,"select * from metadatos.bias") %>% 
+    as_tibble %>% 
+    mutate(dia = substr(fecha,1,2),
+           mes = substr(fecha,3,4),
+           ano = substr(fecha,5,8),
+           fecha = ymd(paste0(ano,'-',mes,'-',dia))) %>% 
+    arrange(fecha) %>% 
+    split(.$fecha) %>% 
+    map(~reciente2(.)) %>% 
+    bind_rows() %>%
+    arrange(-as.numeric(fecha))%>% 
+    head(1) %>% 
+    gather(var,atributo,contains('attribute_value')) %>% 
+    select(-var) %>% 
+    gather(var,fpr,contains('fpr_disparity')) %>% 
+    select(-var) %>% 
+    mutate(colores = cbb.s[1:nrow(.)])
+  
+  
+  ll
+  
+})
+
+#Gráficas ------------
+#matrix de confusión
+
+output$confmat_plot <- renderEcharts4r({
+  
+  kk <-  kk_react()
+  
+  kk %>% 
+    mutate(count =round(100*count/sum(count),
+                        digits = 2))%>% 
+    e_charts(score) %>% 
+    e_heatmap(label_value, count) %>% 
+    e_visual_map(count) %>% 
+    e_title("Matriz de confusión",
+            paste0('Para el código de origen ',input$wac,
+                   ' con viajes de distancia ',input$distBias,' Km.')) %>% 
+    e_tooltip()
+  
+})
+
+output$barras_plot <- renderEcharts4r({
+
+  kk <- bias_react()
+  
+  
+  kk %>% 
+    e_charts(atributo) %>% 
+    e_bar(fpr, name = 'FPR Disparity') %>% 
+    e_flip_coords() %>% 
+    e_tooltip()
+  
+})
+
+#Tablas------------------------------------------------
+
+#Fairness
+output$fb_out <- renderDT({
+  
+  
+  data <- bias_react() %>% 
+    select(fecha, atributo, FalseDiscoveryRate = fdr)
+  
+  if (!nrow(data)>0) {
+    data <- data.frame(EstadoActual = 'Sin alertas de Forma de Operar SERVICIOS WEB')    
+    
+    DT::datatable(data, 
+                  rownames = FALSE,
+                  extensions = c( 'ColReorder','Buttons'),
+                  options = list(scrollX = TRUE,
+                                 colReorder = TRUE)) 
+    
+  }else{
+    DT::datatable(data, 
+                  rownames = FALSE,
+                  extensions = c( 'ColReorder','Buttons'),
+                  options = list(scrollX = TRUE,
+                                 colReorder = TRUE))
+  }
+  
+})
+
+

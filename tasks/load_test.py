@@ -1,5 +1,3 @@
-# PYTHONPATH='.' luigi --module pruebita Load_Testing --local-scheduler
-
 ###  Librerias necesarias
 import luigi
 import luigi.contrib.s3
@@ -17,7 +15,6 @@ import psycopg2
 from psycopg2 import extras
 from zipfile import ZipFile
 from pathlib import Path
-import os
 
 ###  Imports desde directorio de proyecto dpa_rita
 ## Credenciales
@@ -29,18 +26,24 @@ MY_PORT,
 MY_DB,
 )
 
-from src.utils.metadatos_utils import Linaje_extract_testing, EL_testing_extract
+## Utilidades
 from src.utils.metadatos_utils import Linaje_load_testing, EL_testing_load
-
+from tasks.metadatos_extract import Metadata_Extract
 from testing.test_absent_hearders import TestingHeaders
+#from task.metadatos_extract import Metadata_Extract
+# ======================================================
+# Prueba unitaria de la etapa load
+# ======================================================
+
+#from testing.test_absent_hearders import TestingHeaders
 MetadatosLoadTesting = Linaje_load_testing()
 
 class Load_Testing(luigi.Task):
     '''
     Prueba unitaria de estructura de archivos descargados
     '''
-    # def requires(self):
-    #     return Extraction()
+    def requires(self):
+        return Metadata_Extract()
 
     # Recolectamos fecha y usuario para metadatos a partir de fecha actual
     MetadatosLoadTesting.fecha =  datetime.now()
@@ -57,9 +60,13 @@ class Load_Testing(luigi.Task):
         unit_test_load = TestingHeaders()
         unit_test_load.test_create_resource()
 
-    def output(self):
-        return
+        os.system('echo "ok"> target/testing_load_ok.txt')
 
+    def output(self):
+        output_path='target/testing_load_ok.txt'
+        return luigi.LocalTarget(output_path)
+
+# Decoradores para escribir metadatos de la prueba (aun si falla)
 @Load_Testing.event_handler(Event.SUCCESS)
 def on_success(self):
     MetadatosLoadTesting.ip_ec2 = ""

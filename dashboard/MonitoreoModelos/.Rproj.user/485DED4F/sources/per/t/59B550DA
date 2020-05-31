@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590873862502.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "59B550DA",
+    "lastKnownWriteTime" : 8026363914660965410,
+    "last_content_update" : 1590873862502,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "1D66DAA8",
+        "caption" : "tablas",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=tablas&cache_key=1D66DAA8",
+        "displayedObservations" : 22,
+        "environment" : "",
+        "expression" : "tablas",
+        "object" : "tablas",
+        "preview" : 0,
+        "totalObservations" : 22,
+        "variables" : 8
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}

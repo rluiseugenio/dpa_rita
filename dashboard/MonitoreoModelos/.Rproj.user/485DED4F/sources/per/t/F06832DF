@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590868452750.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "68|40|83|0|\n",
+    "hash" : "1264253638",
+    "id" : "F06832DF",
+    "lastKnownWriteTime" : 1590935373,
+    "last_content_update" : 1590935373659,
+    "path" : "~/R/MonitoreoModelos/source/serverBias.R",
+    "project_path" : "source/serverBias.R",
+    "properties" : {
+        "cursorPosition" : "103,2",
+        "scrollLine" : "97"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -3,7 +3,7 @@ output$info66 <- renderUI({
   stra <- paste('A continuación se muestra la información del mejor modelo')
 })
 
-#Catálogo de Respuestas
+#Desempeño mejor modelo
 output$info3 <- renderDT({
 
 data <- dbGetQuery(con2,"select * 

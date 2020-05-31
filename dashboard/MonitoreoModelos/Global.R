@@ -8,10 +8,10 @@ library(echarts4r)
 library(DT)
 library(lubridate)
 library(scales)
-library(rpivotTable)
 library(shinyWidgets)
 library(purrr)
 library(magrittr)
+library(shiny)
 
 
 

@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590931419383.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3306580297",
+    "id" : "CB41671C",
+    "lastKnownWriteTime" : 1590935331,
+    "last_content_update" : 1590935331086,
+    "path" : "~/R/MonitoreoModelos/Global.R",
+    "project_path" : "Global.R",
+    "properties" : {
+        "cursorPosition" : "86,0",
+        "scrollLine" : "71"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

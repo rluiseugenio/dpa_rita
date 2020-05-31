@@ -61,7 +61,10 @@ res <- tt %>%
   split(.$fecha) %>% 
   map(~reciente(.)) %>% 
   bind_rows() %>% 
-  mutate(observado = sample(c(0,1),nrow(.),replace =TRUE),
+  mutate(prediccion = sample(c(0,1),
+                            nrow(.),
+                            replace =TRUE,
+                            prob = c(.2,.8)),
          ruido = runif(nrow(.),-0.25,.25),
          ef = abs(as.numeric(prediccion)-observado),
          ef = ifelse(ef==0,NA,ef),
@@ -127,7 +130,7 @@ output$modelos_plot <- renderEcharts4r({
     e_datazoom(x_index = 0, type = "inside") %>%
     e_datazoom() %>% 
     e_title(paste0('Número de vuelo ',input$vuelo),
-            paste0('Distancia de',input$distMon,' Km')) 
+            paste0('Distancia de ',input$distMon,' Km')) 
   
 })
 

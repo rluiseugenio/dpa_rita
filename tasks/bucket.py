@@ -77,9 +77,9 @@ from tasks.clean import GetCleanData
 from tasks.semantic_column_testing import Semantic_Testing_col
 from tasks.semantic_type_testing import Semantic_Testing
 from tasks.semantic import GetFEData
+from tasks.metadatos_semantic import Metadata_Semantic
 
-
-
+CURRENT_DIR = os.getcwd()
 
 # ------------------- MODELLING ----------------------------
 #--bucname models-dpa --numIt 1 --numPCA 2 --obj 0-1.5 --model LR
@@ -87,7 +87,7 @@ from tasks.semantic import GetFEData
 class CreateModelBucket(luigi.Task):
 	bucname = luigi.Parameter()
 	def requires():
-		return GetFEData()
+		return Metadata_Semantic()
 
 	def output(self):
 		dir = CURRENT_DIR + "target/create_s3_" + str(self.bucname) + ".txt"

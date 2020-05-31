@@ -20,3 +20,4 @@ psycopg2
 datetime
 redshift_tool
 marbles
+aequitas

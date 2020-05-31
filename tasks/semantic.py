@@ -29,6 +29,7 @@ from pathlib import Path
 ###librerias para clean
 from pyspark.sql import SparkSession
 from src.features.build_features import clean, crear_features
+import marbles.core
 
 ###  Imports desde directorio de proyecto dpa_rita
 ## Credenciales
@@ -94,11 +95,12 @@ class GetFEData(luigi.Task):
 		return Semantic_Testing()
 
 	def output(self):
-		dir = CURRENT_DIR + "target/data_semantic.txt"
+		dir = "target/data_semantic.txt"
 		return luigi.local_target.LocalTarget(dir)
 
 	def run(self):
 		df_util = crear_features()#CACHE.get_clean_data()
+		meta_semantic = [] # arreglo para reunir tuplas de metadatos
 
 		MiLinajeSemantic.ip_ec2 = str(df_util.count())
 		MiLinajeSemantic.fecha =  str(datetime.now())
@@ -112,7 +114,14 @@ class GetFEData(luigi.Task):
 		MiLinajeSemantic.task_status = 'Successful'
 		# Insertamos metadatos a DB
 		print(MiLinajeSemantic.to_upsert())
-		semantic_metadata(MiLinajeSemantic.to_upsert())
+		#semantic_metadata(MiLinajeSemantic.to_upsert())
+		meta_semantic.append(MiLinajeSemantic.to_upsert())
+		# Escritura de csv para carga de metadatos
+		df = pd.DataFrame(meta_semantic, columns=["num_filas_modificadas",\
+		"fecha","nombre_task","usuario","year","month","ip_ec2",\
+		"variables","ruta_s3","task_status"])
+		df.to_csv("metadata/semantic_metadata.csv",index=False,header=False)
+
 		## Inserta archivo y elimina csv
 		#os.system('bash ./src/utils/inserta_semantic_rita_to_rds.sh')
 		#os.system('rm semantic.csv')

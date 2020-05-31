@@ -54,7 +54,7 @@ from src.utils.metadatos_utils import Linaje_semantic1_testing, Linaje_semantic2
 
 from tasks.extract import Extraction
 from tasks.load_test import Load_Testing
-from tasks.load import Load
+from tasks.metadatos_load import Metadata_Load
 
 #-----------------------------------------------------------------------------------------------------------------------------
 # ======================================================
@@ -73,7 +73,7 @@ class CleanColumn_Testing(luigi.Task):
     Prueba unitaria de número de columnas correctas en clean.rita
     '''
     def requires(self):
-        return Load()
+        return Metadata_Load()
 
     # Recolectamos fecha y usuario para metadatos a partir de fecha actual
     MetadatosCleanColumnTesting.fecha =  datetime.now()

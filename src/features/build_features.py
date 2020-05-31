@@ -31,6 +31,7 @@ def clean():
     #====================================================================
     # Task: Pasar a minusculas los nombres de columnas
     #====================================================================
+    meta_clean = [] # arreglo para reunir tuplas de metadatos
     df = get_raw_data()
 
     # Inicializa clase para reunir metadatos
@@ -55,7 +56,8 @@ def clean():
     MiLinaje_clean.variables_limpias = counting_cols
 
     # Subimos los metadatos al RDS
-    clean_metadata_rds(MiLinaje_clean.to_upsert())
+    #clean_metadata_rds(MiLinaje_clean.to_upsert())
+    meta_clean.append(MiLinaje_clean.to_upsert())
 
     #====================================================================
     # Task: Seleccionar columnas no vacias
@@ -91,7 +93,8 @@ def clean():
      divairportlandings"
 
     # Subimos los metadatos al RDS
-    clean_metadata_rds(MiLinaje_clean.to_upsert())
+    #clean_metadata_rds(MiLinaje_clean.to_upsert())
+    meta_clean.append(MiLinaje_clean.to_upsert())
 
     #========================================================================================================
     # agregar columna con clasificación de tiempo en horas de atraso del vuelo 0-1.5, 1.5-3.5,3.5-, cancelled
@@ -133,7 +136,8 @@ def clean():
          divairportlandings,rangoatrasohoras,cancelled,0-1.5,1.5-3.5,3.5-"
 
     # Subimos los metadatos al RDS
-    clean_metadata_rds(MiLinaje_clean.to_upsert())
+    #clean_metadata_rds(MiLinaje_clean.to_upsert())
+    meta_clean.append(MiLinaje_clean.to_upsert())
 
     #===================================================================
     # Aplicación de la función limpieza texto
@@ -179,7 +183,13 @@ def clean():
              divairportlandings,rangoatrasohoras,cancelled,0-1.5,1.5-3.5,3.5-"
 
     # Subimos los metadatos al RDS
-    clean_metadata_rds(MiLinaje_clean.to_upsert())
+    #clean_metadata_rds(MiLinaje_clean.to_upsert())
+    meta_clean.append(MiLinaje_clean.to_upsert())
+
+    datos_clean = pd.DataFrame(meta_clean, columns=["fecha",\
+    "nombre_task","usuario","ip_ec2","num_columnas_modificadas","num_filas_modificadas",\
+    "variables_limpias","task_status"])
+    datos_clean.to_csv("metadata/clean_metadata.csv",index=False,header=False)
 
     base.show(2)
     print((base.count(), len(base.columns)))
@@ -333,7 +343,7 @@ def get_raw_data():
 
    config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
    connection = pg.connect(config_psyco)
-   pdf = pd.read_sql_query('select * from raw.rita_light',con=connection)
+   pdf = pd.read_sql_query('select * from raw.rita order by random() limit 15000;',con=connection)
    spark = SparkSession.builder.config('spark.driver.extraClassPath', 'postgresql-9.4.1207.jar').getOrCreate()
    df = spark.createDataFrame(pdf, schema=schema)
    return df

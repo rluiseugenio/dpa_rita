@@ -2,10 +2,15 @@
 opciones_vuelo <- reactive({
   
   if(input$vuelo!=''){
+  
   dbGetQuery(con2,sprintf("select distinct distance from
+                                      predictions.train
+                                        where flight_number = '%s'",
+                          input$vuelo)) %>% 
+      rbind(  dbGetQuery(con2,sprintf("select distinct distance from
                                       predictions.test
                                       where flight_number = '%s'",
-                          input$vuelo)) %>% 
+                                      input$vuelo))) %>% 
     unique %>% 
     as_tibble %>% 
     mutate(label = paste(distance,'Km')) %>% 
@@ -31,8 +36,10 @@ modelos_react <- reactive({
                                   score as prediccion,
                                   fecha
                            from predictions.train
-                           where distance = '%s'",
-                                  input$distMon)) %>% 
+                           where distance = '%s'
+                           and flight_number = '%s'",
+                                  input$distMon,#
+                                  input$vuelo)) %>% 
       mutate(flight_number = input$vuelo) %>% 
       select(flight_number, distance, observado, prediccion,
              fecha)
@@ -44,7 +51,7 @@ modelos_react <- reactive({
                            from predictions.test
                            where distance = '%s'
                            and flight_number = '%s'",
-                      input$distMon,
+                                  input$distMon,#
                       input$vuelo)) %>% 
       mutate(observado = NA) %>% 
       select(flight_number, distance, observado, prediccion,
@@ -233,8 +240,6 @@ output$alertas_out <- renderDT({
   
   data <- modelos_react() %>% 
     filter(!is.na(ef)) %>% 
-    mutate(observado = observado -ruido,
-           prediccion = prediccion - ruido) %>% 
     select(fecha,
            flight_number,
            distance,observado,
@@ -262,7 +267,8 @@ output$alertas_out <- renderDT({
 output$modelos_out <- renderDT({
 
   
-  data <- modelos_react()
+  data <- modelos_react() %>% 
+    select(-ruido)
   
   if (!nrow(data)>0) {
     data <- data.frame(EstadoActual = 'Sin data')    

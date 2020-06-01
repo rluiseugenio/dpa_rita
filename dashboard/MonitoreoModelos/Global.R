@@ -65,6 +65,8 @@ catalogo_wac <- dbGetQuery(con2,"select distinct originwac from
 
 catalogo_vuelos <- dbGetQuery(con2,"select distinct flight_number from
                                       predictions.test ") %>% 
+  rbind(dbGetQuery(con2,"select distinct flight_number from
+                                      predictions.train ")) %>% 
   as_tibble %>% 
   mutate(label = paste('Número de vuelo:',flight_number)) %>% 
   select(value = flight_number, label)
@@ -72,7 +74,7 @@ catalogo_vuelos <- dbGetQuery(con2,"select distinct flight_number from
 reciente <- function(x){
   x %<>% 
     mutate(aux = 1:nrow(.)) %>% 
-    filter(!is.na(observado)) %>% 
+    # filter(!is.na(observado)) %>% 
     filter(aux == 1) %>% 
     select(-aux)
 }

@@ -81,6 +81,13 @@ bs4DashPage(
       icon = "tachometer-alt",
       startExpanded = TRUE,
       selected = TRUE,
+     
+      
+       bs4SidebarMenuSubItem(
+        "Información",
+        tabName = "Info",
+        icon = "handshake"
+      ),
 
       bs4SidebarMenuSubItem(
         text = "Modelos",
@@ -91,26 +98,22 @@ bs4DashPage(
         text = "Fairness & Bias",
         tabName = "fomTNP",
         icon = "angle-double-right"
-      ),
-     bs4SidebarMenuSubItem(
-        "Información",
-        tabName = "Info",
-        icon = "handshake"
       )
       
     )
     
   ),
   controlbar = bs4DashControlbar(
+    
+    UIControlInfo(),
     UIControlMonitor(),
-    UIControlBias(),
-    UIControlInfo()
+    UIControlBias()
   ),
   body = bs4DashBody(
     bs4TabItems(
+        UIBodyInfo(),
         UIBodyMonitor(),
-        UIBodyBias(),
-        UIBodyInfo()
+        UIBodyBias()
     )
   )
 )

@@ -107,8 +107,11 @@ Infraestructura: AWS
 
 #### 0. Requerimientos
 
-[Pendiente: Leon documentar como conectarse al bastión via SSH y la estructura]
+Para conectarse hacia la máquina virtual que servirá como bastión:
 
+```
+ssh -i mi-llave.pub ubuntu@endopoint-de-mi-instancia
+```
 
 Considerando lo anterior, dentro de bastión se de contar con docker:
 

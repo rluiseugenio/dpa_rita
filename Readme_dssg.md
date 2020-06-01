@@ -14,13 +14,8 @@
 
 ## Introducción
 
-### Data Science for Social Good at Imperial College London 2019
-The Data Science for Social Good Fellowship is a summer program to train aspiring data scientists to work on data mining, machine learning, big data, and data science projects with social impact. Working closely with governments and nonprofits, fellows take on real-world problems in education, health, energy, public safety, transportation, economic development, international development, and more.
-
-For three months they learn, hone, and apply their data science, analytical, and coding skills, collaborate in a fast-paced atmosphere, and learn from mentors coming from industry and academia.
-
-### Partners
-The project was done in collaboration with the [CIBERCV](https://www.cibercv.es/en) (Biomedical Research Networking Centres - Cardiovascular) research team working at the Hospital Universitario de Salamanca ([USAL](https://ibsal.es/en/research-units/cardiovascular-research-unit)). USAL has one of the most advanced cardiographic imaging units in Spain and serves an ageing, largely rural population. The team of cardiologists at USAL is investigating new technologies such as artificial intelligence to help improve patient care.
+### Proyecto de arquitectura de producto de datos.
+Este proyecto se desarrolla en el marco de la materia arquitectura de producto de datos impartida por Msc. Liliana Millán Nuñez, como parte del programa de maestría en Ciencia de Datos del Instituto Tecnológico Autónomo de México, para el primer semestre de 2020. 
 
 ## Overview
 The echocardiogram analysis process consists of 3 major processing steps.

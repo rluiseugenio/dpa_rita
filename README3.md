@@ -16,7 +16,6 @@
 | 4 | Luis Eugenio Rojón Jiménez        |
 | 5 | Cesar Zamora Martínez             |
 
-
 ***
 ### Tabla de contenidos.
 
@@ -83,15 +82,15 @@ Infraestructura AWS
 
 Para tener acceso al repositorio es necesario clonarlo:
 
-```
-    git clone https://github.com/paola-md/dpa_rita
+```bash
+git clone https://github.com/paola-md/dpa_rita
 ```
 
 Configura zona horaria
 
 ```
-    sudo apt-get update
-    sudo echo "America/Mexico_City" > /etc/timezone
+sudo apt-get update
+sudo echo "America/Mexico_City" > /etc/timezone
     sudo apt-get install -y tzdata
 ```
 Configura codificación
@@ -276,7 +275,7 @@ Dicho proceso se realizará con base en una serie especificaciones que se plante
 
 **4) ¿Dónde guardaremos los datos?**
   - Se estima pertinente emplear en una base de datos RDS para conservar historicidad de los mismos y detectar posibles errores en la dinámica del producto de datos.
-  ------En este sentido, se considera realizar posteriormente transformaciones de este conjunto de datos hacia lam carga de una base de datos empleando PostGreSQL.------
+    ------En este sentido, se considera realizar posteriormente transformaciones de este conjunto de datos hacia lam carga de una base de datos empleando PostGreSQL.------
 
 **5) ¿En qué formato?**
   -  Tal como se ha mencionado, se plantea guardarlos en el formato original de descarga, el cual corresponde archivos de extensión .zip en el RDS los cuales son versiones comprimidas de archivos .csv de la base.
@@ -558,7 +557,6 @@ Project Organization
     │       └── visualize.py
     │
     └── tox.ini            <- tox file with settings for running tox; see tox.testrun.org
-
 
 --------
 

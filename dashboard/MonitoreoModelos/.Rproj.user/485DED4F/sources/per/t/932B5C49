@@ -1,0 +1,25 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1590850297925.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "0|56|24|0|\n59|29|83|0|\n86|30|94|0|\n231|26|256|0|\n",
+    "hash" : "1267467532",
+    "id" : "932B5C49",
+    "lastKnownWriteTime" : 1590934720,
+    "last_content_update" : 1590934720794,
+    "path" : "~/R/MonitoreoModelos/source/FunctionsUI.R",
+    "project_path" : "source/FunctionsUI.R",
+    "properties" : {
+        "cursorPosition" : "123,41",
+        "scrollLine" : "112"
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

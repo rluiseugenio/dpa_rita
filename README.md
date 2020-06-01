@@ -273,7 +273,7 @@ Project Organization
 Set:
 
 ```
-VERSION=5.0.0
+VERSION=6.0.0
 REPO_URL=paolamedo/aws_rita
 BUILD_DIR=/home/paola/Documents/MCD/ProductoDatos/PROYECTO/dpa_rita
 

@@ -5,6 +5,7 @@ from pyspark.ml import Pipeline,  PipelineModel
 from pyspark.sql import SparkSession
 from pyspark.ml.feature import VectorAssembler
 from pyspark.sql.functions import concat, col, lit
+from pyspark.sql import functions as f
 
 from datetime import date, datetime
 import zipfile
@@ -105,8 +106,11 @@ def get_predictions():
     vars_pred = ['dayofmonth','prediction', 'distance', 'flight_number_reporting_airline']
     df_pred = prediction.select([c for c in prediction.columns if c in vars_pred])
     df_pred = df_pred.withColumn('s3_name', lit(s3_name))
-    df_pred = df_pred.withColumn('fecha', concat(lit("2020"), lit("2"), col('dayofmonth')))
+    df_pred = df_pred.withColumn('s3_name', lit(s3_name))
 
+    df_pred = df_pred.withColumn('auxi', f.when(f.col('dayofmonth') < 9, "0").otherwise(""))
+
+    df_pred = df_pred.withColumn('fecha', concat(lit("2020"), lit("02"), col('auxi'), col('dayofmonth')))
     vars_pred = ['flight_number_reporting_airline', 'prediction',
                   'distance', 's3_name', 'fecha']
     df_pred = df_pred.select([c for c in df_pred.columns if c in vars_pred ])

@@ -20,6 +20,7 @@ from pyspark.sql import functions as f
 from pyspark.sql.functions import udf
 from pyspark.sql.functions import col, lower, regexp_replace, split
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType
+from pyspark.sql import functions as f
 
 from collections import defaultdict
 
@@ -342,7 +343,9 @@ def save_train_predictions(prediction, objetivo, model_name, hyperparams):
     df_bias = prediction.select([c for c in prediction.columns if c in vars_bias])
     df_bias=df_bias.withColumnRenamed("prediction", "score").withColumnRenamed("label", "label_value")
     df_bias = df_bias.withColumn('s3_name', lit(s3_name))
-    df_bias = df_bias.withColumn('fecha', concat(lit("2019"), lit("12"), col('dayofmonth')))
+
+    df_bias = df_bias.withColumn('aux', f.when(f.col('dayofmonth') < 9, "0").otherwise(""))
+    df_bias = df_bias.withColumn('fecha', concat(lit("2019"), lit("12"), col('aux'), col('dayofmonth')))
 
     vars_bias = ['flight_number_reporting_airline', 'prediction',
                  'originwac', 'label_value', 'distance', 'score',

@@ -38,7 +38,7 @@ class CreatePredictions(PostgresQuery):
     database = MY_DB
     host = MY_HOST
     table ='metadatos.predictions'
-    update_id = "13" #Para que vuelva a correr
+    update_id = "19" #Para que vuelva a correr
 
     data_list =  save_predictions()
     query = "insert into " + table + " values "  + str(tuple(data_list))

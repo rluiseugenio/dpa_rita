@@ -26,7 +26,7 @@ CURRENT_DIR = os.getcwd()
 
 class RunModelSimple(luigi.Task):
 	bucname = "models-dpa"
-	numIt = 200
+	numIt = 202
 	numPCA = 7
 	obj = "0-1.5"
 	model = "LR"

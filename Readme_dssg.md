@@ -6,7 +6,7 @@ vuelos de la base de datos denominada conocida como [RITA](http://stat-computing
 ## Tabla de contenidos
 
 1. [Introducción](https://github.com/dssg/usal_echo#introduction)
-2. [Overview](https://github.com/dssg/usal_echo#overview)
+2. [Consideraciones](https://github.com/dssg/usal_echo#overview)
 3. [Requerimientos de infraestructura](https://github.com/dssg/usal_echo#infrastructure-requirements)
 4. [Instalación y setup](https://github.com/dssg/usal_echo#installation-and-setup)
 5. [Corriendo el Pipeline](https://github.com/dssg/usal_echo#run-the-pipeline)
@@ -21,7 +21,7 @@ de datos impartida por Msc. Liliana Millán Nuñez, como parte del programa de
 maestría en Ciencia de Datos del Instituto Tecnológico Autónomo de México, para
  el primer semestre de 2020.
 
-## Overview
+## Consideraciones
 
 El proceso de predicción  de retrasos o cancelaciones de los vuelos se basa
 fundamentalmente en las siguientes ideas:
@@ -42,11 +42,46 @@ El pipeline descrito corresponde a la siguiente estructura:
 
 ![USAL Echo Project Overview](docs/images/usal_echo_pipeline_overview.png?raw=true "USAL Echo Project Overview")
 
+
+
+**Metadatos**
+
+En complemento a lo anterior, en la base de datos PostgreSQL alojada en AWS RDS
+se incorporan una serie de tablas que reúnen los metadatos generados en cada una
+de las etapas del pipeline, que para mejor referencia se resumen a continuación:
+
+| Tabla       | Descripción de metadatos                                                                                            |
+|-------------|---------------------------------------------------------------------------------------------------------------------|
+| "extract"   | Información extraída de la pagina electrónica de Rita, en archivos .zip correspondientes a un mes y año específicos |
+| load        | Corresponde a los datos que se cargan hacia RDS en esquema raw                                                      |
+| clean       | Relativo a la información de la etapa de limpieza de los datos desde el esquema raw                                 |
+| semantic    | Reúne la información de la etapa de feature engineering con vista hacia el modelado predictivo                                                                                                                          |
+| models      | Incorpora los metadatos de la etapa de modelado                                                                     |
+| bias        | Reúne la información de bias de los modelos predictivos                                                             |
+| predictions | Considera la información generada para realizar predicciones                                                        |
+
+**Consideraciones éticas**
+
+Se identificaron posibles implicaciones éticas del producto de datos materia de este proyecto
+
+**Eje de usuarios:**
+
+* Hacer que pierdan vuelos y deban hacer doble gasto en un viaje,
+* Sesgar a que los usuarios viajen o no en una aerolínea,
+
+**Eje de aerolíneas:**
+
+* Perjudicar la reputación  de una aerolínea,
+* Proyectar la responsabilidad de eventos fuera de su control,
+* Dañar su estabilidad económica y empleos,
+* Aumentar quejas injustificadas del servicio.
+
+
 ## Requerimientos de infraestructura
 
-Para el manejo y procesamiento de los datos este projecto usa infraestructura en
+Para el manejo y procesamiento de los datos este proyecto usa infraestructura en
  la nube basada en servicios de Amazon Web Services (AWS). Concretamente, se
- emplean dos buckets de AWS S3 (denominados **) y una instancia AWS EC2 para ejecutar todo el
+ emplean tres buckets de AWS S3 (denominados *models-dpa*, ) y una instancia AWS EC2 para ejecutar todo el
  código. Los resultados para cada capa de procesamiento se almacenan en un base
  de datos basada en PostgreSQL en AWS RDS.
 
@@ -72,72 +107,22 @@ Infraestructura: AWS
 
 #### 0. Requerimientos
 
-ssh -i "nombre_llave.pem" ubuntu@<endpoint-de-mi-instancia>
+[Pendiente: Leon documentar como conectarse al bastión via SSH y la estructura]
+
+
+Considerando lo anterior, dentro de bastión se de contar con docker:
 
 ```
 sudo apt update
 sudo apt-get install docker.io git
 ```
 
-**Credenciales de aws**
 
-Estarán localizadas en ```~/.aws/credentials``` y se crean de la siguiente manera:
-
-```
-mkdir ~/.aws
-nano ~/.aws/credentials
-
-# Posteriormente se pega el id y la llave correspondiente
-
-[default]
-aws_access_key_id=aws_access_key_id
-aws_secret_access_key=aws_secret_access_key
-```
-
-**Credenicales de PostgresSQL**
-
-Estarán localizadas en ```~/.rita``` y se crean de la siguiente manera
+[Pendiente: Leon documentar estructura de carpetas]
 
 ```
-mkdir ~/.rita
-cd .rita
-mkdir ~/.rita/conf
-mkdir ~/.rita/keys
-mkdir ~/.rita/logs
-
-# posteriormente se pega la configuración y la llave de acceso
-
-nano ~/.rita/conf/path_parameters.yml
-
-bucket: "test-aws-boto"
-region: "us-east-1"
-region2: "us-east-1f"
-profile: "dpa"
-key: 'ec2-keypair'
-ami: "ami-0d1cd67c26f5fca19"
-vpc: "vpc-0cffc8f100e5271b3"
-gateway: "igw-08da14e5eaa65c84d"
-subnet: "subnet-087d35547d07c26c6"
-group: "sg-0fa1c85891a994d1b"
-user: "postgres"
-password : "*******"
-host : "rita-1.cbxcxaqtctoq.us-east-1.rds.amazonaws.com"
-port : "5432"
-database: "postgres"
-
-nano ~/.rita/keys/rita_kp.pem
-
-
------BEGIN RSA PRIVATE KEY-----
-...
------END RSA PRIVATE KEY-----
-
-
-
-
+mkidr [alguna carpeta]
 ```
-
-
 
 
 #### 1.

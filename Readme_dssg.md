@@ -85,6 +85,11 @@ sudo apt-get install docker.io git
 
 [Pendiente: Leon documentar estructura de carpetas]
 
+```
+mkidr [alguna carpeta]
+```
+
+
 #### 1.
 
 Clone the TensorFlow Python3 conda environment in your GPU instance set up with AWS Deep Learning AMI and activate it.
@@ -104,24 +109,25 @@ pip install -r requirements.txt
 python setup.py install
 ```
 
-#### 3. Credentials files
-To run the pipeline, you need to specify the credentials for your aws and postgres infrastructure. The pipeline looks for credentials files in specific locations. You should create these now if they do not already exist.
+#### 3. Archivos de credenciales
+
+Para ejecutar el pipeline, se deben especificar las credenciales para su infraestructura en AWS y postgres, puesto que el primero busca archivos de credenciales en ubicaciones específicas. Debería crearlos ahora si aún no existen
 
 ##### aws credentials   
-Located in `~/.aws/credentials` and formatted as:
+Se ubican en `~/.aws/credentials` y deben ser generadas como sigue
 ```
 mkdir ~/.aws
 nano ~/.aws/credentials
 
-# Then paste the access id and key below into the file
-
-[default]
+# Luego se debe pegar la identificación de acceso y la clave a continuación en dicho archivo
+[dpa]
 aws_access_key_id=your_key_id
 aws_secret_access_key=your_secret_key
 ```
-The pipeline uses the `default` user credentials.
+El pipeline usa las credenciales del usuario `dpa`.
 
-##### postgres credentials  
+##### Credenciales de postgres
+
 Modify the postgres credentials in `~/usr/usal_echo/conf/local/postgres_credentials.json`. This file must exist to run the pipeline. An example is created during setup and you must modify it for your configuration.
 ```
 cd ~/usr/usal_echo/conf/
@@ -163,13 +169,14 @@ The models used to run this pipeline can be downloaded from s3:
 
 They need to be saved in the `model_dir` that you have specified above, and that `model_dir` needs to already have been created.
 
-#### 6. Create the database schema
+#### 6. Crear el esquema de las bases de datos
+
 As per the requirements listed in [Infrastructure requirements](https://github.com/dssg/usal_echo#infrastructure-requirements) you require a database indtallation with credentials stored as described above. After the database has been created, you need to run the script that creates the different schema that we require to persist the outputs from the different pipeline processes: classification, segmentation and measurements. The database schema is stored in `usr/usal_echo/conf/models_schema.sql` and must be set up by running the following command (change psswd, user, database and host to correspond with your setup):
 ```
 PGPASSWORD=psswd psql -U user -d database_name -h host -f '/home/ubuntu/usr/usal_echo/conf/models_schema.sql'
 ```
 
-## Run the pipelineent
+## Correr el pipeline
 
 The final step is to run the `inquire.py` script which can be called from within the `usal_echo` directory using the short cut usal_echo:
 ```
@@ -269,7 +276,7 @@ Finally, specify the name of the directory which contains the dicom files and im
 The log files are stored in `~/usr/usal_echo/logs`.
 
 ### Notebooks
-A set of notebooks exists in the `notebooks` directory of this repository. They contain the functions for each of the pipeline steps, as well as some elementary data analysis and can be used to experiment.
+Existe un conjunto de cuadernos en el directorio `notebooks` de este repositorio. Contienen las funciones para cada uno de los pasos de la tubería, así como algunos análisis de datos elementales y se pueden usar para experimentar.
 
 ## Code organisation
 The code is organised as follows:

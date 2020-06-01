@@ -187,17 +187,16 @@ nano postgres_credentials.json
 The parameters for the s3 bucket and for storing dicom files, images and models must be stored as a yaml file in `~/usr/usal_echo/conf/path_parameters.yml`. This file must exist to run the pipeline. An example is created during setup and you must modify it for your configuration.
 
 ```
-cd ~/usr/usal_echo/conf/
+cd .rita/conf/
 nano path_parameters.yml
 
-# Then modify the paths below in the file
+# Modifa la informacion en estas líneas
 
-bucket: "your_s3_bucket_name"
-dcm_dir: "~/data/01_raw"
-img_dir: "~/data/02_intermediate"
-segmentation_dir: "~/data/04_segmentation"
-model_dir: "~/models"
-classification_model: "model.ckpt-6460"
+user: "postgres"
+password : "mi-password"
+host : "mi-endpoint-de-rds"
+port : "5432"
+database: "postgres"
 ```
 
 The `dcm_dir` is the directory to which dicom files will be downloaded. The `img_dir` is the directory to which jpg images are saved. The `model_dir` is the directory in which models are stored. The classification and segmentation models must be saved in the `model_dir`. Use `~/` to refer to the user directory.

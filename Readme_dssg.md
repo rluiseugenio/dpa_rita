@@ -1,17 +1,15 @@
 # Retrasos en vuelos de la base de datos RITA
 
-**Este proyecto automatizan la predicción de retrasos o cancelaciones de los vuelos de la base de datos denominada conocida como [RITA](http://stat-computing.org/dataexpo/2009/the-data.html) (ver también [transtats.bts.gov](https://www.transtats.bts.gov/OT_Delay/OT_DelayCause1.asp))**
-
-**This project automates the analysis of echocardiogram images to detect normal heart functioning.** Echocardiograms are ultrasound images of the heart, that are lower in cost and quicker to perform than other imaging techniques such as MR images and CT scans. They are thus the most frequently used cardiac imaging technique for preventative screenings and ongoing monitoring of heart conditions. Cardiologists spend a significant amount of time analysing echocardiograms and reporting on the results. Many of these  analytical studies are for people with normal heart functioning that require no further medical intervention. Automating the identification of normal heart function from echocardiogram images can potentially reduce the time that cardiologists spend in front of computers and help them increase the amount of time spent with ill patients that need them most.
+**Este proyecto automatizan la predicción de retrasos o cancelaciones de los vuelos de la base de datos denominada conocida como [RITA](http://stat-computing.org/dataexpo/2009/the-data.html) (ver también [transtats.bts.gov](https://www.transtats.bts.gov/OT_Delay/OT_DelayCause1.asp))**. Esta base agrupa una serie de datos de vuelos que incluyen salidas a tiempo, llegadas a tiempo, demoras, vuelos cancelados de todo Estados Unidos del Departamento de Transporte. Dado que los tiempos de viaje de los usuarios se encuentran sujetos a la disponibilidad y viabilidad de los vuelos de las aerolíneas comerciales, los cuales a su vez se encuentran estrechamente ligados a otros factores (por ejemplo, políticas comerciales, incidentes de seguridad o eventos climáticos), los pasajeros experimentan cierto nivel de incertidumbre sobre si sus vuelos serán retrasados o cancelados en definitiva. La automatización de las predicciones como se plantean en este proyecto permite no solo que los usuarios prevean la administración de su tiempo al realizar viajes, sino que puedan diseñar estrategias que les permita continuar con su viaje en caso de una probable cancelación de un vuelo.
 
 ## Tabla de contenidos
 
 1. [Introducción](https://github.com/dssg/usal_echo#introduction)
 2. [Overview](https://github.com/dssg/usal_echo#overview)
-3. [Requerimientos de Infraestructura](https://github.com/dssg/usal_echo#infrastructure-requirements)
+3. [Requerimientos de infraestructura](https://github.com/dssg/usal_echo#infrastructure-requirements)
 4. [Instalación y setup](https://github.com/dssg/usal_echo#installation-and-setup)
 5. [Corriendo el Pipeline](https://github.com/dssg/usal_echo#run-the-pipeline)
-6. [Organizacion del código](https://github.com/dssg/usal_echo#code-organisation)
+6. [Organización del código](https://github.com/dssg/usal_echo#code-organisation)
 7. [Contributors](https://github.com/dssg/usal_echo#contributors)
 
 ## Introducción

@@ -72,8 +72,34 @@ Infraestructura: AWS
 
 #### 0. Requerimientos
 
-[Pendiente: Leon documentar como conectarse al bastión via SSH y la estructura]
+# Instrucciones para crear bastión
 
+**Nota:** Formalmente el bastión es sólo una máquina dentro de un entorno seguro que da acceso a otras máquinas. Puede ser cualquier máquina virtual de AWS.
+
+## 1. Inicio de sesión y región
+
+1. Iniciar sesión en la consola de AWS ([https://aws.amazon.com/es/](https://aws.amazon.com/es/)),
+
+## 2. Creación de una máquina virtual que servirá como bastión
+
+**Nota:** Entiendo que la cuenta gratuita de AWS asociada al ITAM puede no hacer elegible la máquina virtual con *type*, denominada 2.micro (Free tier elegible). Pero puede ser cualquiera.
+
+2. Nuevamente en la consola de AWS, ir a *Buscar servicios* para ingresar el texto *EC2*. Esto nos lleva al *EC2 Dashboard*.
+3. En el *EC2 Dashboard*, hacer el scroll hasta el campo *Launch instance* y dar click en el botón homónimo. Este paso nos lleva a una serie de pasos para configurar la máquina virtual de AWS.
+4. **Step 1: Choose an Amazon Machine Image (AMI) Cancel and Exit.-** Buscar la imagen de Ubuntu Server 18.04 LTS (HVM), SSD Volume Type y pulsar el botón *Select*.
+5. **Step 2: Choose an Instance Type.-** buscar la máquina con *type* t2.large,
+6. **Step 3: Configure Instance Details.-** se dejan los valores predeterminados,
+7. **Step 4: Add Storage.-** seleccionamos 30 GB de almacenamiento,
+8. **Step 5: Add Tags.-** dejamos la configuración base,
+9. **Step 6: Configure Security Group.-** dejamos la configuración base.
+10. **Step 7: Review Instance Launch.-** presionamos *Launch*,
+11. Añadimos o creamos una llave de AWS (formato .pem) y damos click en la casilla *I acknowledge that I have access to the selected private key file (testingec2ubuntin.pem), and that without this file, I won't be able to log into my instance.* Presionamos *Launch instances*
+17. Damos click *View instances*
+18. Veremos como empieza a levantarse en el *EC2 Dashboard*. Para conectarse, se debe seleccionar la instancia correspondiente de la tabla, presionar el bottom *Connect*, lo cual genera un campo con muchos códigos, entre ellos debemos buscar uno como este (copiarlo y pegarlo en la terminal)
+
+ssh -i "nombre_llave.pem" ubuntu@ec2-54-226-157-22.compute-1.amazonaws.com
+
+**Nota:** Se sugiere que la llave .pem se mueva a la carpeta .ssh y desde ahí ejecutar el comando del paso 18.
 
 Considerando lo anterior, dentro de bastión se de contar con docker:
 
@@ -82,12 +108,65 @@ sudo apt update
 sudo apt-get install docker.io git
 ```
 
+**Credenciales de aws**
 
-[Pendiente: Leon documentar estructura de carpetas]
+Estarán localizadas en ```~/.aws/credentials``` y se crean de la siguiente manera:
 
 ```
-mkidr [alguna carpeta]
+mkdir ~/.aws
+nano ~/.aws/credentials
+
+# Posteriormente se pega el id y la llave correspondiente
+
+[default]
+aws_access_key_id=aws_access_key_id
+aws_secret_access_key=aws_secret_access_key
 ```
+
+**Credenicales de PostgresSQL**
+
+Estarán localizadas en ```~/.rita``` y se crean de la siguiente manera
+
+```
+mkdir ~/.rita
+cd .rita
+mkdir ~/.rita/conf
+mkdir ~/.rita/keys
+mkdir ~/.rita/logs
+
+# posteriormente se pega la configuración y la llave de acceso
+
+nano ~/.rita/conf/path_parameters.yml
+
+bucket: "test-aws-boto"
+region: "us-east-1"
+region2: "us-east-1f"
+profile: "dpa"
+key: 'ec2-keypair'
+ami: "ami-0d1cd67c26f5fca19"
+vpc: "vpc-0cffc8f100e5271b3"
+gateway: "igw-08da14e5eaa65c84d"
+subnet: "subnet-087d35547d07c26c6"
+group: "sg-0fa1c85891a994d1b"
+user: "postgres"
+password : "*******"
+host : "rita-1.cbxcxaqtctoq.us-east-1.rds.amazonaws.com"
+port : "5432"
+database: "postgres"
+
+nano ~/.rita/keys/rita_kp.pem
+
+
+-----BEGIN RSA PRIVATE KEY-----
+...
+-----END RSA PRIVATE KEY-----
+
+
+
+
+```
+
+
 
 
 #### 1.

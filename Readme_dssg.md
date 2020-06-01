@@ -168,24 +168,7 @@ El pipeline usa las credenciales del usuario `dpa`.
 
 ##### Credenciales de postgres
 
-Modify the postgres credentials in `~/usr/usal_echo/conf/local/postgres_credentials.json`. This file must exist to run the pipeline. An example is created during setup and you must modify it for your configuration.
-```
-cd ~/usr/usal_echo/conf/
-nano postgres_credentials.json
-
-# Then modify the postgres credentials below into the file
-
-{
-"user":"your_user",
-"host": "your_server.rds.amazonaws.com",
-"database": "your_database_name",
-"psswd": "your_database_password"
-}
-```
-
-#### 4. Specify data paths
-The parameters for the s3 bucket and for storing dicom files, images and models must be stored as a yaml file in `~/usr/usal_echo/conf/path_parameters.yml`. This file must exist to run the pipeline. An example is created during setup and you must modify it for your configuration.
-
+Modifique las credenciales de postgres en `.rita/conf/path_parameters.yml`. Este archivo debe existir para ejecutar el pipelone. Se crea un ejemplo durante la instalación y debe modificarlo para su configuración.
 ```
 cd .rita/conf/
 nano path_parameters.yml
@@ -199,7 +182,9 @@ port : "5432"
 database: "postgres"
 ```
 
-The `dcm_dir` is the directory to which dicom files will be downloaded. The `img_dir` is the directory to which jpg images are saved. The `model_dir` is the directory in which models are stored. The classification and segmentation models must be saved in the `model_dir`. Use `~/` to refer to the user directory.
+#### 4. Specify data paths
+
+pendiente
 
 #### 5. Crear el esquema de las bases de datos
 

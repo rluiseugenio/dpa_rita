@@ -47,12 +47,13 @@ En este sentido, para facilitar el entendimiento de los documentos y acciones de
 | # | Carpeta                           | Descripción  |
 |---|-----------------------------------|--------------|
 | 1 | Docs | Refiere la documentación de los pasos realizados para las diferentes etapas del proyecto. |
-| 2 | Diseño | Contiene un documento *mock-up* con de la conceptualización del proyecto a realizar. |
-| 3 | EDA | Análisis exploratorio preeliminar para identificar potenciales transformaciones. |
-| 4 | ETL | Primera versión del ETL, considerando la etapa de Luigi. |
-| 5 | sql | Contiene propuestas para hacer la carga a una base PostgreSQL de los datos desde csv. |
-| 6 | Linaje | Presenta una serie de esquemas que describe tanto los metadatos que se recopilarán en las diferentes fases del proyecto, así como el linaje de los datos generados en cada una de dichas etapas. |
-| 7 | UTILS | Esta carpeta contiene las instrucciones necesarias para crear el ambiente virtual donde se correrá luigi con el resto de los paquetes para el pipeline |
+| 2 | Diseño | Contiene un documento *mock-up* con la conceptualización del proyecto a realizar. |
+| 3 | EDA | Análisis exploratorio para identificar potenciales transformaciones. |
+| 4 | UTILS | Esta carpeta contiene las instrucciones necesarias para crear el ambiente virtual donde se correrá luigi con el resto de los paquetes para el pipeline |
+| 5 | src | En esta carpeta se encuentran los programas necesarios para correr el proyecto |
+| 6 | tasks | El contenido de la carpeta son los tasks correspondientes al proceso que se llevará a cabo en luigi. |
+| 7 | testing | En esta carpeta se encuentran las pruebas unitarias que se correrán a través de luigi.|
+
 
 **Nota:** La estructura del repositorio y su contenido se irá actualizando conforme el equipo avance en el desarrollo del multi-citado proyecto.
 

@@ -138,13 +138,14 @@ source ~/.bashrc
 conda activate usal_echo
 ```
 
-#### 2. Clone and setup repository
-After activating your Anaconda environment, clone this repository into your work space. Navigate to `usal_echo` and install the required packages with pip. Then run the setup.py script.
+#### 2. Clonar el repositorio de github
+
+Para clonar el repositorio de trabajo del proyecto ejecutar:
+
 ```
-git clone https://github.com/dssg/usal_echo.git
-cd usal_echo
-pip install -r requirements.txt
-python setup.py install
+mkdir dpa_rita
+cd dpa_rita
+git clone https://github.com/paola-md/dpa_rita/
 ```
 
 #### 3. Archivos de credenciales
@@ -157,7 +158,8 @@ Se ubican en `~/.aws/credentials` y deben ser generadas como sigue
 mkdir ~/.aws
 nano ~/.aws/credentials
 
-# Luego se debe pegar la identificación de acceso y la clave a continuación en dicho archivo
+# Luego se debe pegar la identificación de acceso y la clave a
+# continuación en dicho archivo
 [dpa]
 aws_access_key_id=your_key_id
 aws_secret_access_key=your_secret_key
@@ -200,14 +202,7 @@ classification_model: "model.ckpt-6460"
 
 The `dcm_dir` is the directory to which dicom files will be downloaded. The `img_dir` is the directory to which jpg images are saved. The `model_dir` is the directory in which models are stored. The classification and segmentation models must be saved in the `model_dir`. Use `~/` to refer to the user directory.
 
-#### 5. Download models
-The models used to run this pipeline can be downloaded from s3:  
-* [classification](): original from Zhang et al, adapted to our dataset using transfer learning.
-* [segmentation](): original from Zhang et al without adaptation
-
-They need to be saved in the `model_dir` that you have specified above, and that `model_dir` needs to already have been created.
-
-#### 6. Crear el esquema de las bases de datos
+#### 5. Crear el esquema de las bases de datos
 
 As per the requirements listed in [Infrastructure requirements](https://github.com/dssg/usal_echo#infrastructure-requirements) you require a database indtallation with credentials stored as described above. After the database has been created, you need to run the script that creates the different schema that we require to persist the outputs from the different pipeline processes: classification, segmentation and measurements. The database schema is stored in `usr/usal_echo/conf/models_schema.sql` and must be set up by running the following command (change psswd, user, database and host to correspond with your setup):
 ```
@@ -225,93 +220,6 @@ Running `usal_echo` will launch a questionnaire in your command line that takes 
 
 ### Pipeline options
 To navigate through the options in the command line prompt hit `spacebar` to check or uncheck multiple choice options and `Enter` to select an option. Navigate between options with the `up` and `down` arrows. You can abort the process with `Ctrl+C`.
-
-#### Data ingestion
-Select to ingest or not to ingest dicom metadata and the Xcelera database. **NB: ingesting the dicom metadata for 25 000 studies takes ~3 days!**
-
-<p align="left">
-<img src="docs/images/inquire_ingest.png" alt="Run pipeline: ingest." width="450" />
-</p>
-
-This step includes the following subprocesses:
-
-##### dicom metadata
-```
-d01_data.ingestion_dcm.ingest_dcm(bucket)
-d02_intermediate.clean_dcm.clean_dcm_meta()
-```
-
-##### Xcelera data
-```
-d01_data.ingestion_xtdb.ingest_xtdb(bucket)
-d02_intermediate.clean_xtdb.clean_tables()
-d02_intermediate.filter_instances.filter_all()
-```
-
-#### Dicom image download
-This step downloads and decompresses the dicom files. The files to download are determined based on the test/train split ratio and downsample ratio, both of which must be specified if this option is selected.
-
-If `Train test ration = 0`, then all the files are downloaded into the test set.  
-If `Train test ratio = 1`, then no files are downloaded into the test set.
-If `Downsample ratio = 1`, no downsampling is done.
-If `0 < Downsample ratio < 1`, then are portion of files corresponding to the downsample ratio is downloaded.
-
-<p align="left">
-<img src="docs/images/inquire_download.png" alt="Run pipeline: download." width="450" />
-</p>
-
-The download step executes the following function:
-```
-d02_intermediate.download_dcm.s3_download_decomp_dcm(train_test_ratio, downsample_ratio, dcm_dir, bucket=bucket)
-```
-`s3_download_decomp_dcm` executes two processing steps: it downloads files from s3 and then decompresses them. If you already have a directory with dicom files that are not decompressed, you can use `d02_intermediate.download_dcm._decompress_dcm()` to decompress your images. The convention is that decompressed images are stored in a subdirectory of the original directory named `raw` and that filenames are appended with `_raw` to end in `.dcm_raw`.
-
-The naming convention for downloaded files is the following: _test_split[**ratio * 100**]\_downsampleby[**inverse ratio**]_. For example, if `Train test ratio = 0.5` and `Downsample ratio = 0.001` the directory name will be _test_split50_downsampleby1000_.
-
-#### Module selection
-Select one or more modules for inference and evaluation.
-
-<p align="left">
-<img src="docs/images/inquire_classification.png" alt="Run pipeline: classification." width="700" />
-</p>
-
-The following functions are executed in each module. `dir_name` is the directory specified in the next step. `dcm_dir` and `img_dir` are specified in _path_paramters.yml_:
-
-##### classification
-```
-img_dir_path = os.path.join(img_dir, dir_name)
-dcmdir_to_jpgs_for_classification(dcm_dir, img_dir_path)
-d03_classification.predict_views.run_classify(img_dir_path, classification_model_path)
-d03_classification.predict_views.agg_probabilities()
-d03_classification.predict_views.predict_views()
-d03_classification.evaluate_views.evaluate_views(img_dir_path, classification_model)
-```
-
-##### segmentation
-```
-dcm_dir_path = os.path.join(dcm_dir, dir_name)
-d04_segmentation.segment_view.run_segment(dcm_dir_path, model_dir, img_dir_path, classification_model)
-d02_intermediate.create_seg_view.create_seg_view()
-d04_segmentation.generate_masks.generate_masks(dcm_dir_path)
-d04_segmentation.evaluate_masks.evaluate_masks()
-```
-
-##### measurements
-```
-d05_measurement.retrieve_meas.retrieve_meas()
-d05_measurement.calculate_meas.calculate_meas(dir_name)
-d05_measurement.evaluate_meas.evaluate_meas(dir_name)
-```
-
-#### Specification of image directory
-Finally, specify the name of the directory which contains the dicom files and images (ie the name of the subdirectory in `dcm_dir` and `img_dir` that contains the data you want to access). It is important that these two subdirectories have the same name, as the classification module accesses the `img_dir` while the segmentation module accesses the `dcm_dir`.
-
-<p align="left">
-<img src="docs/images/inquire_dir.png" alt="Run pipeline: specify directory." width="450" />
-</p>
-
-### Log files
-The log files are stored in `~/usr/usal_echo/logs`.
 
 ### Notebooks
 Existe un conjunto de cuadernos en el directorio `notebooks` de este repositorio. Contienen las funciones para cada uno de los pasos de la tubería, así como algunos análisis de datos elementales y se pueden usar para experimentar.

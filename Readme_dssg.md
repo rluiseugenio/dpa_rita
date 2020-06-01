@@ -1,6 +1,7 @@
 # Retrasos en vuelos de la base de datos RITA
 
-**Este proyecto automatizan la predicción de retrasos o cancelaciones de los vuelos de la base de datos denominada conocida como [RITA](http://stat-computing.org/dataexpo/2009/the-data.html) (ver también [transtats.bts.gov](https://www.transtats.bts.gov/OT_Delay/OT_DelayCause1.asp))**. Esta base agrupa una serie de datos de vuelos que incluyen salidas a tiempo, llegadas a tiempo, demoras, vuelos cancelados de todo Estados Unidos del Departamento de Transporte. Dado que los tiempos de viaje de los usuarios se encuentran sujetos a la disponibilidad y viabilidad de los vuelos de las aerolíneas comerciales, los cuales a su vez se encuentran estrechamente ligados a otros factores (por ejemplo, políticas comerciales, incidentes de seguridad o eventos climáticos), los pasajeros experimentan cierto nivel de incertidumbre sobre si sus vuelos serán retrasados o cancelados en definitiva. La automatización de las predicciones como se plantean en este proyecto permite no solo que los usuarios prevean la administración de su tiempo al realizar viajes, sino que puedan diseñar estrategias que les permita continuar con su viaje en caso de una probable cancelación de un vuelo.
+**Este proyecto automatizan la predicción de retrasos o cancelaciones de los
+vuelos de la base de datos denominada conocida como [RITA](http://stat-computing.org/dataexpo/2009/the-data.html) (ver también [transtats.bts.gov](https://www.transtats.bts.gov/OT_Delay/OT_DelayCause1.asp))**. Esta base agrupa una serie de datos de vuelos que incluyen salidas a tiempo, llegadas a tiempo, demoras, vuelos cancelados de todo Estados Unidos del Departamento de Transporte. Dado que los tiempos de viaje de los usuarios se encuentran sujetos a la disponibilidad y viabilidad de los vuelos de las aerolíneas comerciales, los cuales a su vez se encuentran estrechamente ligados a otros factores (por ejemplo, políticas comerciales, incidentes de seguridad o eventos climáticos), los pasajeros experimentan cierto nivel de incertidumbre sobre si sus vuelos serán retrasados o cancelados en definitiva. La automatización de las predicciones como se plantean en este proyecto permite no solo que los usuarios prevean la administración de su tiempo al realizar viajes, sino que puedan diseñar estrategias que les permita continuar con su viaje en caso de una probable cancelación de un vuelo.
 
 ## Tabla de contenidos
 
@@ -15,64 +16,77 @@
 ## Introducción
 
 ### Proyecto de arquitectura de producto de datos.
-Este proyecto se desarrolla en el marco de la materia arquitectura de producto de datos impartida por Msc. Liliana Millán Nuñez, como parte del programa de maestría en Ciencia de Datos del Instituto Tecnológico Autónomo de México, para el primer semestre de 2020. 
+Este proyecto se desarrolla en el marco de la materia arquitectura de producto
+de datos impartida por Msc. Liliana Millán Nuñez, como parte del programa de
+maestría en Ciencia de Datos del Instituto Tecnológico Autónomo de México, para
+ el primer semestre de 2020.
 
 ## Overview
-The echocardiogram analysis process consists of 3 major processing steps.
 
-1. View **Classification** into A2C (apical two chamber), A4C (apical four chamber) and Plax (parasternal long axis) views.
-2. **Segmentation** of heart chambers in each of these three views.
-3. Calculation of **measurements** (in particular the left ventricular ejection fraction) and assessment of heart condition as "normal", "grey-zone" or "abnormal".
+El proceso de predicción  de retrasos o cancelaciones de los vuelos se basa
+fundamentalmente en las siguientes ideas:
 
-Our pipeline has been designed to run in a modular way. Data ingestion, cleaning and view filtering can be run independently from the classification, segmentation and measurement modules provided that the dicom files are stored in an accessible directory. The name of this directory needs to be specified when running the pipeline (see [Section 5](https://github.com/dssg/usal_echo#specification-of-image-directory)).
+1. **Predicción en retrasos** basada en intervalos que indican la cantidad de horas
+ de retraso en un vuelo; a saber de i) 0 a 1.5 horas de retraso, ii) 1.5 a 3.5
+ horas de retraso, y iii) más de 3.5 horas de retraso.
+2. **Cancelación** representado como una variable binaria que indica si un vuelo
+fue o no cancelado.
+3. Calculo de medidas de **bias** y **fairness**: [Pendiente: descripción].
 
-The processing pipeline is structured as follows.
+Nuestro pipeline ha sido diseñado para funcionar de forma modular usando la
+librería *Luigi* de Python, considerando la ingestión de datos, su limpieza,
+creación de nuevas *features* así como predicción se pueden ejecutar de manera
+independientemente.
+
+El pipeline descrito corresponde a la siguiente estructura:
+
 ![USAL Echo Project Overview](docs/images/usal_echo_pipeline_overview.png?raw=true "USAL Echo Project Overview")
 
-The codebase is an evolution of code developed by [Zhang et al](https://bitbucket.org/rahuldeo/echocv/src/master/).
+## Requerimientos de infraestructura
 
-## Requerimientos de infrastructura
-We retrieve our data from an AWS S3 bucket and use an AWS EC2 server for running all code. Results for each processing layer are stored in an AWS RDS.
+Para el manejo y procesamiento de los datos este projecto usa infraestructura en
+ la nube basada en servicios de Amazon Web Services (AWS). Concretamente, se
+ emplean dos buckets de AWS S3 (denominados **) y una instancia AWS EC2 para ejecutar todo el
+ código. Los resultados para cada capa de procesamiento se almacenan en un base
+ de datos basada en PostgreSQL en AWS RDS.
+
 ```
-Infrastructure: AWS
+Infraestructura: AWS
 
-+ AMI: ami-079bef5a6246ca216, Deep Learning AMI (Ubuntu) Version 23.1
-+ EC2 instance: p3.2xlarge
-    + GPU: 1
-    + vCPU: 8
-    + RAM: 61 GB
-+ OS: ubuntu 18.04 LTS
-+ Volumes: 1
-    + Type: gp2
-    + Size: 450 GB
-+ RDS: PostgreSQL
-    + Engine: PostgreSQL
-    + Engine version: 10.6
-    + Instance: db.t2.xlarge
-    + vCPU: 2
-    + RAM: 4 GB
-    + Storage: 100 GB
++ AMI: ami-085925f297f89fce1 (64-bit x86), Ubuntu Server 18.04 LTS (HVM), SSD Volume Type
++ instancia EC2: t2.large
+      GPU: 1
+      vCPU: 2
+      RAM: 8 GB
++ OS: Ubuntu 18.04 LTS
++ RDS:
+    Engine: PostgreSQL
+    Engine version: 11.5
+    instancia: db.t2.micro
+    vCPU: 1
+    Ram: 20 GB
+    Almacenamiento: 1000 GB
 ```
 
-## Installation and setup
+## Instalación y setup
 
-#### 0. Requirements
-In addition to the infrastructure mentioned above, the following software is required:
-* [Anaconda](https://docs.anaconda.com/anaconda/install/)
-* [git](https://www.atlassian.com/git/tutorials/install-git)  
+#### 0. Requerimientos
 
-All instructions that follow assume that you are working in your terminal.
+[Pendiente: Leon documentar como conectarse al bastión via SSH y la estructura]
 
-You need to install and update the following packages on your system before activating any virtual environment.
+
+Considerando lo anterior, dentro de bastión se de contar con docker:
+
 ```
 sudo apt update
-sudo apt install make gcc jq libpq-dev postgresql-client postgresql-client python3 python3-dev python3-venv
-sudo apt-get install libgdcm-tools
+sudo apt-get install docker.io git
 ```
 
-When installing these libraries, it is possible that a message window will pop up while trying to configure the library `libssl1.1:amd64`. This message is normal and tells you that some of the services need a restart. Say yes and enter to continue. The system will take care of restarting the required services.
 
-#### 1. Conda env and pip install
+[Pendiente: Leon documentar estructura de carpetas]
+
+#### 1.
+
 Clone the TensorFlow Python3 conda environment in your GPU instance set up with AWS Deep Learning AMI and activate it.
 ```
 conda create --name usal_echo --clone tensorflow_p36

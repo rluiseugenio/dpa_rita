@@ -106,7 +106,6 @@ def get_predictions():
     vars_pred = ['dayofmonth','prediction', 'distance', 'flight_number_reporting_airline']
     df_pred = prediction.select([c for c in prediction.columns if c in vars_pred])
     df_pred = df_pred.withColumn('s3_name', lit(s3_name))
-    df_pred = df_pred.withColumn('s3_name', lit(s3_name))
 
     df_pred = df_pred.withColumn('auxi', f.when(f.col('dayofmonth') < 9, "0").otherwise(""))
 

@@ -40,8 +40,14 @@ independientemente.
 
 El pipeline descrito corresponde a la siguiente estructura:
 
-![USAL Echo Project Overview](docs/images/usal_echo_pipeline_overview.png?raw=true "USAL Echo Project Overview")
+![Diagrama de flujo del ELT](reports/figures/ETL.jpeg?raw=true "Title")
 
+En la etapa de Extract, se descargan los datos de Rita a través de un task de Luigi, posteriormente en la etapa de Load los datos se transforman a csv en la instancia y se guardan en una tabla de la RDS llamada raw.rita a través de un task de Luigi, finalmente en la etapa Transform los datos se extraen de la tabla raw.rita y son limpiados dando formato a columnas y eliminando columnas vacías guardandose en la tabla clean.rita de la RDS a través de un task Luigi. De cada etapa se realizan dos pruebas unitarias y se genera una tabla de metadata.
+
+
+![Diagrama de flujo de Modelado](reports/figures/Models.jpeg?raw=true "Title")
+
+Para la etapa de modelado los datos se obtienen de la tabla clean.rita de la RDS, posteriormente se realiza feature engineering creándose y transformándose nuevas variables y se guardan en la tabla semantic.rita a través de un task de luigi,a continuación  se realizan dos pruebas unitarias y se genera metadata. Una vez obteniéndose los datos de la tabla semantic.rita se realiza la generación de modelos, una vez elegido el mejor modelo se mide el bias y fairness del modelo y se genera metadata. Posteriormente se realizan las predicciones y de estas se realizan dos pruebas unitarias y se genera metadata. Una vez obtenidas las predicciones se envían a una tabla de la RDS llamada predictions.test. Finalmente con las tablas de prediction.test y de la metadata de las precicciones genera una API y un dashboard.
 
 
 **Metadatos**
@@ -128,9 +134,31 @@ mkdir ~/.rita
 mkdir ~/.rita/conf ~/.rita/keys ~/.rita/logs
 mkdir dpa_rita
 ```
+#### 1. Guardar llaves secretas
+Para re-utilizar las credenciales de la base de datos, de la región de las cubetas y otras configraciones de AWS al igual que para homogeneizar los nombres en todos los archivos creamos el archivo path_parameters.yml
 
 
-#### 1.
+cd $HOME
+nano path_parameters.yml
+
+# Este es un pequeño ejemplo
+
+bucket: "un nombre"
+region: "us-east-1"
+profile: "dpa"
+key: 'ec2-keypair'
+ami: "ami-0d1cd67cxxxxxxxx"
+vpc: "vpc-0cffc8f1xxxxxxxx"
+gateway: "igw-08da14e5xxxxxxxx"
+subnet: "subnet-087d35xxxxxxxx"
+group: "sg-0fa1c8589xxxxxxxx"
+user: "postgres"
+password : "xxxxxxxx"
+host : "xxxxxxxx.us-east-1.rds.amazonaws.com"
+port : "5432"
+database: "postgres"
+
+#### 2.
 
 Clone the TensorFlow Python3 conda environment in your GPU instance set up with AWS Deep Learning AMI and activate it.
 ```
@@ -140,7 +168,7 @@ source ~/.bashrc
 conda activate usal_echo
 ```
 
-#### 2. Clonar el repositorio de github
+#### 3. Clonar el repositorio de github
 
 Para clonar el repositorio de trabajo del proyecto ejecutar:
 
@@ -150,7 +178,7 @@ cd dpa_rita
 git clone https://github.com/paola-md/dpa_rita/
 ```
 
-#### 3. Archivos de credenciales
+#### 4. Archivos de credenciales
 
 Para ejecutar el pipeline, se deben especificar las credenciales para su infraestructura en AWS y postgres, puesto que el primero busca archivos de credenciales en ubicaciones específicas. Debería crearlos ahora si aún no existen
 
@@ -204,20 +232,32 @@ PGPASSWORD=psswd psql -U user -d database_name -h host -f '/home/ubuntu/src/util
 
 ## Correr el pipeline
 
-The final step is to run the `inquire.py` script which can be called from within the `usal_echo` directory using the short cut usal_echo:
-```
-usal_echo
-```
+La siguiente instrucción se debe ejecutar para cargar la libraria src con los archivos del proyecto.
 
-Running `usal_echo` will launch a questionnaire in your command line that takes you through the setup options for running the pipeline. The options are discussed in detail below.
+python3 setup.py install
 
-### Pipeline options
-To navigate through the options in the command line prompt hit `spacebar` to check or uncheck multiple choice options and `Enter` to select an option. Navigate between options with the `up` and `down` arrows. You can abort the process with `Ctrl+C`.
+
+A continuación, dentro de la carpeta orquestadores se corre el pipeline.
+
+cd src/orquestadores
+
+
+Existen dos vertientes, una para entrenar y otra para predecir. El parámetro type indica cual rama correr. La rama de predict, requiere que se haya entrenado (type = train) con los datos y se haya guardado un modelo.
+
+Rama para entrenar:
+
+PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type train
+
+
+Rama para predecir:
+
+PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type predict
+
 
 ### Notebooks
 Existe un conjunto de cuadernos en el directorio `notebooks` de este repositorio. Contienen las funciones para cada uno de los pasos de la tubería, así como algunos análisis de datos elementales y se pueden usar para experimentar.
 
-## Code organisation
+## Code organization
 The code is organised as follows:
 1. `d00_utils`: Utility functions used throughout the system
 2. `d01_data`: Ingesting dicom metadata and XCelera csv files from s3 into database

@@ -39,27 +39,39 @@ kk_react <- reactive({
 })
 
 bias_react <- reactive({
-  
+
   ll <- dbGetQuery(con2,"select * from metadatos.bias") %>% 
     as_tibble %>% 
-    mutate(dia = substr(fecha,1,2),
-           mes = substr(fecha,3,4),
-           ano = substr(fecha,5,8),
+    mutate(dia = substr(fecha,7,8),
+           mes = substr(fecha,5,6),
+           ano = substr(fecha,1,4),
            fecha = ymd(paste0(ano,'-',mes,'-',dia))) %>% 
     arrange(fecha) %>% 
     split(.$fecha) %>% 
     map(~reciente2(.)) %>% 
     bind_rows() %>%
     arrange(-as.numeric(fecha))%>% 
-    head(1) %>% 
-    gather(var,atributo,contains('attribute_value')) %>% 
-    select(-var) %>% 
-    gather(var,fpr,contains('fpr_disparity')) %>% 
-    select(-var) %>% 
-    mutate(colores = cbb.s[1:nrow(.)])
+    head(1) 
   
   
-  ll
+q1 <- ll %>% 
+    select(contains('q1')) %>% 
+    purrr::set_names(nm = c('atributo', 'fdr')) 
+  
+q2 <- ll %>% 
+      select(contains('q2')) %>% 
+      purrr::set_names(nm = c('atributo', 'fdr')) 
+    
+  
+q3 <- ll %>% 
+      select(contains('q3')) %>% 
+      purrr::set_names(nm = c('atributo', 'fdr')) 
+    
+q4 <- ll %>% 
+      select(contains('q4')) %>% 
+      purrr::set_names(nm = c('atributo', 'fdr')) 
+    
+res <- rbind(q1,q2,q3,q4)
   
 })
 
@@ -88,11 +100,12 @@ output$barras_plot <- renderEcharts4r({
   kk <- bias_react()
   
   
-  kk %>% 
+  kk  %>% 
     e_charts(atributo) %>% 
-    e_bar(fpr, name = 'FPR Disparity') %>% 
+    e_bar(fdr, name = 'FPR Disparity') %>% 
     e_flip_coords() %>% 
-    e_tooltip()
+    e_tooltip( formatter = e_tooltip_item_formatter(style = "decimal",
+                                                    digits = 2)    )
   
 })
 
@@ -103,10 +116,10 @@ output$fb_out <- renderDT({
   
   
   data <- bias_react() %>% 
-    select(fecha, atributo, FalseDiscoveryRate = fdr)
+    select(atributo, fpr = fdr)
   
   if (!nrow(data)>0) {
-    data <- data.frame(EstadoActual = 'Sin alertas de Forma de Operar SERVICIOS WEB')    
+    data <- data.frame(EstadoActual = 'Sin alertas.')    
     
     DT::datatable(data, 
                   rownames = FALSE,

@@ -14,7 +14,7 @@ data <- dbGetQuery(con2,"select *
  
     DT::datatable(data, 
                   rownames = FALSE,
-                  extensions = list(),
+                  extensions = 'ColReorder',
                   options = list(scrollX = TRUE,
                                  colReorder = TRUE)) 
  

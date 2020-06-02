@@ -380,6 +380,8 @@ PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type train
 PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type predict
 ```
 
+![Pipeline](reports/figures/pipeline.png?raw=true "Title")
+
 ### Notebooks
 Existe un conjunto de cuadernos en el directorio `notebooks` de este repositorio. Contienen las funciones para cada uno de los pasos de la tubería, así como algunos análisis de datos elementales y se pueden usar para experimentar.
 
@@ -395,6 +397,107 @@ The code is organised as follows:
 
 ## Contributors
 
-**Technical mentors:** 
+**Technical mentors:**
 
 Danahi Ayzailadema Ramos Martínez, Paola Mejía Domenzaín, León Manuel Garay Vásquez, Luis Eugenio Rojón Jiménez y Cesar Zamora Martínez
+
+```
+├── Diseño
+│   ├── Imagenes
+│   └── Readme.md
+├── Dockerfile
+├── EDA
+│   ├── Imagenes
+│   └── Readme.md
+├── LICENSE
+├── Linaje
+│   └── Readme.md
+├── Makefile
+├── README.md
+├── README2.md
+├── README3.md
+├── Readme_dssg.md
+├── alter_orq.py
+├── alter_orq_sep.py
+├── clean_luigi.py
+├── dashboard
+│   └── MonitoreoModelos
+├── docs
+│   ├── 1.1_Bastion_configuracionAWS.md
+│   ├── 1.2_Bastion_conexionesSSH.md
+│   ├── Makefile
+│   ├── commands.rst
+│   ├── conf.py
+│   ├── getting-started.rst
+│   ├── index.rst
+│   └── make.bat
+├── final_requirements.txt
+├── metadata
+├── metadatos_rds_extract.py
+├── models
+├── notebooks
+│   ├── 0.1-liliana-pyspark.ipynb
+│   ├── 0.2-danahi-clean.ipynb
+│   ├── 0.3-paola-modelling.ipynb
+│   ├── 0.4-paola-pipeline.ipynb
+│   ├── 0.5-luis-feature-engineering.ipynb
+│   ├── 0.5-paola-save-model.ipynb
+│   ├── 0.6-paola-bias-metadatos.ipynb
+│   ├── 0.6-paola-reporte-fairness.ipynb
+│   ├── 0.7-paola-predict.ipynb
+│   ├── 0.9-final-checkpoint.ipynb
+│   └── zepelling
+├── postgresql-9.4.1207.jar
+├── references
+├── reports
+│   └── figures
+├── requirements.txt
+├── setup.py
+├── src
+│   ├── __init__.py
+│   ├── credentials_psql.txt
+│   ├── data
+│   ├── deploy
+│   ├── features
+│   ├── models
+│   ├── orquestador-clean.py
+│   ├── orquestador-modelling.py
+│   ├── orquestador.py
+│   ├── orquestadores
+│   ├── postgresql-9.4.1207.jar
+│   ├── pruebas.py
+│   ├── unit_tests
+│   ├── utils
+│   └── visualization
+├── target
+├── tasks
+│   ├── all_targets.py
+│   ├── bucket.py
+│   ├── clean.py
+│   ├── clean_column_testing.py
+│   ├── clean_rango_testing.py
+│   ├── extract.py
+│   ├── load.py
+│   ├── load_test.py
+│   ├── metadatos_clean.py
+│   ├── metadatos_extract.py
+│   ├── metadatos_load.py
+│   ├── metadatos_semantic.py
+│   ├── modeling.py
+│   ├── semantic.py
+│   ├── semantic_column_testing.py
+│   ├── semantic_type_testing.py
+│   ├── target_a.py
+│   ├── target_b.py
+│   ├── target_c.py
+│   └── target_d.py
+├── test_environment.py
+├── testing
+│   ├── test_absent_hearders.py
+│   ├── test_clean_columns.py
+│   ├── test_clean_rangos.py
+│   ├── test_semantic_column_types.py
+│   └── test_semantic_columns.py
+└── tox.ini
+
+```

@@ -129,7 +129,7 @@ Para el proyecto se escogió esta métrica ya que se necesita que el modelo a de
 
 Para el manejo y procesamiento de los datos este proyecto usa infraestructura en
  la nube basada en servicios de Amazon Web Services (AWS). Concretamente, se
- emplean tres buckets de AWS S3 (denominados *models-dpa*, ) y una instancia AWS EC2 para ejecutar todo el
+ emplean tres buckets de AWS S3 (denominados *models-dpa* y *preds-dpa* ) y una instancia AWS EC2 para ejecutar todo el
  código. Los resultados para cada capa de procesamiento se almacenan en un base
  de datos basada en PostgreSQL en AWS RDS.
 
@@ -175,7 +175,6 @@ Se crean las siguientes carpetas en las cuales estarán las credenciales necesar
 mkidr ~/.aws
 mkdir ~/.rita
 mkdir ~/.rita/conf ~/.rita/keys ~/.rita/logs
-mkdir dpa_rita
 ```
 #### 2. Guardar llaves secretas
 Para re-utilizar las credenciales de la base de datos, de la región de las cubetas y otras configraciones de AWS al igual que para homogeneizar los nombres en todos los archivos creamos el archivo path_parameters.yml
@@ -207,7 +206,6 @@ database: "postgres"
 Para clonar el repositorio de trabajo del proyecto ejecutar:
 
 ```
-cd dpa_rita
 git clone https://github.com/paola-md/dpa_rita/
 ```
 

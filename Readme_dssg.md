@@ -120,11 +120,12 @@ sudo apt update
 sudo apt-get install docker.io git
 ```
 
-
-[Pendiente: Leon documentar estructura de carpetas]
+Se crean las siguientes carpetas en las cuales estarán las credenciales necesarias para correr el proyecto.
 
 ```
-mkidr [alguna carpeta]
+mkidr ~/.aws
+mkdir ~/.rita
+mkdir ~/.rita/conf ~/.rita/keys ~/.rita/logs
 ```
 
 

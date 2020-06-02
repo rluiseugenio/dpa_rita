@@ -382,8 +382,24 @@ PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type predi
 
 ![Pipeline](reports/figures/pipeline.png?raw=true "Title")
 
-### Notebooks
-Existe un conjunto de cuadernos en el directorio `notebooks` de este repositorio. Contienen las funciones para cada uno de los pasos de la tubería, así como algunos análisis de datos elementales y se pueden usar para experimentar.
+## Dashboard de monitoreo
+Con el objetivo de monitorear el desempeño del modelo en tiempo real se construyó un dashboard en donde es posible revisar en tiempo real las predicciones que devuelve el modelo después de hacer una consulta al API. Además, actualizará los valores observado en cuanto estén disponibles.
+
+El dashboard cuenta con tres pestañas:
+
+1. *Información*: Aquí se muestra la información del modelo usado para generar las predicciones, que por construcción es el modelo con mejor desempeño.
+2. *Modelos*: En esta pestaña se monitorean las predicciones en tiempo real para un número de vuelo y una distancia en particular, se alerta cuando las observaciones no coinciden con las predicciones de forma que es fácil determinar si el desempeño del modelo ha degenerado, se extraen los datos de las predicciones para los parámetros de vuelo y distancia seleccionados y se tiene visibilidad de las distribuciones de la variable distancia en los conjuntos de entrenamiento y prueba de forma que se garantiza que no haya cambios tan notables al momento de actualizar los datos.
+3. *Fairness & Bias*: Finalmente en la última pestaña se presenta un resumen del reporte de Fairness& Bias para nuestras variables críticas. Este resumen consta de una tabla con los valores de disparidad en los rangos de distancias, una gráfica de barras con una visualización de estos valores y una matriz de confusión para inspeccionar el desempeño del modelo a través de los códigos de origen y las distancias seleccionadas en la sección de parámetros.
+
+Para correr el dashboard basta con colocarse a través de la terminal en el directorio principal del proyecto (dpa_rita/) e indicar las siguientes instrucciones:
+
+```
+cd dashboard/MonitoreoModelos
+R 
+shiny::runApp()
+```
+
+A continuación, se abrirá una ventana del navegador con la dirección http://127.0.0.1:4809/ con el dashboard funcionando.
 
 ## Organización del proyecto 
 

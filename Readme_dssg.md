@@ -111,12 +111,6 @@ Para el proyecto se escogió esta métrica ya que se necesita que el modelo a de
 
 ![False Positive Parity Distancia](reports/figures/fpr_distance.png?raw=true "Title")
 
-![False Positive Parity Originwac](reports/figures/fpr_origin.png?raw=true "Title")
-
-![False Positive Parity Distancia](reports/figures/fpr_distance.png?raw=true "Title")
-
-![False Positive Parity Originwac](reports/figures/fpr_origin.png?raw=true "Title")
-
 ## Requerimientos de infraestructura
 
 Para el manejo y procesamiento de los datos este proyecto usa infraestructura en

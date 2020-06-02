@@ -22,8 +22,7 @@ los cuales a su vez se encuentran estrechamente ligados a otros factores (por
 3. [Requerimientos de infraestructura](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#requerimientos-de-infraestructura)
 4. [Instalación y setup](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#instalación-y-setup)
 5. [Corriendo el Pipeline](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#correr-el-pipeline)
-6. [Organización del proyecto](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#organización-del-proyecto)
-7. [Contributors](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#contributors)
+6. [Contributors](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#contributors)
 
 ## Introducción
 
@@ -658,123 +657,6 @@ A continuación, se abrir una ventana del navegador con la dirección
 
 ```
 http://127.0.0.1:4809/
-```
-
-## Organización del proyecto
-
-```
-.
-├── Diseño
-│   ├── Imagenes
-│   └── Readme.md
-├── Dockerfile
-├── EDA
-│   ├── Imagenes
-│   └── Readme.md
-├── LICENSE
-├── Linaje
-│   └── Readme.md
-├── Makefile
-├── Readme.md
-├── __pycache__
-│   └── alter_orq_sep.cpython-37.pyc
-├── alter_orq.py
-├── alter_orq_sep.py
-├── build
-│   ├── bdist.linux-x86_64
-│   └── lib
-├── clean_luigi.py
-├── dashboard
-│   └── MonitoreoModelos
-├── data
-├── dist
-│   └── src-0.1.0-py3.7.egg
-├── docs
-│   ├── 1.1_Bastion_configuracionAWS.md
-│   ├── 1.2_Bastion_conexionesSSH.md
-│   ├── Makefile
-│   ├── commands.rst
-│   ├── conf.py
-│   ├── getting-started.rst
-│   ├── index.rst
-│   └── make.bat
-├── final_requirements.txt
-├── metadata
-├── metadatos_rds_extract.py
-├── models
-├── notebooks
-│   ├── 0.1-liliana-pyspark.ipynb
-│   ├── 0.2-danahi-clean.ipynb
-│   ├── 0.3-paola-modelling.ipynb
-│   ├── 0.4-paola-pipeline.ipynb
-│   ├── 0.5-luis-feature-engineering.ipynb
-│   ├── 0.5-paola-save-model.ipynb
-│   ├── 0.6-paola-bias-metadatos.ipynb
-│   ├── 0.6-paola-reporte-fairness.ipynb
-│   ├── 0.7-paola-predict.ipynb
-│   ├── 0.9-final-checkpoint.ipynb
-│   └── zepelling
-├── postgresql-9.4.1207.jar
-├── references
-├── reports
-│   └── figures
-├── requirements.txt
-├── setup.py
-├── src
-│   ├── __init__.py
-│   ├── __pycache__
-│   ├── credentials_psql.txt
-│   ├── data
-│   ├── deploy
-│   ├── features
-│   ├── models
-│   ├── orquestador-clean.py
-│   ├── orquestador-modelling.py
-│   ├── orquestador.py
-│   ├── orquestadores
-│   ├── postgresql-9.4.1207.jar
-│   ├── pruebas.py
-│   ├── unit_tests
-│   ├── utils
-│   └── visualization
-├── src.egg-info
-│   ├── PKG-INFO
-│   ├── SOURCES.txt
-│   ├── dependency_links.txt
-│   └── top_level.txt
-├── target
-├── tasks
-│   ├── __pycache__
-│   ├── all_targets.py
-│   ├── bucket.py
-│   ├── clean.py
-│   ├── clean_column_testing.py
-│   ├── clean_rango_testing.py
-│   ├── extract.py
-│   ├── load.py
-│   ├── load_test.py
-│   ├── metadatos_clean.py
-│   ├── metadatos_extract.py
-│   ├── metadatos_load.py
-│   ├── metadatos_semantic.py
-│   ├── modeling.py
-│   ├── semantic.py
-│   ├── semantic_column_testing.py
-│   ├── semantic_type_testing.py
-│   ├── target_a.py
-│   ├── target_b.py
-│   ├── target_c.py
-│   └── target_d.py
-├── test_environment.py
-├── testing
-│   ├── __pycache__
-│   ├── test_absent_hearders.py
-│   ├── test_clean_columns.py
-│   ├── test_clean_rangos.py
-│   ├── test_semantic_column_types.py
-│   └── test_semantic_columns.py
-└── tox.ini
-
 ```
 
 ## Contributors

@@ -630,10 +630,10 @@ las predicciones, que por construcción es el modelo con mejor desempeño.
  origen y las distancias seleccionadas en la sección de parámetros.
 
 Este dashboard se construyó usando principalmente las paqueterías de *shiny* y *shinyWidgets*
-que permiten desarrollar aplicaciones web para el lenguaje de programación R y la librería 
-*bs4Dash* que es una capa de abstracción sobre Shiny para implementar el framework *Bootstrap 4* 
-de *Javascript* para diseños más robustos que permiten ajustar el dashboard a cualquier
-pantalla de forma dinámic. Esto garantiza que se pueda monitorear del desempeño de 
+que permiten desarrollar aplicaciones web para el lenguaje de programación R en conjunto con la librería 
+*bs4Dash* que es una capa de abstracción sobre Shiny que implementa el framework *Bootstrap 4* 
+de *Javascript* permitiendo diseños web más robustos que garantizan que el dashboard se ajuste a cualquier
+pantalla de forma dinámica. Esto garantiza que se pueda monitorear el desempeño de los 
 modelos desde dispositivos móviles, por ejemplo.
 
 Para correr el dashboard, se deben seguir los pasos descritos a continuación:

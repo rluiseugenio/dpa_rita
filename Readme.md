@@ -1,7 +1,7 @@
 # Retrasos en vuelos de la base de datos RITA
 
-**Este proyecto automatizan la predicción de retrasos o cancelaciones de los
-vuelos de la base de datos denominada conocida como [RITA](http://stat-computing.org/dataexpo/2009/the-data.html) (ver también [transtats.bts.gov](https://www.transtats.bts.gov/OT_Delay/OT_DelayCause1.asp))**. Esta base agrupa una serie de datos de vuelos que incluyen salidas a tiempo, llegadas a tiempo, demoras, vuelos cancelados de todo Estados Unidos del Departamento de Transporte. Dado que los tiempos de viaje de los usuarios se encuentran sujetos a la disponibilidad y viabilidad de los vuelos de las aerolíneas comerciales, los cuales a su vez se encuentran estrechamente ligados a otros factores (por ejemplo, políticas comerciales, incidentes de seguridad o eventos climáticos), los pasajeros experimentan cierto nivel de incertidumbre sobre si sus vuelos serán retrasados o cancelados en definitiva. La automatización de las predicciones como se plantean en este proyecto permite no solo que los usuarios prevean la administración de su tiempo al realizar viajes, sino que puedan diseñar estrategias que les permita continuar con su viaje en caso de una probable cancelación de un vuelo.
+**Este proyecto automatiza la predicción de retrasos o cancelaciones de los
+vuelos de la base de datos denominada conocida como [RITA](http://stat-computing.org/dataexpo/2009/the-data.html) (ver también [transtats.bts.gov](https://www.transtats.bts.gov/OT_Delay/OT_DelayCause1.asp))**. Dicha base agrupa una serie de datos de vuelos que incluyen salidas a tiempo, llegadas a tiempo, demoras, vuelos cancelados de todo Estados Unidos del Departamento de Transporte. Dado que los tiempos de viaje de los usuarios se encuentran sujetos a la disponibilidad y viabilidad de los vuelos de las aerolíneas comerciales, los cuales a su vez se encuentran estrechamente ligados a otros factores (por ejemplo, políticas comerciales, incidentes de seguridad o eventos climáticos), los pasajeros experimentan cierto nivel de incertidumbre sobre si sus vuelos serán retrasados o cancelados en definitiva. La automatización de las predicciones como se plantean en este proyecto permite no solo que los usuarios prevean la administración de su tiempo al realizar viajes, sino que puedan diseñar estrategias que les permita continuar con su viaje en caso de una probable cancelación de un vuelo.
 
 ## Tabla de contenidos
 
@@ -20,14 +20,39 @@ Este proyecto se desarrolla en el marco de la materia arquitectura de producto
 de datos impartida por Msc. Liliana Millán Nuñez, como parte del programa de
 maestría en Ciencia de Datos del Instituto Tecnológico Autónomo de México, para
  el primer semestre de 2020.
- 
+
  ### Sobre base de datos RITA
- 
- Como se ha mencionado previamente, el interés de este proyecto gira en torno a la base de datos denominada conocida como RITA, la cual provee una serie de datos de vuelos que incluyen salidas a tiempo, llegadas a tiempo, demoras, vuelos cancelados de todo Estados Unidos del Departamento de Transporte, poseyendo una frecuencia de actualización mensual, con datos históricos desde junio del 2003.
 
-Ahora bien, dado que los tiempos de viaje de los usuarios se encuentran sujetos a la disponibilidad y viabilidad de los vuelos de las aerolíneas comerciales, los cuales a su vez se encuentran estrechamente ligados a otros factores (por ejemplo, políticas comerciales, incidentes de seguridad o eventos climáticos), los pasajeros experimentan cierto nivel de incertidumbre sobre si sus vuelos serán retrasados o cancelados en definitiva. Una forma de poder atacar la incertidumbre de los viajeros, sería contar con una sistema que pueda dar elementos a los usuarios acerca de 1) si existirá retraso en su vuelo, 2) en caso de que exista retraso, pueda informar el lapso de tiempo equivalente a dicho evento, o 3) indique si su vuelo se cancelará. Esto permitirá no solo que los usuarios prevean la administración de su tiempo al realizar viajes, sino que puedan diseñar estrategia que les permita continuar con su viaje en caso de una probable cancelación de un vuelo.
+ Como se ha mencionado previamente, el interés de este proyecto gira en torno a
+ la base de datos denominada conocida como RITA, la cual provee una serie de
+ datos de vuelos que incluyen salidas a tiempo, llegadas a tiempo, demoras,
+ vuelos cancelados de todo Estados Unidos del Departamento de Transporte,
+ poseyendo una frecuencia de actualización mensual, con datos históricos desde
+ junio del 2003.
 
-Con ello en mente, el problema que pretende abordar el presente proyecto, a través del desarrollo de producto de datos, es la incertidumbre de los viajeros ante retraso en los vuelos, siendo la pregunta que guía el proyecto es ¿que intervalo de tiempo se va a retrasar mi vuelo, o si bien será cancelado?. El objetivo, por tanto, será desarrollar un sistema que permita predecir retrasos en vuelos de forma precisa para que los viajeros puedan planear su agenda de viaje de acuerdo a los probables retrasos o cancelaciones de las aerolíneas. Este sistema estará dirigido a los pasajeros de la aerolínea. Es decir, el público en general que va a viajar dentro de Estados Unidos.
+Ahora bien, dado que los tiempos de viaje de los usuarios se encuentran sujetos
+a la disponibilidad y viabilidad de los vuelos de las aerolíneas comerciales,
+los cuales a su vez se encuentran estrechamente ligados a otros factores (por
+ejemplo, políticas comerciales, incidentes de seguridad o eventos climáticos),
+los pasajeros experimentan cierto nivel de incertidumbre sobre si sus vuelos
+serán retrasados o cancelados en definitiva. Una forma de poder atacar la
+incertidumbre de los viajeros, sería contar con una sistema que pueda dar
+elementos a los usuarios acerca de 1) si existirá retraso en su vuelo, 2) en
+caso de que exista retraso, pueda informar el lapso de tiempo equivalente a
+dicho evento, o 3) indique si su vuelo se cancelará. Esto permitirá no solo que
+los usuarios prevean la administración de su tiempo al realizar viajes, sino que
+ puedan diseñar estrategia que les permita continuar con su viaje en caso de una
+  probable cancelación de un vuelo.
+
+Con ello en mente, el problema que pretende abordar el presente proyecto, a
+través del desarrollo de producto de datos, es la incertidumbre de los viajeros
+ante retraso en los vuelos, siendo la pregunta que guía el proyecto es ¿que
+intervalo de tiempo se va a retrasar mi vuelo, o si bien será cancelado?. El
+objetivo, por tanto, será desarrollar un sistema que permita predecir retrasos
+en vuelos de forma precisa para que los viajeros puedan planear su agenda de
+viaje de acuerdo a los probables retrasos o cancelaciones de las aerolíneas.
+Este sistema estará dirigido a los pasajeros de la aerolínea. Es decir, el
+público en general que va a viajar dentro de Estados Unidos.
 
 ## Consideraciones
 
@@ -39,7 +64,9 @@ fundamentalmente en las siguientes ideas:
  horas de retraso, y iii) más de 3.5 horas de retraso.
 2. **Cancelación** representado como una variable binaria que indica si un vuelo
 fue o no cancelado.
-3. Calculo de medidas de **bias** y **fairness**: se considera como variable protegida a la distancia recorrida por los vuelos, empleando la métrica **False Positive Parity**.
+3. Calculo de medidas de **bias** y **fairness**: se considera como variable
+protegida a la distancia recorrida por los vuelos, empleando la métrica
+**False Positive Parity**.
 
 Nuestro pipeline ha sido diseñado para funcionar de forma modular usando la
 librería *Luigi* de Python, considerando la ingestión de datos, su limpieza,
@@ -50,13 +77,83 @@ El pipeline descrito corresponde a la siguiente estructura:
 
 ![Diagrama de flujo del ELT](reports/figures/ETL.jpeg?raw=true "Title")
 
-En la etapa de Extract, se descargan los datos de Rita a través de un task de Luigi, posteriormente en la etapa de Load los datos se transforman a csv en la instancia y se guardan en una tabla de la RDS llamada raw.rita a través de un task de Luigi, finalmente en la etapa Transform los datos se extraen de la tabla raw.rita y son limpiados dando formato a columnas y eliminando columnas vacías guardandose en la tabla clean.rita de la RDS a través de un task Luigi. De cada etapa se realizan dos pruebas unitarias y se genera una tabla de metadata.
+En la etapa de Extract, se descargan los datos de Rita a través de un task de
+Luigi, posteriormente en la etapa de Load los datos se transforman a csv en la
+instancia y se guardan en una tabla de la RDS llamada raw.rita a través de un
+task de Luigi, finalmente en la etapa Transform los datos se extraen de la tabla
+ raw.rita y son limpiados dando formato a columnas y eliminando columnas vacías
+ guardándose en la tabla clean.rita de la RDS a través de un task Luigi. De cada
+  etapa se realizan dos pruebas unitarias y se genera una tabla de metadata.
 
 
 ![Diagrama de flujo de Modelado](reports/figures/Models.jpeg?raw=true "Title")
 
-Para la etapa de modelado los datos se obtienen de la tabla clean.rita de la RDS, posteriormente se realiza feature engineering creándose y transformándose nuevas variables y se guardan en la tabla semantic.rita a través de un task de luigi,a continuación  se realizan dos pruebas unitarias y se genera metadata. Una vez obteniéndose los datos de la tabla semantic.rita se realiza la generación de modelos, una vez elegido el mejor modelo se mide el bias y fairness del modelo y se genera metadata. Posteriormente se realizan las predicciones y de estas se realizan dos pruebas unitarias y se genera metadata. Una vez obtenidas las predicciones se envían a una tabla de la RDS llamada predictions.test. Finalmente con las tablas de prediction.test y de la metadata de las precicciones genera una API y un dashboard.
+Para la etapa de modelado los datos se obtienen de la tabla clean.rita de la
+RDS, posteriormente se realiza feature engineering creándose y transformándose
+nuevas variables y se guardan en la tabla semantic.rita a través de un task de
+Luigi, a continuación  se realizan dos pruebas unitarias y se genera metadata.
+Una vez obteniéndose los datos de la tabla semantic.rita se realiza la
+generación de modelos, una vez elegido el mejor modelo se mide el bias y
+fairness del modelo y se genera metadata. Posteriormente se realizan las
+predicciones y de estas se realizan dos pruebas unitarias y se genera metadata.
+Una vez obtenidas las predicciones se envían a una tabla de la RDS llamada
+predictions.test. Finalmente con las tablas de prediction.test y de la metadata
+de las predicciones genera una API y un dashboard.
 
+Para facilitar el entendimiento de las etapas recién descritas a continuación
+se presentan los esquemas de tablas de RDS que involucran en el proyecto:
+
+
+| Tabla             | Descripción                                                                                                                                                                                             |
+|-------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| raw.rita          |                                                                       Reune la Informacion de la base de datos Rita, sin procesar.                                                                      |
+| clean.rita        | Corresponde al procesamiento de la información de la tabla raw.rita para limpieza de los datos (considerando transformaciones tales como pasar a minúsculas, eliminar estaciones, guiones, entre otros  |
+| semantic.rita     |                                Relativa a la etapa de feature engineering, donde se consolidad variables útiles para los ejercicios de predicción materia de este modelo                                |
+| predictions.train |                                                                      Tabla que reúne las predicciones de retraso o la cancelación del vuelo de los datos de entrenamiento                                                                     |
+| models            |                                                                         Tabla que reúne las predicciones de los datos de prueba                                                                         |
+
+
+**Testing Extract**
+
+En esta etapa se realiza una prueba para verificar que los datos descargados tengas el número esperado de columnas.
+
+**Testing Load**
+
+En esta etapa se verifican los datos cargados.
+
+**Testing Clean**
+
+En esta etapa se verifica que la cantidad de columnas limpiadas sean las esperadas.
+
+**Testing Clean Rangos**
+
+En esta etapa se verifica que los valores de la variable creada sean los esperados.
+
+**Etapa Test semantic**
+
+En esta etapa se comprueba que la cantidad de columnas resultantes sean las esperadas.
+
+
+**Modelado**
+
+En esta etapa se crean distintos modelos para predecir el rango de retraso o la cancelación del vuelo.
+
+**Predicciones Train**
+
+En esta etapa se realizan predicciones en el conjunto de datos de entrenamiento.
+
+
+**Predicciones Test**
+
+En esta etapa se realizan las predicciones con el modelo con los datos de prueba.
+
+**Predicciones**
+
+En esta etapa se guardan las predicciones de los modelos.
+
+**Fairness y Bias**
+
+En esta etapa de realiza el análisis de sesgo y equidad.
 
 **Metadatos**
 
@@ -73,233 +170,6 @@ de las etapas del pipeline, que para mejor referencia se resumen a continuación
 | models      | Incorpora los metadatos de la etapa de modelado                                                                     |
 | bias        | Reúne la información de bias de los modelos predictivos                                                             |
 | predictions | Considera la información generada para realizar predicciones                                                        |
-
-
-**Etapa Extract**
-
-Esta estapa se refiere a cuando se obtienen los datos crudos (Raw) desde el API de la base de datos Rita, en formato .zip y son cargados a una base de datos RDS.
-
-
-|         Nombre        | Función                                                                     |
-|:---------------------:|-----------------------------------------------------------------------------|
-| fecha                 | fecha de ejecución                                                          |
-| nombre_task           | nombre del task que se ejecuto                                              |
-| year                  | año de los datos                                                            |
-| month                 | mes de los datos                                                            |
-| usuario               | quien ejecuto el task*                                                      |
-| ip_ec2                | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
-| tamano_zip            | tamaño del archivo descargado                                               |
-| nombre_archivo        | nombre del archivo nuevo generado                                           |
-| ruta_s3               | load ocurre en S3, ruta de almacenamiento incluyendo el bucket              |
-| status                | estatus de ejecución: Fallido, exitoso, etc.                                |
-
-
-
-**Etapa Load**
-
-Corresponde a la etapa en que se realiza un pre-procesamiento de los datos obtenido en la etapa previa. Se realiza la descomposición del archivo, cambia a formato CSV.
-
-
-|         Nombre        | Función                                                                     |
-|:---------------------:|-----------------------------------------------------------------------------|
-| fecha                 | fecha de ejecución                                                          |
-| nombre_task           | nombre del task que se ejecuto                                              |
-| usuario               | quien ejecuto el task*                                                      |
-| ip_ec2                | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
-| tamano_csv            | tamaño del archivo exportado                                                |
-| nombre_archivo        | nombre del archivo generado                                                 |
-| num_columnas          | corresponde al número de columnas de los datos descargados                  |
-| num_renglores         | corresponde al número de renglones de los datos descargados                 |
-
-
-**Etapa clean**
-
-En seguimiento con la etapa anterior, en esta etapa se realiza la limpiea de los datos pre-procesados.
-
-|          Nombre          | Función                                                                     |
-|:------------------------:|-----------------------------------------------------------------------------|
-| fecha                    | fecha de ejecución                                                          |
-| nombre_task              | nombre del task que se ejecuto                                              |
-| usuario                  | quien ejecuto el task*                                                      |
-| ip_ec2                   | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
-| num_columnas_modificadas | número de variables modificadas                                             |
-| num_filas_modificadas    | número de registros modificados                                             |
-| variables_limpias        | variables con las que se realizará la siguiente tarea (feature engineering) |
-| status                   | estatus de ejecución: Fallido, exitoso, etc.                                |
-
-
-**Clean Rangos**
-
-En esta etapa se crea la variable de rangos correspondiente al tiempo de retraso.
-
-| Nombre           | Función                                       |
-|------------------|-----------------------------------------------|
-| EDA              | Se utilizaron las variables del EDA           |
-| rangoatrasohoras | Se dividió el tiempo de retraso en intervalos |
-
-
-
-**Etapa Semantic**
-
-En esta etapa se realizan tranformaciones en las variables y se crean nuevas variables para el modelaje.
-
-
-| Nombre           | Función                                        |
-|------------------|------------------------------------------------|
-| EDA              | Se utilizaron las variables del EDA            |
-| rangoatrasohoras | Se dividió el tiempo de retraso en intervalos  |
-| findesemana      | Indica si el vuelo fue en fin de semana        |
-| quincena         | Indica si el vuelo se llevó a cabo en quincena |
-| dephour          | Hora de despegue del vuelo                     |
-| seishoras        | Indica si el vuelo es a las 0, 6 o 18 horas    |
-
-
-**Testing Extract**
-
-En esta etapa se realiza una prueba para verificar que los datos descargados tengas el número esperado de columnas.
-
-|         Nombre        | Función                                                                     |
-|:---------------------:|-----------------------------------------------------------------------------|
-| fecha                 | fecha de ejecución                                                          |
-| nombre_task           | nombre del task que se ejecuto                                              |
-| year                  | año de los datos                                                            |
-| month                 | mes de los datos                                                            |
-| usuario               | quien ejecuto el task*                                                      |
-| ip_ec2                | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
-| tamano_zip            | tamaño del archivo descargado                                               |
-| status                | estatus de ejecución: Fallido, exitoso, etc.                                |
-
-
-**Testing Load**
-
-En esta etapa se verifican los datos cargados. 
-
-|         Nombre        | Función                                                                     |
-|:---------------------:|-----------------------------------------------------------------------------|
-| fecha                 | fecha de ejecución                                                          |
-| nombre_task           | nombre del task que se ejecuto                                              |
-| usuario               | quien ejecuto el task*                                                      |
-| ip_ec2                | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
-| year                  | año de los datos                                                            |
-| month                 | mes de los datos                                                            |
-| status                | estatus de ejecución: Fallido, exitoso, etc.                                |
-
-
-**Testing Clean**
-
-En esta etapa se verifica que la cantidad de columnas limpiadas sean las esperadas.
-
-|          Nombre          | Función                                                                     |
-|:------------------------:|-----------------------------------------------------------------------------|
-| fecha                    | fecha de ejecución                                                          |
-| nombre_task              | nombre del task que se ejecuto                                              |
-| usuario                  | quien ejecuto el task*                                                      |
-| ip_ec2                   | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
-| status                   | estatus de ejecución: Fallido, exitoso, etc.                                |
-
-
-**Testing Clean Rangos**
-
-En esta etapa se verifica que los valores de la variable creada sean los esperados.
-
-|          Nombre          | Función                                                                     |
-|:------------------------:|-----------------------------------------------------------------------------|
-| fecha                    | fecha de ejecución                                                          |
-| nombre_task              | nombre del task que se ejecuto                                              |
-| usuario                  | quien ejecuto el task*                                                      |
-| ip_ec2                   | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
-| status                   | estatus de ejecución: Fallido, exitoso, etc.                                |
-
-
-**Etapa Test semantic**
-
-En esta etapa se comprueba que la cantidad de columnas resultantes sean las esperadas.
-
-|          Nombre          | Función                                                                     |
-|:------------------------:|-----------------------------------------------------------------------------|
-| fecha                    | fecha de ejecución                                                          |
-| nombre_task              | nombre del task que se ejecuto                                              |
-| year                     | año de los datos                                                            |
-| month                    | mes de los datos                                                            |
-| usuario                  | quien ejecuto el task*                                                      |
-| msg_error                | mensaje de error                                                            |
-| status                   | estatus de ejecución: Fallido, exitoso, etc.                                |
-
-
-**Modelado**
-
-En esta etapa se crean distintos modelos para predecir el rango de retrazo o la cancelación del vuelo.
-
-| Nombre      | Función                                            |
-|-------------|----------------------------------------------------|
-| fecha       | fecha de vuelo                                     |
-| objetivo    | variable que se desea predecir (tiempo de retraso) |
-| model_name  | nombre del modelo                                  |
-| hyperparams | hiperparámetros del modelo                         |
-| AUROC       | área bajo la curva ROC                             |
-| AUPR        | área bajo la curva AUPR                            |
-| precision   | precisión del modelo                               |
-| recall      | Exhaustividad del modelo                           |
-| f1          | score f1                                           |
-| train_time  | tiempo que se tardó en entrenar el modelo          |
-| test_split  | porcentaje de la muestra usado para entrenar       |
-| train_nrows | número de observaciones de la etapa train          |
-
-
-**Predicciones Train**
-
-En esta etapa se realizan predicciones en el conjunto de datos de entrenamiento.
-
-| Nombre      | Función                                                 |
-|-------------|---------------------------------------------------------|
-| originwac   | origen del vuelo                                        |
-| distance    | distancia recorrida del vuelo                           |
-| label_value | variable binaria (0 o 1)                                |
-| score       | predicción generada por el modelo                       |
-| s3_name     | nombre de la cubeta en la que se guardará la predicción |
-
-
-**Predicciones Test**
-
-En esta etapa se realizan las predicciones con el modelo con los datos de prueba.
-
-| Nombre        | Función                                                 |
-|---------------|---------------------------------------------------------|
-| flight_number | número de vuelo                                         |
-| distance      | distancia recorrida del vuelo                           |
-| prediction    | valor predecido                                         |
-| s3_name       | nombre de la cubeta en la que se guardará la predicción |
-
-
-**Predicciones**
-
-En esta etapa se guardan las predicciones de los modelos.
-
-| Nombre        | Función                                                 |
-|---------------|---------------------------------------------------------|
-| fecha         | fecha de vuelo                                          |
-| s3_name_model | nombre del modelo que se guardará en s3                 |
-| s3_name_pred  | nombre de la predicción que se guardará en s3           |
-| binary_stats  | porcentaje de unos regresados por el modelo             |
-
-
-**Fairness y Bias**
-
-En esta etapa de realiza el análisis de sesgo y equidad.
-
-| Nombre             | Función                     |
-|--------------------|-----------------------------|
-| fecha              | fecha de vuelo              |
-| s3_name            | nombre de la cubeta         |
-| attribute_value_q1 | rango del primer cuartil    |
-| attribute_value_q2 | rango del segundo cuartil   |
-| attribute_value_q3 | rango del tercer cuartil    |
-| attribute_value_q4 | rango del cuarto cuartil    |
-| fpr_disparity_q1   | métrica del primer cuartil  |
-| fpr_disparity_q2   | métrica del segundo cuartil |
-| fpr_disparity_q3   | métrica del tercer cuartil  |
-| fpr_disparity_q4   | métrica del cuarto cuartil  |
-
 
 
 **Pruebas unitarias**
@@ -605,11 +475,11 @@ PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type predi
 ![Pipeline](reports/figures/pipeline.jpg?raw=true "Title")
 
 ## API
-Se contruyó un API utilizando la biblioteca *flask* y *flask_restx* de Python para la documentación con Swagger. A saber, el endpoint local es: 
+Se contruyó un API utilizando la biblioteca *flask* y *flask_restx* de Python para la documentación con Swagger. A saber, el endpoint local es:
 
 http://127.0.0.1:5000/predicts/1609
 
-Donde el 1609 es cualquier vuelo del cuál se desee saber si se va a retrazar más de una hora y media o no. Se realiza una opreación GET, la cuál recibe el parámetro flight identifier y regresa la predicción (200) o (404) en caso de no encontrar ese vuelo. 
+Donde el 1609 es cualquier vuelo del cuál se desee saber si se va a retrazar más de una hora y media o no. Se realiza una opreación GET, la cuál recibe el parámetro flight identifier y regresa la predicción (200) o (404) en caso de no encontrar ese vuelo.
 
 A continuación se muestra el swagger.json:
 
@@ -686,13 +556,13 @@ Para correr el dashboard basta con colocarse a través de la terminal en el dire
 
 ```
 cd dashboard/MonitoreoModelos
-R 
+R
 shiny::runApp()
 ```
 
 A continuación, se abrirá una ventana del navegador con la dirección http://127.0.0.1:4809/ con el dashboard funcionando.
 
-## Organización del proyecto 
+## Organización del proyecto
 
 
 ```

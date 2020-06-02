@@ -101,6 +101,16 @@ Como consecuencia, la métrica que nos interesa es *False Positive Parity* porqu
 
 Para el proyecto se escogió esta métrica ya que se necesita que el modelo a desarrollar sea bueno detectando la etiqueta positiva y no hay (mucho) costo en introducir falsos negativos al sistema. El costo de un falso negativo es que usuarios esperen en el aeropuerto a su vuelo retrasado y este sería el status-quo sin el modelo o producto de datos. Asimismo, ésta se consideró adecuada toda vez la variable *target* no es subjetiva: si un vuelo se retrasa sabemos exactamente cuánto se retrasó y no depende de la percepción del usuario.
 
+![False Positive Parity Distancia](reports/figures/fpr_distance.png?raw=true "Title")
+
+![False Positive Parity Originwac](reports/figures/fpr_origin.png?raw=true "Title")
+
+![False Positive Parity Distancia](reports/figures/fpr_distance.png?raw=true "Title")
+
+
+
+![False Positive Parity Originwac](reports/figures/fpr_origin.png?raw=true "Title")
+
 ## Requerimientos de infraestructura
 
 Para el manejo y procesamiento de los datos este proyecto usa infraestructura en

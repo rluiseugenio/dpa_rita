@@ -532,6 +532,65 @@ A continuación se muestra el swagger.json:
 }
 ```
 
+En este sentido, para poder acceder al API de predicciones se debe llevar a cabo
+el siguiente proceso:
+
+**Instala flask**
+
+Dentro de una terminal que refleje la instancia del contenedor de Docker del
+proyecto (ver numeral 4.4):
+
+```
+pip install flask_restx
+```
+**Crea el port forwarding para ver predicciones localmente**
+
+Posteriormente en dicha terminal, se debe hacer el puenteo que permite visualizar
+las predicciones del modelo, a través del puerto 5000 de la maquina local con
+que el usuario accede al bastion.
+
+Para ello se de correr **en la máquina local**:
+
+```
+ssh -i <mi-llave> -N -f -L localhost:5000:localhost:5000 ubuntu@<mi-endpoint>
+``
+**Corre app***
+
+Posteriormente dentro de una terminal que refleje la instancia del contenedor de
+Docker del proyecto (ver numeral 4.4) se debe ejecutar lo siguiente para correr
+la app de predicciones:
+
+```
+cd src/deploy
+python3 app.py
+```
+
+**Ver predicciones**
+
+El paso anterior, permite ver las predicciones del proyecto, para ello en la
+máquina local con que se accede a bastión, basta acceder desde un navegador a
+la dirección:
+
+```
+http://127.0.0.1:5000/predicts/1609
+``
+
+Se reitera que 1609 es cualquier vuelo del cuál se desee saber si se va a
+retrasar más de una hora y media o no. Se realiza una operación GET, la cuál
+recibe el parámetro flight identifier y regresa la predicción (200) o (404) en
+ caso de no encontrar ese vuelo.
+
+**Ver swagger**
+
+También se puede visualizar el swagger descrito previamente accediendo desde un
+navegador máquina local con que se accede a bastión a la dirección:
+
+```
+http://127.0.0.1:5000/swagger.json
+```
+
+
+
 ## Dashboard de monitoreo
 Con el objetivo de monitorear el desempeño del modelo en tiempo real se
 construyó un dashboard en donde es posible revisar en tiempo real las
@@ -559,17 +618,35 @@ las predicciones, que por construcción es el modelo con mejor desempeño.
   confusión para inspeccionar el desempeño del modelo a través de los códigos de
  origen y las distancias seleccionadas en la sección de parámetros.
 
-Para correr el dashboard basta con colocarse a través de la terminal en el
-directorio principal del proyecto (dpa_rita/) e indicar las siguientes instrucciones:
+Para correr el dashboard, se deben seguir los pasos descritos a continuación:
+
+**Crear el port forwarding para ver dashboard**
+
+Para ello se de correr **en la máquina local**:
+
+```
+ssh -i <mi-llave> -N -f -L localhost:4809:localhost:4809 ubuntu@<mi-endpoint>
+``
+
+**Activando el dashboard**
+
+Dentro de una terminal que refleje la instancia del contenedor de Docker del
+proyecto (ver numeral 4.4), basta con colocarse a través de la terminal en el
+irectorio principal del proyecto (dpa_rita/) e indicar las siguientes
+instrucciones:
 
 ```
 cd dashboard/MonitoreoModelos
 R
 shiny::runApp()
 ```
+**Visualizando el dashboard**
 
-A continuación, se abrirá una ventana del navegador con la dirección
-http://127.0.0.1:4809/ con el dashboard funcionando.
+A continuación, se abrir una ventana del navegador con la dirección
+
+```
+http://127.0.0.1:4809/
+```
 
 ## Organización del proyecto
 

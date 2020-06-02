@@ -74,6 +74,234 @@ de las etapas del pipeline, que para mejor referencia se resumen a continuación
 | bias        | Reúne la información de bias de los modelos predictivos                                                             |
 | predictions | Considera la información generada para realizar predicciones                                                        |
 
+
+**Etapa Extract**
+
+Esta estapa se refiere a cuando se obtienen los datos crudos (Raw) desde el API de la base de datos Rita, en formato .zip y son cargados a una base de datos RDS.
+
+
+|         Nombre        | Función                                                                     |
+|:---------------------:|-----------------------------------------------------------------------------|
+| fecha                 | fecha de ejecución                                                          |
+| nombre_task           | nombre del task que se ejecuto                                              |
+| year                  | año de los datos                                                            |
+| month                 | mes de los datos                                                            |
+| usuario               | quien ejecuto el task*                                                      |
+| ip_ec2                | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
+| tamano_zip            | tamaño del archivo descargado                                               |
+| nombre_archivo        | nombre del archivo nuevo generado                                           |
+| ruta_s3               | load ocurre en S3, ruta de almacenamiento incluyendo el bucket              |
+| status                | estatus de ejecución: Fallido, exitoso, etc.                                |
+
+
+
+**Etapa Load**
+
+Corresponde a la etapa en que se realiza un pre-procesamiento de los datos obtenido en la etapa previa. Se realiza la descomposición del archivo, cambia a formato CSV.
+
+
+|         Nombre        | Función                                                                     |
+|:---------------------:|-----------------------------------------------------------------------------|
+| fecha                 | fecha de ejecución                                                          |
+| nombre_task           | nombre del task que se ejecuto                                              |
+| usuario               | quien ejecuto el task*                                                      |
+| ip_ec2                | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
+| tamano_csv            | tamaño del archivo exportado                                                |
+| nombre_archivo        | nombre del archivo generado                                                 |
+| num_columnas          | corresponde al número de columnas de los datos descargados                  |
+| num_renglores         | corresponde al número de renglones de los datos descargados                 |
+
+
+**Etapa clean**
+
+En seguimiento con la etapa anterior, en esta etapa se realiza la limpiea de los datos pre-procesados.
+
+|          Nombre          | Función                                                                     |
+|:------------------------:|-----------------------------------------------------------------------------|
+| fecha                    | fecha de ejecución                                                          |
+| nombre_task              | nombre del task que se ejecuto                                              |
+| usuario                  | quien ejecuto el task*                                                      |
+| ip_ec2                   | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
+| num_columnas_modificadas | número de variables modificadas                                             |
+| num_filas_modificadas    | número de registros modificados                                             |
+| variables_limpias        | variables con las que se realizará la siguiente tarea (feature engineering) |
+| status                   | estatus de ejecución: Fallido, exitoso, etc.                                |
+
+
+**Clean Rangos**
+
+En esta etapa se crea la variable de rangos correspondiente al tiempo de retraso.
+
+| Nombre           | Función                                       |
+|------------------|-----------------------------------------------|
+| EDA              | Se utilizaron las variables del EDA           |
+| rangoatrasohoras | Se dividió el tiempo de retraso en intervalos |
+
+
+
+**Etapa Semantic**
+
+En esta etapa se realizan tranformaciones en las variables y se crean nuevas variables para el modelaje.
+
+
+| Nombre           | Función                                        |
+|------------------|------------------------------------------------|
+| EDA              | Se utilizaron las variables del EDA            |
+| rangoatrasohoras | Se dividió el tiempo de retraso en intervalos  |
+| findesemana      | Indica si el vuelo fue en fin de semana        |
+| quincena         | Indica si el vuelo se llevó a cabo en quincena |
+| dephour          | Hora de despegue del vuelo                     |
+| seishoras        | Indica si el vuelo es a las 0, 6 o 18 horas    |
+
+
+**Testing Extract**
+
+En esta etapa se realiza una prueba para verificar que los datos descargados tengas el número esperado de columnas.
+
+|         Nombre        | Función                                                                     |
+|:---------------------:|-----------------------------------------------------------------------------|
+| fecha                 | fecha de ejecución                                                          |
+| nombre_task           | nombre del task que se ejecuto                                              |
+| year                  | año de los datos                                                            |
+| month                 | mes de los datos                                                            |
+| usuario               | quien ejecuto el task*                                                      |
+| ip_ec2                | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
+| tamano_zip            | tamaño del archivo descargado                                               |
+| status                | estatus de ejecución: Fallido, exitoso, etc.                                |
+
+
+**Testing Load**
+
+En esta etapa se verifican los datos cargados. 
+
+|         Nombre        | Función                                                                     |
+|:---------------------:|-----------------------------------------------------------------------------|
+| fecha                 | fecha de ejecución                                                          |
+| nombre_task           | nombre del task que se ejecuto                                              |
+| usuario               | quien ejecuto el task*                                                      |
+| ip_ec2                | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
+| year                  | año de los datos                                                            |
+| month                 | mes de los datos                                                            |
+| status                | estatus de ejecución: Fallido, exitoso, etc.                                |
+
+
+**Testing Clean**
+
+En esta etapa se verifica que la cantidad de columnas limpiadas sean las esperadas.
+
+|          Nombre          | Función                                                                     |
+|:------------------------:|-----------------------------------------------------------------------------|
+| fecha                    | fecha de ejecución                                                          |
+| nombre_task              | nombre del task que se ejecuto                                              |
+| usuario                  | quien ejecuto el task*                                                      |
+| ip_ec2                   | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
+| status                   | estatus de ejecución: Fallido, exitoso, etc.                                |
+
+
+**Testing Clean Rangos**
+
+En esta etapa se verifica que los valores de la variable creada sean los esperados.
+
+|          Nombre          | Función                                                                     |
+|:------------------------:|-----------------------------------------------------------------------------|
+| fecha                    | fecha de ejecución                                                          |
+| nombre_task              | nombre del task que se ejecuto                                              |
+| usuario                  | quien ejecuto el task*                                                      |
+| ip_ec2                   | Corresponde a la dirección IP desde donde se ejecuto la tarea               |
+| status                   | estatus de ejecución: Fallido, exitoso, etc.                                |
+
+
+**Etapa Test semantic**
+
+En esta etapa se comprueba que la cantidad de columnas resultantes sean las esperadas.
+
+|          Nombre          | Función                                                                     |
+|:------------------------:|-----------------------------------------------------------------------------|
+| fecha                    | fecha de ejecución                                                          |
+| nombre_task              | nombre del task que se ejecuto                                              |
+| year                     | año de los datos                                                            |
+| month                    | mes de los datos                                                            |
+| usuario                  | quien ejecuto el task*                                                      |
+| msg_error                | mensaje de error                                                            |
+| status                   | estatus de ejecución: Fallido, exitoso, etc.                                |
+
+
+**Modelado**
+
+En esta etapa se crean distintos modelos para predecir el rango de retrazo o la cancelación del vuelo.
+
+| Nombre      | Función                                            |
+|-------------|----------------------------------------------------|
+| fecha       | fecha de vuelo                                     |
+| objetivo    | variable que se desea predecir (tiempo de retraso) |
+| model_name  | nombre del modelo                                  |
+| hyperparams | hiperparámetros del modelo                         |
+| AUROC       | área bajo la curva ROC                             |
+| AUPR        | área bajo la curva AUPR                            |
+| precision   | precisión del modelo                               |
+| recall      | Exhaustividad del modelo                           |
+| f1          | score f1                                           |
+| train_time  | tiempo que se tardó en entrenar el modelo          |
+| test_split  | porcentaje de la muestra usado para entrenar       |
+| train_nrows | número de observaciones de la etapa train          |
+
+
+**Predicciones Train**
+
+En esta etapa se realizan predicciones en el conjunto de datos de entrenamiento.
+
+| Nombre      | Función                                                 |
+|-------------|---------------------------------------------------------|
+| originwac   | origen del vuelo                                        |
+| distance    | distancia recorrida del vuelo                           |
+| label_value | variable binaria (0 o 1)                                |
+| score       | predicción generada por el modelo                       |
+| s3_name     | nombre de la cubeta en la que se guardará la predicción |
+
+
+**Predicciones Test**
+
+En esta etapa se realizan las predicciones con el modelo con los datos de prueba.
+
+| Nombre        | Función                                                 |
+|---------------|---------------------------------------------------------|
+| flight_number | número de vuelo                                         |
+| distance      | distancia recorrida del vuelo                           |
+| prediction    | valor predecido                                         |
+| s3_name       | nombre de la cubeta en la que se guardará la predicción |
+
+
+**Predicciones**
+
+En esta etapa se guardan las predicciones de los modelos.
+
+| Nombre        | Función                                                 |
+|---------------|---------------------------------------------------------|
+| fecha         | fecha de vuelo                                          |
+| s3_name_model | nombre del modelo que se guardará en s3                 |
+| s3_name_pred  | nombre de la predicción que se guardará en s3           |
+| binary_stats  | porcentaje de unos regresados por el modelo             |
+
+
+**Fairness y Bias**
+
+En esta etapa de realiza el análisis de sesgo y equidad.
+
+| Nombre             | Función                     |
+|--------------------|-----------------------------|
+| fecha              | fecha de vuelo              |
+| s3_name            | nombre de la cubeta         |
+| attribute_value_q1 | rango del primer cuartil    |
+| attribute_value_q2 | rango del segundo cuartil   |
+| attribute_value_q3 | rango del tercer cuartil    |
+| attribute_value_q4 | rango del cuarto cuartil    |
+| fpr_disparity_q1   | métrica del primer cuartil  |
+| fpr_disparity_q2   | métrica del segundo cuartil |
+| fpr_disparity_q3   | métrica del tercer cuartil  |
+| fpr_disparity_q4   | métrica del cuarto cuartil  |
+
+
+
 **Pruebas unitarias**
 
 Para asegurar la consistencia y robustez del proyecto, el diseño del pipeline consideró una serie de pruebas unitarias entre las que destacan:

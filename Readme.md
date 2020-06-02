@@ -659,6 +659,11 @@ A continuación, se abrir una ventana del navegador con la dirección
 http://127.0.0.1:4809/
 ```
 
+### Más detalles
+
+Más detalles del proceso recién descrito se pueden encontrar en este [notebook](
+https://github.com/paola-md/dpa_rita/blob/master/notebooks/0.9-final-checkpoint.ipynb)
+
 ## Contributors
 
 **Technical mentors:**

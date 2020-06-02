@@ -91,13 +91,29 @@ kk <- dbGetQuery(con2,"select distance, count(*) as conteo
                    from predictions.test
                    group by distance")   %>% 
   mutate(fuente = 'TEST')
+
+
+
+
+etiqueta <- data.frame(grupo_distancias = c(rep('89 Km-335 Km',(335-89)),
+                        rep('335 Km-461 Km',(461-335)),
+                        rep('462 Km-732 Km',(733-461)),
+                        rep('733 Km-2133 Km',(2133-733)),
+                        rep('>2133 Km',(3000-2133+1))),
+                       distance = c(89:334,
+                                    335:460,
+                                    461:732,
+                                    733:2133,
+                                    2134:3000),
+                       stringsAsFactors = FALSE)
+
 res <- tt %>% 
   rbind(kk) %>% 
   mutate_if(bit64::is.integer64,as.integer) %>% 
   group_by(fuente) %>% 
   mutate(porcentaje = 100*conteo/sum(conteo)) %>% 
   ungroup %>% 
-  mutate(distance = paste0(distance,' Km'))
+  left_join(etiqueta)
 
 res
 
@@ -161,13 +177,13 @@ observeEvent(input$add, {
 output$distribucion_train_plot <- renderEcharts4r({
  
   
-  # browser()
+
   colors <- cbb.s
   
   gr <- dist_react() %>%
     filter(fuente == 'TRAIN') %>% 
-    mutate(distance = ifelse(porcentaje >= 4, distance, "OTRAS")) %>%
-    group_by(distance) %>%
+    # mutate(grupo_distancias = ifelse(porcentaje >= 4, grupo_distancias, "OTRAS")) %>%
+    group_by(grupo_distancias) %>%
     summarise(porcentaje = sum(porcentaje),
               conteo = sum(conteo)) %>%
     ungroup() 
@@ -183,7 +199,7 @@ output$distribucion_train_plot <- renderEcharts4r({
   }else{  
     
     gr %>%
-      e_charts(distance) %>%
+      e_charts(grupo_distancias) %>%
       e_pie(porcentaje, radius = c("50%", "70%")) %>%
       e_labels(formatter= c("{b}: {d}%")) %>%
       e_tooltip(trigger = "item") %>%
@@ -203,11 +219,10 @@ output$distribucion_test_plot <- renderEcharts4r({
   
   gr <- dist_react() %>%
     filter(fuente == 'TEST') %>% 
-    mutate(distance = ifelse(porcentaje >= 4, distance, "OTRAS")) %>%
-    group_by(distance) %>%
+    group_by(grupo_distancias) %>%
     summarise(porcentaje = sum(porcentaje),
               conteo = sum(conteo)) %>%
-    ungroup() 
+    ungroup()
   
   
   if(nrow(gr)==0){
@@ -221,7 +236,7 @@ output$distribucion_test_plot <- renderEcharts4r({
   }else{  
     
     gr %>%
-      e_charts(distance) %>%
+      e_charts(grupo_distancias) %>%
       e_pie(porcentaje, radius = c("50%", "70%")) %>%
       e_labels(formatter= c("{b}: {d}%")) %>%
       e_tooltip(trigger = "item") %>%

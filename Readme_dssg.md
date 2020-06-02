@@ -66,6 +66,16 @@ de las etapas del pipeline, que para mejor referencia se resumen a continuación
 | bias        | Reúne la información de bias de los modelos predictivos                                                             |
 | predictions | Considera la información generada para realizar predicciones                                                        |
 
+**Pruebas unitarias**
+
+Para asegurar la consistencia y robustez del proyecto, el diseño del pipeline consideró una serie de pruebas unitarias entre las que destacan:
+
+* **Prueba de extracción:** verifica si los csv descargados de RITA tienen el número esperado de columnas (180)
+* **Prueba de consistencia de columnas tras limpieza:** comprueba que la cantidad de columnas en clean.rita sean las esperadas
+* **Prueba de creación de categorías de rango de horas de retraso:** prueba verifica que los valores de la columna *rangoatrashoras* sean los indicados.
+* **Prueba Semantic:** comprueba que la cantidad de columnas en semantic.rita sean las esperadas.
+
+
 **Consideraciones éticas**
 
 Se identificaron posibles implicaciones éticas del producto de datos materia de este proyecto
@@ -111,7 +121,7 @@ Infraestructura: AWS
 
 ## Instalación y setup
 
-#### 0. Requerimientos
+#### 1. Requerimientos
 
 Para conectarse hacia la máquina virtual que servirá como bastión:
 
@@ -135,7 +145,7 @@ mkdir ~/.rita
 mkdir ~/.rita/conf ~/.rita/keys ~/.rita/logs
 mkdir dpa_rita
 ```
-#### 1. Guardar llaves secretas
+#### 2. Guardar llaves secretas
 Para re-utilizar las credenciales de la base de datos, de la región de las cubetas y otras configraciones de AWS al igual que para homogeneizar los nombres en todos los archivos creamos el archivo path_parameters.yml
 
 ```
@@ -160,7 +170,7 @@ port : "5432"
 database: "postgres"
 ```
 
-#### 2.Clonar el repositorio de github
+#### 3.Clonar el repositorio de github
 
 Para clonar el repositorio de trabajo del proyecto ejecutar:
 

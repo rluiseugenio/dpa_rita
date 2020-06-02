@@ -113,7 +113,7 @@ Para conectarse hacia la máquina virtual que servirá como bastión:
 ssh -i mi-llave.pub ubuntu@endopoint-de-mi-instancia
 ```
 
-Considerando lo anterior, dentro de bastión se de contar con docker:
+Considerando lo anterior, se necesita un par de herramientas adicionales:
 
 ```
 sudo apt update
@@ -145,7 +145,6 @@ conda activate usal_echo
 Para clonar el repositorio de trabajo del proyecto ejecutar:
 
 ```
-
 cd dpa_rita
 git clone https://github.com/paola-md/dpa_rita/
 ```
@@ -185,22 +184,124 @@ port : "5432"
 database: "postgres"
 ```
 
-#### 4. Specify data paths
+#### 4. Docker
 
-pendiente
+La ejecución del proyecto se basa en una imagen de Docker que permite emplear
+[PySpark](https://spark.apache.org/docs/latest/api/python/pyspark.html), con lo
+cual es necesario configuraciones de la misma.
 
-#### 5. Crear el esquema de las bases de datos
+**4.1 Declaramos variables**
 
-Según los requisitos enumerados en [Requisitos de infraestructura] (https://github.com/dssg/usal_echo#infrastructure-requirements), necesita una instalación de la base de datos de nombre *postgres* con credenciales almacenadas como se describe anteriormente. Una vez que se ha creado la base de datos, debe ejecutar el script que crea el esquema diferente que necesitamos para conservar los resultados de los diferentes procesos del pipeline. Los esquema de la base de datos se almacena en la ruta `src/utils/sql` a través de los archivos `crear_tablas.sql`, `create_predict_tables.sql` y `metada_model.sql` y debe configurarse ejecutando el siguiente comando (cambiar psswd, usuario, base de datos y host para que corresponda con su configuración):
+En la terminal del bastión ingresamos:
 
 ```
-PGPASSWORD=psswd psql -U user -d database_name -h host -f '/home/ubuntu/src/utils/sql/crear_tablas.sql'
-
-PGPASSWORD=psswd psql -U user -d database_name -h host -f '/home/ubuntu/src/utils/sql/create_predict_tables.sql'
-
-PGPASSWORD=psswd psql -U user -d database_name -h host -f '/home/ubuntu/src/utils/sql/metada_model.sql'
+VERSION=6.0.1
+REPO_URL=paolamedo/aws_rita
+BUILD_DIR=/home/ubuntu/dpa_rita
 ```
 
+**4.2 Descargamos la imagen del repositorio del proyecto en Dockerhub**
+
+Posteriormente descargamos de Dockerhub la imagen de Docker del proyecto que nos
+permitirá usar PySpark.
+
+```
+docker pull $REPO_URL:$VERSION
+```
+
+**4.3 Acceder a la instancia y encender el demonio de Luigi**
+
+El siguiente comando nos dará acceso a una terminal de la instancia de Docker que
+permite usar PySpark y además monta los archivos del repositorio de Github para
+ejecutar el pipeline.
+
+```
+sudo docker run --rm -it \
+-v $BUILD_DIR:/home  \
+-v $HOME/.aws:/root/.aws:ro  \
+-v $HOME/.rita:/root/.rita \
+--entrypoint "/bin/bash" \
+--net=host \
+$REPO_URL:$VERSION
+```
+
+Una vez en dicha istancia de docker nos desplazaremos para activar el demonio de
+Luigi:
+
+```
+cd home
+luigid # Activamos el demonio de luigi
+```
+
+**4.4 Acceder a más terminales de la instancia de docker**
+
+Es posible acceder con más terminales del bastión a la instancia de Docker que
+se ha levantando previamente, emplea el id de ésta que se deriva del comando:
+
+```
+docker ps # obtenemos el id del instancia (<id-de-instancia>)
+```
+
+Así, para acceder a una nueva terminal que refleje la instancia de nuestro contenedor
+basta con usar el comando siguiente:
+
+```
+docker exec -it <id-de-instancia> /bin/bash
+```
+
+**4.5 Forwardear scheduler de Luigi hacia maquina local**
+
+Para poder visualizar el scheduler del pipeline que correremos con Luigi, es
+necesario hacer el portforwarding del puerto 8082 del bastión hacia la máquina
+local en donde estamos trabajando. Para tal efecto se debe ejecutar el comando:
+
+```
+# Modificar el contenido con los datos de la llave ssh y endpoint del bastion
+ssh -i <mi-llave.pem> -N -f -L localhost:8082:localhost:8082 ubuntu@<mi-endpoint>
+```
+
+Así en nuestra máquina local debemos abrir un navegador empleando la dirección:
+
+```
+localhost:8082
+```
+
+
+#### 5. Creación de esquemas en base de datos
+
+Según los requisitos enumerados en [Requisitos de infraestructura] (https://github.com/dssg/usal_echo#infrastructure-requirements), necesita una instalación de la base de datos de nombre postgres con credenciales.
+
+**5.1 Archivo de credenciales**
+
+Dentro de una terminal que refleje la instancia del contenedor de Docker del
+proyecto (ver numeral 4.4) es necesario editar el archivo `.pg_service.conf`
+para que `psql` reconozca las credenciales, para ello
+se debe seguir el procedimiento siguiente:
+
+```
+nano .pg_service.conf
+
+# Modificar el contenido de abajo segun corresponda
+[rita]
+host=<endopoint-de-mi-base>
+port=5432
+user=postgres
+password=<mi-password>
+dbname=postgres
+
+```
+
+**5.2 Creación de esquema con psql**
+
+Para la creación de los respectivos esquemas, ahora se ejecutarán mediante
+`psql` una serie de scripts:
+
+```
+cd /home/src/utils/sql
+psql service=rita -f 'crear_tablas.sql'
+psql service=rita -f 'create_predict_tables.sql'
+psql service=rita -f 'create_predict_tables.sql'
+```
 
 ## Correr el pipeline
 

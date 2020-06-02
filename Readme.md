@@ -180,9 +180,11 @@ Para el proyecto se escogió esta métrica ya que se necesita que el modelo a de
 
 Para el manejo y procesamiento de los datos este proyecto usa infraestructura en
  la nube basada en servicios de Amazon Web Services (AWS). Concretamente, se
- emplean tres buckets de AWS S3 (denominados *models-dpa* y *preds-dpa* ) y una instancia AWS EC2 para ejecutar todo el
- código. Los resultados para cada capa de procesamiento se almacenan en un base
- de datos basada en PostgreSQL en AWS RDS. Cabe destacar que toda la infraestructura debe pertenecer a la región *us-east-1*.
+ emplean tres buckets de AWS S3 (denominados *models-dpa* y *preds-dpa* ) y una
+ instancia AWS EC2 para ejecutar todo el código. Los resultados para cada capa
+ de procesamiento se almacenan en un base de datos basada en PostgreSQL en AWS
+ RDS. Cabe destacar que toda la infraestructura debe pertenecer a la región
+*us-east-1*.
 
 ```
 Infraestructura: AWS
@@ -201,6 +203,8 @@ Infraestructura: AWS
     Ram: 20 GB
     Almacenamiento: 1000 GB
 ```
+Este proyecto asume que se tiene acceso a tales servicios y que se han configurado
+oportunamente.
 
 ## Instalación y setup
 
@@ -220,7 +224,8 @@ sudo apt update
 sudo apt-get install docker.io git
 ```
 
-Se crean las siguientes carpetas en las cuales estarán las credenciales necesarias para correr el proyecto.
+Se crean las siguientes carpetas en las cuales estarán las credenciales
+necesarias para correr el proyecto.
 
 ```
 mkidr ~/.aws
@@ -228,7 +233,9 @@ mkdir ~/.rita
 mkdir ~/.rita/conf ~/.rita/keys ~/.rita/logs
 ```
 #### 2. Guardar llaves secretas
-Para re-utilizar las credenciales de la base de datos, de la región de las cubetas y otras configraciones de AWS al igual que para homogeneizar los nombres en todos los archivos creamos el archivo path_parameters.yml
+Para re-utilizar las credenciales de la base de datos, de la región de las
+cubetas y otras configraciones de AWS al igual que para homogeneizar los nombres
+ en todos los archivos creamos el archivo path_parameters.yml
 
 ```
 cd $HOME
@@ -262,7 +269,10 @@ git clone https://github.com/paola-md/dpa_rita/
 
 #### 4. Archivos de credenciales
 
-Para ejecutar el pipeline, se deben especificar las credenciales para su infraestructura en AWS y postgres, puesto que el primero busca archivos de credenciales en ubicaciones específicas. Debería crearlos ahora si aún no existen
+Para ejecutar el pipeline, se deben especificar las credenciales para su
+infraestructura en AWS y postgres, puesto que el primero busca archivos de
+credenciales en ubicaciones específicas. Debería crearlos ahora si aún no
+existen.
 
 ##### aws credentials   
 Se ubican en `~/.aws/credentials` y deben ser generadas como sigue
@@ -280,7 +290,10 @@ El pipeline usa las credenciales del usuario `dpa`.
 
 ##### Credenciales de postgres
 
-Modifique las credenciales de postgres en `.rita/conf/path_parameters.yml`. Este archivo debe existir para ejecutar el pipelone. Se crea un ejemplo durante la instalación y debe modificarlo para su configuración.
+Modifique las credenciales de postgres en `.rita/conf/path_parameters.yml`. Este
+ archivo debe existir para ejecutar el pipelone. Se crea un ejemplo durante la
+ instalación y debe modificarlo para su configuración.
+
 ```
 cd .rita/conf/
 nano path_parameters.yml
@@ -293,7 +306,6 @@ host : "mi-endpoint-de-rds"
 port : "5432"
 database: "postgres"
 ```
-
 #### 4. Docker
 
 La ejecución del proyecto se basa en una imagen de Docker que permite emplear
@@ -335,8 +347,8 @@ sudo docker run --rm -it \
 $REPO_URL:$VERSION
 ```
 
-Una vez en dicha istancia de docker nos desplazaremos para activar el demonio de
-Luigi:
+Una vez en dicha instancia de docker nos desplazaremos para activar el demonio
+de Luigi:
 
 ```
 cd home
@@ -362,7 +374,7 @@ docker exec -it <id-de-instancia> /bin/bash
 **4.5 Forwardear scheduler de Luigi hacia maquina local**
 
 Para poder visualizar el scheduler del pipeline que correremos con Luigi, es
-necesario hacer el portforwarding del puerto 8082 del bastión hacia la máquina
+necesario hacer el *port forwarding* del puerto 8082 del bastión hacia la máquina
 local en donde estamos trabajando. Para tal efecto se debe ejecutar el comando:
 
 ```
@@ -379,7 +391,8 @@ localhost:8082
 
 #### 5. Creación de esquemas en base de datos
 
-Según los requisitos enumerados en [Requisitos de infraestructura] (https://github.com/dssg/usal_echo#infrastructure-requirements), necesita una instalación de la base de datos de nombre postgres con credenciales.
+Según los requisitos enumerados en [Requisitos de infraestructura] (https://github.com/dssg/usal_echo#infrastructure-requirements), necesita una instalación de la base de
+datos de nombre postgres con credenciales.
 
 **5.1 Archivo de credenciales**
 
@@ -414,7 +427,9 @@ psql service=rita -f 'create_predict_tables.sql'
 
 ## Correr el pipeline
 
-La siguiente instrucción se debe ejecutar para cargar la libraria src con los archivos del proyecto.
+Dentro de una terminal que refleje la instancia del contenedor de Docker del
+proyecto (ver numeral 4.4), la siguiente instrucción se debe ejecutar para
+cargar la librería src con los archivos del proyecto.
 
 ```
 python3 setup.py install
@@ -426,7 +441,9 @@ A continuación, dentro de la carpeta orquestadores se corre el pipeline.
 cd src/orquestadores
 ```
 
-Existen dos vertientes, una para entrenar y otra para predecir. El parámetro type indica cual rama correr. La rama de predict, requiere que se haya entrenado (type = train) con los datos y se haya guardado un modelo.
+Existen dos vertientes, una para entrenar y otra para predecir. El parámetro
+*type* indica cual rama correr. La rama de predict, requiere que se haya
+entrenado (type = train) con los datos y se haya guardado un modelo.
 
 **Rama para entrenar:**
 
@@ -442,11 +459,16 @@ PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type predi
 ![Pipeline](reports/figures/pipeline.jpg?raw=true "Title")
 
 ## API
-Se contruyó un API utilizando la biblioteca *flask* y *flask_restx* de Python para la documentación con Swagger. A saber, el endpoint local es:
+
+Se construyó un API utilizando la biblioteca *flask* y *flask_restx* de Python
+para la documentación con Swagger. A saber, el endpoint local es:
 
 http://127.0.0.1:5000/predicts/1609
 
-Donde el 1609 es cualquier vuelo del cuál se desee saber si se va a retrazar más de una hora y media o no. Se realiza una opreación GET, la cuál recibe el parámetro flight identifier y regresa la predicción (200) o (404) en caso de no encontrar ese vuelo.
+Donde el 1609 es cualquier vuelo del cuál se desee saber si se va a retrasar más
+ de una hora y media o no. Se realiza una operación GET, la cuál recibe el
+ parámetro flight identifier y regresa la predicción (200) o (404) en caso de no
+  encontrar ese vuelo.
 
 A continuación se muestra el swagger.json:
 
@@ -511,15 +533,34 @@ A continuación se muestra el swagger.json:
 ```
 
 ## Dashboard de monitoreo
-Con el objetivo de monitorear el desempeño del modelo en tiempo real se construyó un dashboard en donde es posible revisar en tiempo real las predicciones que devuelve el modelo después de hacer una consulta al API. Además, actualizará los valores observado en cuanto estén disponibles.
+Con el objetivo de monitorear el desempeño del modelo en tiempo real se
+construyó un dashboard en donde es posible revisar en tiempo real las
+predicciones que devuelve el modelo después de hacer una consulta al API.
+Además, actualizará los valores observado en cuanto estén disponibles.
 
 El dashboard cuenta con tres pestañas:
 
-1. *Información*: Aquí se muestra la información del modelo usado para generar las predicciones, que por construcción es el modelo con mejor desempeño.
-2. *Modelos*: En esta pestaña se monitorean las predicciones en tiempo real para un número de vuelo y una distancia en particular, se alerta cuando las observaciones no coinciden con las predicciones de forma que es fácil determinar si el desempeño del modelo ha degenerado, se extraen los datos de las predicciones para los parámetros de vuelo y distancia seleccionados y se tiene visibilidad de las distribuciones de la variable distancia en los conjuntos de entrenamiento y prueba de forma que se garantiza que no haya cambios tan notables al momento de actualizar los datos.
-3. *Fairness & Bias*: Finalmente en la última pestaña se presenta un resumen del reporte de Fairness& Bias para nuestras variables críticas. Este resumen consta de una tabla con los valores de disparidad en los rangos de distancias, una gráfica de barras con una visualización de estos valores y una matriz de confusión para inspeccionar el desempeño del modelo a través de los códigos de origen y las distancias seleccionadas en la sección de parámetros.
+1. *Información*: Aquí se muestra la información del modelo usado para generar
+las predicciones, que por construcción es el modelo con mejor desempeño.
 
-Para correr el dashboard basta con colocarse a través de la terminal en el directorio principal del proyecto (dpa_rita/) e indicar las siguientes instrucciones:
+2. *Modelos*: En esta pestaña se monitorean las predicciones en tiempo real para
+ un número de vuelo y una distancia en particular, se alerta cuando las
+ observaciones no coinciden con las predicciones de forma que es fácil determinar
+  si el desempeño del modelo ha degenerado, se extraen los datos de las
+  predicciones para los parámetros de vuelo y distancia seleccionados y se tiene
+   visibilidad de las distribuciones de la variable distancia en los conjuntos
+   de entrenamiento y prueba de forma que se garantiza que no haya cambios tan
+   notables al momento de actualizar los datos.
+
+3. *Fairness & Bias*: Finalmente en la última pestaña se presenta un resumen del
+ reporte de Fairness& Bias para nuestras variables críticas. Este resumen consta
+  de una tabla con los valores de disparidad en los rangos de distancias, una
+  gráfica de barras con una visualización de estos valores y una matriz de
+  confusión para inspeccionar el desempeño del modelo a través de los códigos de
+ origen y las distancias seleccionadas en la sección de parámetros.
+
+Para correr el dashboard basta con colocarse a través de la terminal en el
+directorio principal del proyecto (dpa_rita/) e indicar las siguientes instrucciones:
 
 ```
 cd dashboard/MonitoreoModelos
@@ -527,7 +568,8 @@ R
 shiny::runApp()
 ```
 
-A continuación, se abrirá una ventana del navegador con la dirección http://127.0.0.1:4809/ con el dashboard funcionando.
+A continuación, se abrirá una ventana del navegador con la dirección
+http://127.0.0.1:4809/ con el dashboard funcionando.
 
 ## Organización del proyecto
 
@@ -636,4 +678,5 @@ A continuación, se abrirá una ventana del navegador con la dirección http://1
 
 **Technical mentors:**
 
-Danahi Ayzailadema Ramos Martínez, Paola Mejía Domenzaín, León Manuel Garay Vásquez, Luis Eugenio Rojón Jiménez y Cesar Zamora Martínez
+Danahi Ayzailadema Ramos Martínez, Paola Mejía Domenzaín, León Manuel Garay
+Vásquez, Luis Eugenio Rojón Jiménez y Cesar Zamora Martínez

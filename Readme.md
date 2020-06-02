@@ -662,8 +662,8 @@ http://127.0.0.1:4809/
 
 ## Organización del proyecto
 
-
 ```
+.
 ├── Diseño
 │   ├── Imagenes
 │   └── Readme.md
@@ -675,12 +675,20 @@ http://127.0.0.1:4809/
 ├── Linaje
 │   └── Readme.md
 ├── Makefile
-├── README.md
+├── Readme.md
+├── __pycache__
+│   └── alter_orq_sep.cpython-37.pyc
 ├── alter_orq.py
 ├── alter_orq_sep.py
+├── build
+│   ├── bdist.linux-x86_64
+│   └── lib
 ├── clean_luigi.py
 ├── dashboard
 │   └── MonitoreoModelos
+├── data
+├── dist
+│   └── src-0.1.0-py3.7.egg
 ├── docs
 │   ├── 1.1_Bastion_configuracionAWS.md
 │   ├── 1.2_Bastion_conexionesSSH.md
@@ -714,6 +722,7 @@ http://127.0.0.1:4809/
 ├── setup.py
 ├── src
 │   ├── __init__.py
+│   ├── __pycache__
 │   ├── credentials_psql.txt
 │   ├── data
 │   ├── deploy
@@ -728,8 +737,14 @@ http://127.0.0.1:4809/
 │   ├── unit_tests
 │   ├── utils
 │   └── visualization
+├── src.egg-info
+│   ├── PKG-INFO
+│   ├── SOURCES.txt
+│   ├── dependency_links.txt
+│   └── top_level.txt
 ├── target
 ├── tasks
+│   ├── __pycache__
 │   ├── all_targets.py
 │   ├── bucket.py
 │   ├── clean.py
@@ -752,6 +767,7 @@ http://127.0.0.1:4809/
 │   └── target_d.py
 ├── test_environment.py
 ├── testing
+│   ├── __pycache__
 │   ├── test_absent_hearders.py
 │   ├── test_clean_columns.py
 │   ├── test_clean_rangos.py

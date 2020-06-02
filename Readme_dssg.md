@@ -176,7 +176,6 @@ Para ejecutar el pipeline, se deben especificar las credenciales para su infraes
 ##### aws credentials   
 Se ubican en `~/.aws/credentials` y deben ser generadas como sigue
 ```
-
 nano ~/.aws/credentials
 
 # Luego se debe pegar la identificación de acceso y la clave a
@@ -277,7 +276,7 @@ local en donde estamos trabajando. Para tal efecto se debe ejecutar el comando:
 
 ```
 # Modificar el contenido con los datos de la llave ssh y endpoint del bastion
-ssh -i <mi-llave.pem> -N -f -L localhost:8082:localhost:8082 ubuntu@<mi-endpoint>
+ssh -i <mi-llave> -N -f -L localhost:8082:localhost:8082 ubuntu@<mi-endpoint>
 ```
 
 Así en nuestra máquina local debemos abrir un navegador empleando la dirección:
@@ -308,7 +307,6 @@ port=5432
 user=postgres
 password=<mi-password>
 dbname=postgres
-
 ```
 
 **5.2 Creación de esquema con psql**
@@ -327,25 +325,28 @@ psql service=rita -f 'create_predict_tables.sql'
 
 La siguiente instrucción se debe ejecutar para cargar la libraria src con los archivos del proyecto.
 
+```
 python3 setup.py install
-
+```
 
 A continuación, dentro de la carpeta orquestadores se corre el pipeline.
 
+```
 cd src/orquestadores
-
+```
 
 Existen dos vertientes, una para entrenar y otra para predecir. El parámetro type indica cual rama correr. La rama de predict, requiere que se haya entrenado (type = train) con los datos y se haya guardado un modelo.
 
-Rama para entrenar:
+**Rama para entrenar:**
 
+```
 PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type train
+```
 
-
-Rama para predecir:
-
+**Rama para predecir:**
+```
 PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type predict
-
+```
 
 ### Notebooks
 Existe un conjunto de cuadernos en el directorio `notebooks` de este repositorio. Contienen las funciones para cada uno de los pasos de la tubería, así como algunos análisis de datos elementales y se pueden usar para experimentar.
@@ -362,4 +363,6 @@ The code is organised as follows:
 
 ## Contributors
 
-**Technical mentors:** Danahi Ayzailadema Ramos Martínez, Paola Mejía Domenzaín, León Manuel Garay Vásquez, Luis Eugenio Rojón Jiménez y Cesar Zamora Martínez
+**Technical mentors:** 
+
+Danahi Ayzailadema Ramos Martínez, Paola Mejía Domenzaín, León Manuel Garay Vásquez, Luis Eugenio Rojón Jiménez y Cesar Zamora Martínez

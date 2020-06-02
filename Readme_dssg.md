@@ -168,6 +168,7 @@ aws_secret_access_key=your_secret_key
 ```
 El pipeline usa las credenciales del usuario `dpa`.
 
+
 ##### Credenciales de postgres
 
 Modifique las credenciales de postgres en `.rita/conf/path_parameters.yml`. Este archivo debe existir para ejecutar el pipelone. Se crea un ejemplo durante la instalación y debe modificarlo para su configuración.
@@ -175,7 +176,7 @@ Modifique las credenciales de postgres en `.rita/conf/path_parameters.yml`. Este
 cd .rita/conf/
 nano path_parameters.yml
 
-# Modifa la informacion en estas líneas
+# Modifica la información en estas líneas
 
 user: "postgres"
 password : "mi-password"
@@ -190,10 +191,16 @@ pendiente
 
 #### 5. Crear el esquema de las bases de datos
 
-As per the requirements listed in [Infrastructure requirements](https://github.com/dssg/usal_echo#infrastructure-requirements) you require a database indtallation with credentials stored as described above. After the database has been created, you need to run the script that creates the different schema that we require to persist the outputs from the different pipeline processes: classification, segmentation and measurements. The database schema is stored in `usr/usal_echo/conf/models_schema.sql` and must be set up by running the following command (change psswd, user, database and host to correspond with your setup):
+Según los requisitos enumerados en [Requisitos de infraestructura] (https://github.com/dssg/usal_echo#infrastructure-requirements), necesita una instalación de la base de datos de nombre *postgres* con credenciales almacenadas como se describe anteriormente. Una vez que se ha creado la base de datos, debe ejecutar el script que crea el esquema diferente que necesitamos para conservar los resultados de los diferentes procesos del pipeline. Los esquema de la base de datos se almacena en la ruta `src/utils/sql` a través de los archivos `crear_tablas.sql`, `create_predict_tables.sql` y `metada_model.sql` y debe configurarse ejecutando el siguiente comando (cambiar psswd, usuario, base de datos y host para que corresponda con su configuración):
+
 ```
-PGPASSWORD=psswd psql -U user -d database_name -h host -f '/home/ubuntu/usr/usal_echo/conf/models_schema.sql'
+PGPASSWORD=psswd psql -U user -d database_name -h host -f '/home/ubuntu/src/utils/sql/crear_tablas.sql'
+
+PGPASSWORD=psswd psql -U user -d database_name -h host -f '/home/ubuntu/src/utils/sql/create_predict_tables.sql'
+
+PGPASSWORD=psswd psql -U user -d database_name -h host -f '/home/ubuntu/src/utils/sql/metada_model.sql'
 ```
+
 
 ## Correr el pipeline
 

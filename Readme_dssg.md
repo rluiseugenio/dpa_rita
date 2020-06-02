@@ -602,7 +602,7 @@ PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type train
 PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type predict
 ```
 
-![Pipeline](reports/figures/pipeline.png?raw=true "Title")
+![Pipeline](reports/figures/pipeline.jpg?raw=true "Title")
 
 ## API
 Se contruyó un API utilizando la biblioteca *flask* y *flask_restx* de Python para la documentación con Swagger. A saber, el endpoint local es: 

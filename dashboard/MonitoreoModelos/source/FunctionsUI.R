@@ -130,7 +130,7 @@ UIBodyMonitor <- function () {
             bs4Card( 
             title = paste0("Datos de entrenamiento"),
             closable = FALSE,
-            width = 6,
+            width = 12,
             # height = 400,
             status = 'primary',
             solidHeader = FALSE,
@@ -138,11 +138,12 @@ UIBodyMonitor <- function () {
             maximizable = TRUE,
             echarts4rOutput("distribucion_train_plot") %>% 
               shinycssloaders::withSpinner(type = 5)
-            ),
+            )),
+          fluidRow(
           bs4Card( 
             title = paste0("Datos de prueba"),
             closable = FALSE,
-            width = 6,
+            width = 12,
             # height = 400,
             status = 'primary',
             solidHeader = FALSE,
@@ -152,7 +153,8 @@ UIBodyMonitor <- function () {
             echarts4rOutput("distribucion_test_plot") %>% 
                        shinycssloaders::withSpinner(type = 5)
                      )
-          )
+          
+        )
         )
         )
       

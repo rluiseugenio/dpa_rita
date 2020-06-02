@@ -10,7 +10,7 @@ vuelos de la base de datos denominada conocida como [RITA](http://stat-computing
 3. [Requerimientos de infraestructura](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#requerimientos-de-infraestructura)
 4. [Instalación y setup](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#instalación-y-setup)
 5. [Corriendo el Pipeline](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#correr-el-pipeline)
-6. [Organización del código](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#code-organization)
+6. [Organización del proyecto](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#organización-del-proyecto)
 7. [Contributors](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#contributors)
 
 ## Introducción

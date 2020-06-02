@@ -116,7 +116,8 @@ Infraestructura: AWS
 Para conectarse hacia la máquina virtual que servirá como bastión:
 
 ```
-ssh -i mi-llave.pub ubuntu@endopoint-de-mi-instancia
+# Modificar datos segun corresponda
+ssh -i <mi-llave> ubuntu@<endpoint-de-mi-instancia>
 ```
 
 Considerando lo anterior, se necesita un par de herramientas adicionales:
@@ -137,11 +138,11 @@ mkdir dpa_rita
 #### 1. Guardar llaves secretas
 Para re-utilizar las credenciales de la base de datos, de la región de las cubetas y otras configraciones de AWS al igual que para homogeneizar los nombres en todos los archivos creamos el archivo path_parameters.yml
 
-
+```
 cd $HOME
 nano path_parameters.yml
 
-# Este es un pequeño ejemplo
+# Modificar los datos de ejemplo en la parte inferior
 
 bucket: "un nombre"
 region: "us-east-1"
@@ -157,18 +158,9 @@ password : "xxxxxxxx"
 host : "xxxxxxxx.us-east-1.rds.amazonaws.com"
 port : "5432"
 database: "postgres"
-
-#### 2.
-
-Clone the TensorFlow Python3 conda environment in your GPU instance set up with AWS Deep Learning AMI and activate it.
-```
-conda create --name usal_echo --clone tensorflow_p36
-echo ". /home/ubuntu/anaconda3/etc/profile.d/conda.sh" >> ~/.bashrc
-source ~/.bashrc
-conda activate usal_echo
 ```
 
-#### 3. Clonar el repositorio de github
+#### 2.Clonar el repositorio de github
 
 Para clonar el repositorio de trabajo del proyecto ejecutar:
 

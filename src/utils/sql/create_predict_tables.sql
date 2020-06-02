@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS predictions.train(
   distance INT,
   label_value FLOAT,
   score FLOAT,
-  s3_name VARCHAR
+  s3_name VARCHAR,
+  fecha VARCHAR
 );
 
 DROP TABLE IF EXISTS predictions.test;
@@ -13,7 +14,8 @@ CREATE TABLE IF NOT EXISTS predictions.test(
   flight_number FLOAT,
   distance FLOAT,
   prediction VARCHAR,
-  s3_name VARCHAR
+  s3_name VARCHAR,
+  fecha VARCHAR
 );
 
 CREATE TABLE IF NOT EXISTS metadatos.predictions(

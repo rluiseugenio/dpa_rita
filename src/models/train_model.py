@@ -43,7 +43,7 @@ from src import (
 def get_data(test=False):
     config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
     connection = pg.connect(config_psyco)
-    
+
     if test:
         query_select = "(select * from semantic.rita where  rangoatrasohoras = '0-1.5' order by flightdate limit 700) union all (select * from semantic.rita where  rangoatrasohoras != '0-1.5' order by flightdate limit 1000);"
     else:
@@ -111,7 +111,7 @@ def get_data(test=False):
                              StructField('actualelapsedtime', FloatType(), True),
                              StructField('airtime', FloatType(), True),
                              StructField('flights', FloatType(), True),
-                             StructField('distance', StringType(), True),
+                             StructField('distance', FloatType(), True),
                              StructField('distancegroup', IntegerType(), True),
                              StructField('divairportlandings', StringType(), True),
                              StructField('rangoatrasohoras', StringType(), True),

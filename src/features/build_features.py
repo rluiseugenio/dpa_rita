@@ -413,7 +413,7 @@ def get_clean_data():
                             ])
     config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
     connection = pg.connect(config_psyco)
-    pdf = pd.read_sql_query('select * from clean.rita limit 1000;',con=connection)
+    pdf = pd.read_sql_query('select * from clean.rita;',con=connection)
     spark = SparkSession.builder.config('spark.driver.extraClassPath', 'postgresql-9.4.1207.jar').getOrCreate()
     df = spark.createDataFrame(pdf, schema=clean_rita)
 

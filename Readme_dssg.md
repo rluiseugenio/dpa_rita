@@ -382,6 +382,75 @@ PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type predi
 
 ![Pipeline](reports/figures/pipeline.png?raw=true "Title")
 
+## API
+Se contruyó un API utilizando la biblioteca *flask* y *flask_restx* de Python para la documentación con Swagger. A saber, el endpoint local es: 
+
+http://127.0.0.1:5000/predicts/1609
+
+Donde el 1609 es cualquier vuelo del cuál se desee saber si se va a retrazar más de una hora y media o no. Se realiza una opreación GET, la cuál recibe el parámetro flight identifier y regresa la predicción (200) o (404) en caso de no encontrar ese vuelo. 
+
+A continuación se muestra el swagger.json:
+
+```
+{
+    "swagger": "2.0",
+    "basePath": "/",
+    "paths": {
+        "/predicts/{flight_number}": {
+            "parameters": [
+                {
+                    "in": "path",
+                    "description": "The flight identifier",
+                    "name": "flight_number",
+                    "required": true,
+                    "type": "integer"
+                }
+            ],
+            "get": {
+                "responses": {
+                    "200": {
+                        "description": "Delay prediction"
+                    },
+                    "404": {
+                        "description": "Delay not found"
+                    }
+                },
+                "summary": "Fetch a given resource",
+                "operationId": "get_predict",
+                "tags": [
+                    "predicts"
+                ]
+            }
+        }
+    },
+    "info": {
+        "title": "Delay API",
+        "version": "1.0",
+        "description": "A RITA Delay API"
+    },
+    "produces": [
+        "application/json"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "tags": [
+        {
+            "name": "predicts",
+            "description": "FLIGHTS operations"
+        }
+    ],
+    "responses": {
+        "ParseError": {
+            "description": "When a mask can't be parsed"
+        },
+        "MaskError": {
+            "description": "When any error occurs on mask"
+        }
+    }
+}
+```
+
 ## Dashboard de monitoreo
 Con el objetivo de monitorear el desempeño del modelo en tiempo real se construyó un dashboard en donde es posible revisar en tiempo real las predicciones que devuelve el modelo después de hacer una consulta al API. Además, actualizará los valores observado en cuanto estén disponibles.
 

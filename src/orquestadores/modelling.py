@@ -18,7 +18,7 @@ import luigi
 import luigi.contrib.s3
 
 # TASKS
-from src.orquestadores.feature_engineering import GetFEData
+from src.orquestadores.tasks.metadatos_semantic import Metadata_Semantic
 
 # ===============================
 CURRENT_DIR = os.getcwd()
@@ -26,13 +26,13 @@ CURRENT_DIR = os.getcwd()
 
 class RunModelSimple(luigi.Task):
 	bucname = "models-dpa"
-	numIt = 200
-	numPCA = 8
+	numIt = 202
+	numPCA = 7
 	obj = "0-1.5"
 	model = "LR"
 
 	def requires(self):
-		return GetFEData()
+		return Metadata_Semantic()
 
 	def output(self):
 		objetivo = self.obj
@@ -62,7 +62,7 @@ class RunModel(luigi.Task):
 	model = luigi.Parameter()
 
 	def requires(self):
-		return GetFEData()
+		return Metadata_Semantic()
 
 	def output(self):
 		objetivo = self.obj
@@ -115,7 +115,7 @@ class RunTargetA(luigi.Task):
 	model = luigi.Parameter()
 
 	def requires(self):
-		return GetFEData()
+		return Metadata_Semantic()
 
 	def output(self):
 		objetivo = TARGET_A
@@ -143,7 +143,7 @@ class RunTargetB(luigi.Task):
 	model = luigi.Parameter()
 
 	def requires(self):
-		return GetFEData()
+		return Metadata_Semantic()
 
 	def output(self):
 		objetivo = TARGET_B
@@ -171,7 +171,7 @@ class RunTargetC(luigi.Task):
 	model = luigi.Parameter()
 
 	def requires(self):
-		return GetFEData()
+		return Metadata_Semantic()
 
 	def output(self):
 		objetivo = TARGET_C
@@ -200,7 +200,7 @@ class RunTargetD(luigi.Task):
 	model = luigi.Parameter()
 
 	def requires(self):
-		return GetFEData()
+		return Metadata_Semantic()
 
 	def output(self):
 		objetivo = TARGET_D

@@ -47,7 +47,7 @@ def parse_filename(objetivo, model_name, hyperparams):
     para_string = para_string.replace(',', "$")
 
     today = date.today()
-    d1 = today.strftime("%d%m%Y")
+    d1 = today.strftime("%Y%m%d")
 
     saved_model_name = "./" + d1 + "_" + objetivo + "_" + model_name + "_" + para_string
 

@@ -82,7 +82,16 @@ def upload_file_to_bucket(model_dir, bucket_name, key_name):
         s3.meta.client.upload_file(model_dir, bucket_name, key_name)
     except Exception as error:
         print (error)
-        logger.error("{} Error uploading in ".format(bucket_name))
+        logger.error("{} Error uploading to ".format(bucket_name))
+
+
+def get_file_from_bucket( bucket_name,model_dir, key_name):
+    try:
+        s3.meta.client.download_file(bucket_name, model_dir,  key_name)
+        #s3.meta.client.upload_file(model_dir, bucket_name, key_name)
+    except Exception as error:
+        print (error)
+        logger.error("{} Error downloading from ".format(bucket_name))
 
 ## ========================================
 #create_bucket("models-dpa")

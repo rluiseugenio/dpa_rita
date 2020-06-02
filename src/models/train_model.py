@@ -6,6 +6,7 @@ from datetime import date, datetime
 from pyspark.sql import SparkSession
 from pyspark.sql.types import IntegerType, DoubleType
 from pyspark.sql.functions import monotonically_increasing_id, countDistinct, approxCountDistinct, when, lit
+from pyspark.sql.functions import concat, col, lit
 
 from pyspark.ml.feature import OneHotEncoder, StringIndexer, Imputer, VectorAssembler, StandardScaler, PCA
 from pyspark.ml import Pipeline
@@ -19,6 +20,7 @@ from pyspark.sql import functions as f
 from pyspark.sql.functions import udf
 from pyspark.sql.functions import col, lower, regexp_replace, split
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType, FloatType
+from pyspark.sql import functions as f
 
 from collections import defaultdict
 
@@ -36,78 +38,90 @@ from src import (
     MY_DB
 )
 
-def get_data(luigi=False):
+
+
+def get_data(test=False):
     config_psyco = "host='{0}' dbname='{1}' user='{2}' password='{3}'".format(MY_HOST,MY_DB,MY_USER,MY_PASS)
     connection = pg.connect(config_psyco)
-    pdf = pd.read_sql_query('select * from semantic.rita limit 2000;',con=connection)
+    
+    if test:
+        query_select = "(select * from semantic.rita where  rangoatrasohoras = '0-1.5' order by flightdate limit 700) union all (select * from semantic.rita where  rangoatrasohoras != '0-1.5' order by flightdate limit 1000);"
+    else:
+        query_select = "(select * from semantic.rita where  rangoatrasohoras = '0-1.5' order by flightdate desc limit 700) union all (select * from semantic.rita where  rangoatrasohoras != '0-1.5' order by flightdate desc limit 1000);"
+    #print(query_select)
+
+    pdf = pd.read_sql_query(query_select,con=connection)
+
     spark = SparkSession \
     .builder \
     .appName("Python Spark SQL basic example") \
     .config("spark.some.config.option", "some-value") \
     .getOrCreate()
-    df = spark.createDataFrame(pdf, schema=StructType([StructField('year', IntegerType(), True),
-                         StructField('quarter', IntegerType(), True),
-                         StructField('month', IntegerType(), True),
-                         StructField('dayofmonth', IntegerType(), True),
-                         StructField('dayofweek', IntegerType(), True),
-                         StructField('flightdate', StringType(), True),
-                         StructField('reporting_airline', StringType(), True),
-                         StructField('dot_id_reporting_airline', IntegerType(), True),
-                         StructField('iata_code_reporting_airline', StringType(), True),
-                         StructField('tail_number', StringType(), True),
-                         StructField('flight_number_reporting_airline', IntegerType(), True),
-                         StructField('originairportid', IntegerType(), True),
-                         StructField('originairportseqid', IntegerType(), True),
-                         StructField('origincitymarketid', IntegerType(), True),
-                         StructField('origin', StringType(), True),
-                         StructField('origincityname', StringType(), True),
-                         StructField('originstate', StringType(), True),
-                         StructField('originstatefips', IntegerType(), True),
-                         StructField('originstatename', StringType(), True),
-                         StructField('originwac', IntegerType(), True),
-                         StructField('destairportid', IntegerType(), True),
-                         StructField('destairportseqid', IntegerType(), True),
-                         StructField('destcitymarketid', IntegerType(), True),
-                         StructField('dest', StringType(), True),
-                         StructField('destcityname', StringType(), True),
-                         StructField('deststate', StringType(), True),
-                         StructField('deststatefips', IntegerType(), True),
-                         StructField('deststatename', StringType(), True),
-                         StructField('destwac', IntegerType(), True),
-                         StructField('crsdeptime', StringType(), True),
-                         StructField('deptime', StringType(), True),
-                         StructField('depdelay', FloatType(), True),
-                         StructField('depdelayminutes', FloatType(), True),
-                         StructField('depdel15', FloatType(), True),
-                         StructField('departuredelaygroups', FloatType(), True),
-                         StructField('deptimeblk', StringType(), True),
-                         StructField('taxiout', FloatType(), True),
-                         StructField('wheelsoff',FloatType(), True),
-                         StructField('wheelson', FloatType(), True),
-                         StructField('taxiin', FloatType(), True),
-                         StructField('crsarrtime', IntegerType(), True),
-                         StructField('arrtime', FloatType(), True),
-                         StructField('arrdelay', FloatType(), True),
-                         StructField('arrdelayminutes', FloatType(), True),
-                         StructField('arrdel15', FloatType(), True),
-                         StructField('arrivaldelaygroups', FloatType(), True),
-                         StructField('arrtimeblk', StringType(), True),
-                         StructField('cancelled', FloatType(), True),
-                         StructField('diverted', FloatType(), True),
-                         StructField('crselapsedtime', FloatType(), True),
-                         StructField('actualelapsedtime', FloatType(), True),
-                         StructField('airtime', FloatType(), True),
-                         StructField('flights', FloatType(), True),
-                         StructField('distance', StringType(), True),
-                         StructField('distancegroup', IntegerType(), True),
-                         StructField('divairportlandings', StringType(), True),
-                         StructField('rangoatrasohoras', StringType(), True),
-                         StructField('findesemana', IntegerType(), True),
-                         StructField('quincena', FloatType(), True),
-                         StructField('dephour', FloatType(), True),
-                         StructField('seishoras', FloatType(), True)
 
-                        ]))
+    df = spark.createDataFrame(pdf, schema=StructType([StructField('year', IntegerType(), True),
+                             StructField('quarter', IntegerType(), True),
+                             StructField('month', IntegerType(), True),
+                             StructField('dayofmonth', IntegerType(), True),
+                             StructField('dayofweek', IntegerType(), True),
+                             StructField('flightdate', StringType(), True),
+                             StructField('reporting_airline', StringType(), True),
+                             StructField('dot_id_reporting_airline', IntegerType(), True),
+                             StructField('iata_code_reporting_airline', StringType(), True),
+                             StructField('tail_number', StringType(), True),
+                             StructField('flight_number_reporting_airline', IntegerType(), True),
+                             StructField('originairportid', IntegerType(), True),
+                             StructField('originairportseqid', IntegerType(), True),
+                             StructField('origincitymarketid', IntegerType(), True),
+                             StructField('origin', StringType(), True),
+                             StructField('origincityname', StringType(), True),
+                             StructField('originstate', StringType(), True),
+                             StructField('originstatefips', IntegerType(), True),
+                             StructField('originstatename', StringType(), True),
+                             StructField('originwac', IntegerType(), True),
+                             StructField('destairportid', IntegerType(), True),
+                             StructField('destairportseqid', IntegerType(), True),
+                             StructField('destcitymarketid', IntegerType(), True),
+                             StructField('dest', StringType(), True),
+                             StructField('destcityname', StringType(), True),
+                             StructField('deststate', StringType(), True),
+                             StructField('deststatefips', IntegerType(), True),
+                             StructField('deststatename', StringType(), True),
+                             StructField('destwac', IntegerType(), True),
+                             StructField('crsdeptime', StringType(), True),
+                             StructField('deptime', StringType(), True),
+                             StructField('depdelay', FloatType(), True),
+                             StructField('depdelayminutes', FloatType(), True),
+                             StructField('depdel15', FloatType(), True),
+                             StructField('departuredelaygroups', FloatType(), True), #CAMBIA
+                             StructField('deptimeblk', StringType(), True),
+                             StructField('taxiout', FloatType(), True),
+                             StructField('wheelsoff', FloatType(), True), #CAMBIA
+                             StructField('wheelson', FloatType(), True), #CAMBIA
+                             StructField('taxiin', FloatType(), True),
+                             StructField('crsarrtime', IntegerType(), True),
+                             StructField('arrtime', FloatType(), True), #CAMBIA
+                             StructField('arrdelay', FloatType(), True),
+                             StructField('arrdelayminutes', FloatType(), True),
+                             StructField('arrdel15', FloatType(), True),
+                             StructField('arrivaldelaygroups', FloatType(), True),  #CAMBIA
+                             StructField('arrtimeblk', StringType(), True),
+                             StructField('cancelled', FloatType(), True),
+                             StructField('diverted', FloatType(), True),
+                             StructField('crselapsedtime', FloatType(), True),
+                             StructField('actualelapsedtime', FloatType(), True),
+                             StructField('airtime', FloatType(), True),
+                             StructField('flights', FloatType(), True),
+                             StructField('distance', StringType(), True),
+                             StructField('distancegroup', IntegerType(), True),
+                             StructField('divairportlandings', StringType(), True),
+                             StructField('rangoatrasohoras', StringType(), True),
+                             StructField('findesemana', IntegerType(), True),
+                             StructField('quincena', FloatType(), True),
+                             StructField('dephour', FloatType(), True),
+                             StructField('seishoras', FloatType(), True)
+
+                            ]))
+
     df.head(2)
     print((df.count(), len(df.columns)))
     return df
@@ -327,15 +341,22 @@ def save_train_predictions(prediction, objetivo, model_name, hyperparams):
     s3_name = parse_filename(objetivo, model_name, hyperparams)
     s3_name = s3_name[2:]
 
-    vars_bias = ['prediction', 'originwac', 'label', 'distance']
+    vars_bias = ['dayofmonth', 'flight_number_reporting_airline', 'prediction', 'originwac', 'label', 'distance']
     df_bias = prediction.select([c for c in prediction.columns if c in vars_bias])
     df_bias=df_bias.withColumnRenamed("prediction", "score").withColumnRenamed("label", "label_value")
     df_bias = df_bias.withColumn('s3_name', lit(s3_name))
 
+    df_bias = df_bias.withColumn('aux', f.when(f.col('dayofmonth') < 9, "0").otherwise(""))
+    df_bias = df_bias.withColumn('fecha', concat(lit("2019"), lit("12"), col('aux'), col('dayofmonth')))
+
+    vars_bias = ['flight_number_reporting_airline', 'prediction',
+                 'originwac', 'label_value', 'distance', 'score',
+                's3_name', 'fecha']
+    df_bias = df_bias.select([c for c in df_bias.columns if c in vars_bias])
+
     df_pandas = df_bias.toPandas()
 
     save_rds_pandas(df_pandas, "predictions.train")
-    #add_metadata_fairness
 
 
 
@@ -393,7 +414,7 @@ def add_meta_data(objetivo, model_name,hyperparams, log,train_time, test_split, 
     recall = log['recall']
     f1 =log['F1 Measure']
     today = date.today()
-    d1 = today.strftime("%d%m%Y")
+    d1 = today.strftime("%Y%m%d")
 
     query = """ INSERT INTO metadatos.models (fecha, objetivo, model_name, s3_name, hyperparams, AUROC, AUPR, precision, recall, f1, train_time,  test_split, train_nrows )   VALUES ( %s, %s,%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s  ) """
     values = (d1,
@@ -411,5 +432,3 @@ def main():
                   "pca": 1}
 
     prediction, df_test = run_model(objetivo, model_name, hyperparams, luigi= False, test_split = 0.2)
-
-#main()

@@ -31,7 +31,7 @@ fundamentalmente en las siguientes ideas:
  horas de retraso, y iii) más de 3.5 horas de retraso.
 2. **Cancelación** representado como una variable binaria que indica si un vuelo
 fue o no cancelado.
-3. Calculo de medidas de **bias** y **fairness**: [Pendiente: descripción].
+3. Calculo de medidas de **bias** y **fairness**: se considera como variable protegida a la distancia recorrida por los vuelos, empleando la métrica **False Positive Parity**.
 
 Nuestro pipeline ha sido diseñado para funcionar de forma modular usando la
 librería *Luigi* de Python, considerando la ingestión de datos, su limpieza,

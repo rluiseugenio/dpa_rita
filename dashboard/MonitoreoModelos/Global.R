@@ -1,19 +1,31 @@
-library(bs4Dash)
-library(shinycssloaders)
-library(RPostgres)
-library(dplyr)
-library(tidyr)
-library(stringr)
-library(echarts4r)
-library(DT)
-library(lubridate)
-library(scales)
-library(shinyWidgets)
-library(purrr)
-library(magrittr)
-library(shiny)
+# library(bs4Dash)
+# library(shinycssloaders)
+# library(RPostgres)
+# library(dplyr)
+# library(tidyr)
+# library(stringr)
+# library(echarts4r)
+# library(DT)
+# library(lubridate)
+# library(scales)
+# library(shinyWidgets)
+# library(purrr)
+# library(magrittr)
+# library(shiny)
+# library(DBI)
 
+cargar_paquetes <- function(...){
+  paquetes <- c("tidyverse", "stringr", "lubridate", "bs4Dash",'shinycssloaders',
+                'RPostgres','dplyr','tidyr','stringr','echarts4r','DT','scales',
+                'shinyWidgets','purrr','magrittr','shiny','DBI',...)
+  if (length(setdiff(paquetes, rownames(installed.packages()))) > 0) {
+    install.packages(setdiff(paquetes, rownames(installed.packages())))  
+  }
+  lapply(paquetes, require, character.only = TRUE)
+  return(search())
+}
 
+cargar_paquetes()
 
 
 con2 <- DBI::dbConnect(RPostgres::Postgres(),

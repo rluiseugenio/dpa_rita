@@ -75,23 +75,31 @@ Para asegurar la consistencia y robustez del proyecto, el diseño del pipeline c
 * **Prueba de creación de categorías de rango de horas de retraso:** prueba verifica que los valores de la columna *rangoatrashoras* sean los indicados.
 * **Prueba Semantic:** comprueba que la cantidad de columnas en semantic.rita sean las esperadas.
 
-
 **Consideraciones éticas**
 
 Se identificaron posibles implicaciones éticas del producto de datos materia de este proyecto
 
-**Eje de usuarios:**
+*Eje de usuarios:*
 
 * Hacer que pierdan vuelos y deban hacer doble gasto en un viaje,
 * Sesgar a que los usuarios viajen o no en una aerolínea,
 
-**Eje de aerolíneas:**
+*Eje de aerolíneas:*
 
 * Perjudicar la reputación  de una aerolínea,
 * Proyectar la responsabilidad de eventos fuera de su control,
 * Dañar su estabilidad económica y empleos,
 * Aumentar quejas injustificadas del servicio.
 
+**Consideraciones sobre Bias y Fairness**
+
+Tomando en cuenta las implicaciones éticas, se seleccionó la *distancia* como variable protegida, con lo cual el objetivo es que el modelo haga predicciones justas sin importar que el vuelo sea corto o largo. En este sentido, al ser dicha variable continua, se estimó pertinente dividirla en quartiles para su análisis.
+
+Dado que uno de los objetivos de este proyecto es predecir el retraso de un vuelo, tras el análisis se identificó realizó una valoración de las consecuencias negativas de tener un falso positivo (esto es, predecir que un vuelo se va a retrasar, cuando en los hechos no sucede), estimándose que son muchas más graves que en un falso negativo (predecir que un vuelo no se va a retrasar y que se retrase). Ello en razón de que el hecho de que un usuario espere tiempo extra en el aeropuerto redunda en menos costos de que no llegué a su vuelo porque tuvo información inexacta de que se iba a retrasar. Es por eso que cobran interés los falsos positivos más que los falsos negativos.
+
+Como consecuencia, la métrica que nos interesa es *False Positive Parity* porque queremos que todas las zonas geográficas de Estados Unidos y grupos de distancia tengan el mismo FPR (false positive rate). Es decir, presentar equivocaciones en las mismas proporciones para etiquetas positivas que eran negativas.
+
+Para el proyecto se escogió esta métrica ya que se necesita que el modelo a desarrollar sea bueno detectando la etiqueta positiva y no hay (mucho) costo en introducir falsos negativos al sistema. El costo de un falso negativo es que usuarios esperen en el aeropuerto a su vuelo retrasado y este sería el status-quo sin el modelo o producto de datos. Asimismo, ésta se consideró adecuada toda vez la variable *target* no es subjetiva: si un vuelo se retrasa sabemos exactamente cuánto se retrasó y no depende de la percepción del usuario.
 
 ## Requerimientos de infraestructura
 

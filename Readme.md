@@ -112,49 +112,6 @@ se presentan los esquemas de tablas de RDS que involucran en el proyecto:
 | predictions.train |                                                                      Tabla que reúne las predicciones de retraso o la cancelación del vuelo de los datos de entrenamiento                                                                     |
 | models            |                                                                         Tabla que reúne las predicciones de los datos de prueba                                                                         |
 
-
-**Testing Extract**
-
-En esta etapa se realiza una prueba para verificar que los datos descargados tengas el número esperado de columnas.
-
-**Testing Load**
-
-En esta etapa se verifican los datos cargados.
-
-**Testing Clean**
-
-En esta etapa se verifica que la cantidad de columnas limpiadas sean las esperadas.
-
-**Testing Clean Rangos**
-
-En esta etapa se verifica que los valores de la variable creada sean los esperados.
-
-**Etapa Test semantic**
-
-En esta etapa se comprueba que la cantidad de columnas resultantes sean las esperadas.
-
-
-**Modelado**
-
-En esta etapa se crean distintos modelos para predecir el rango de retraso o la cancelación del vuelo.
-
-**Predicciones Train**
-
-En esta etapa se realizan predicciones en el conjunto de datos de entrenamiento.
-
-
-**Predicciones Test**
-
-En esta etapa se realizan las predicciones con el modelo con los datos de prueba.
-
-**Predicciones**
-
-En esta etapa se guardan las predicciones de los modelos.
-
-**Fairness y Bias**
-
-En esta etapa de realiza el análisis de sesgo y equidad.
-
 **Metadatos**
 
 En complemento a lo anterior, en la base de datos PostgreSQL alojada en AWS RDS
@@ -176,10 +133,20 @@ de las etapas del pipeline, que para mejor referencia se resumen a continuación
 
 Para asegurar la consistencia y robustez del proyecto, el diseño del pipeline consideró una serie de pruebas unitarias entre las que destacan:
 
-* **Prueba de extracción:** verifica si los csv descargados de RITA tienen el número esperado de columnas (180)
+* **Prueba de extracción/carga:** verifica si los csv descargados de RITA tienen el número esperado de columnas (180)
 * **Prueba de consistencia de columnas tras limpieza:** comprueba que la cantidad de columnas en clean.rita sean las esperadas
 * **Prueba de creación de categorías de rango de horas de retraso:** prueba verifica que los valores de la columna *rangoatrashoras* sean los indicados.
 * **Prueba Semantic:** comprueba que la cantidad de columnas en semantic.rita sean las esperadas.
+
+Al respecto, también se guardan metadatos de todas las pruebas unitarias, tal
+como se listan a continuación:
+
+* metadatos.testing_load,
+* metadatos.testing_clean_columns,
+* metadatos.testing_clean_rangos,
+* metadatos.testing_semantic,
+* metadatos.testing_predict_types,
+* metadatos.testing_predict_cols
 
 **Consideraciones éticas**
 

@@ -636,42 +636,17 @@ de *Javascript* permitiendo diseños web más robustos que garantizan que el das
 pantalla de forma dinámica. Esto garantiza que se pueda monitorear el desempeño de los 
 modelos desde dispositivos móviles, por ejemplo.
 
-Para correr el dashboard, se deben seguir los pasos descritos a continuación:
-
-**Crear el port forwarding para ver dashboard**
-
-Para ello se debe de correr **en la máquina local**:
+Para correr el dashboard, se necesita tener una máquina con sistema operativo basado en Unix y con la versión más reciente de R.
+Después, basta con seguir los pasos descritos a continuación y se abrirá una pestaña del navegador de Internet predeterminado con el dashboard funcionando:
 
 ```
-ssh -i <mi-llave> -N -f -L localhost:4809:localhost:4809 ubuntu@<mi-endpoint>
-``
-
-**Activando el dashboard**
-
-Dentro de una terminal que refleje la instancia del contenedor de Docker del
-proyecto (ver numeral 4.4), basta con colocarse a través de la terminal en el
-irectorio principal del proyecto (dpa_rita/) e indicar las siguientes
-instrucciones:
-
-
-```
-cd dashboard/MonitoreoModelos
+git clone https://github.com/paola-md/dpa_rita/
+cd dpa_rita/dashboard/MonitoreoModelos
 R
+source('Global.R')
 shiny::runApp()
 ```
 
-**Visualizando el dashboard**
-
-A continuación, se abrir una ventana del navegador con la dirección
-
-```
-http://127.0.0.1:4809/
-```
-
-### Más detalles
-
-Más detalles del proceso recién descrito se pueden encontrar en este [notebook](
-https://github.com/paola-md/dpa_rita/blob/master/notebooks/0.9-final-checkpoint.ipynb)
 
 ## Contributors
 

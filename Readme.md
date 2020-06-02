@@ -606,7 +606,7 @@ http://127.0.0.1:5000/swagger.json
 Con el objetivo de monitorear el desempeño del modelo en tiempo real se
 construyó un dashboard en donde es posible revisar en tiempo real las
 predicciones que devuelve el modelo después de hacer una consulta al API.
-Además, actualizará los valores observado en cuanto estén disponibles.
+Además, actualizará los valores observado de inmediato en cuanto estén disponibles.
 
 El dashboard cuenta con tres pestañas:
 
@@ -629,11 +629,18 @@ las predicciones, que por construcción es el modelo con mejor desempeño.
   confusión para inspeccionar el desempeño del modelo a través de los códigos de
  origen y las distancias seleccionadas en la sección de parámetros.
 
+Este dashboard se construyó usando principalmente las paqueterías de *shiny* y *shinyWidgets*
+que permiten desarrollar aplicaciones web para el lenguaje de programación R y la librería 
+*bs4Dash* que es una capa de abstracción sobre Shiny para implementar el framework *Bootstrap 4* 
+de *Javascript* para diseños más robustos que permiten ajustar el dashboard a cualquier
+pantalla de forma dinámic. Esto garantiza que se pueda monitorear del desempeño de 
+modelos desde dispositivos móviles, por ejemplo.
+
 Para correr el dashboard, se deben seguir los pasos descritos a continuación:
 
 **Crear el port forwarding para ver dashboard**
 
-Para ello se de correr **en la máquina local**:
+Para ello se debe de correr **en la máquina local**:
 
 ```
 ssh -i <mi-llave> -N -f -L localhost:4809:localhost:4809 ubuntu@<mi-endpoint>
@@ -646,11 +653,13 @@ proyecto (ver numeral 4.4), basta con colocarse a través de la terminal en el
 irectorio principal del proyecto (dpa_rita/) e indicar las siguientes
 instrucciones:
 
+
 ```
 cd dashboard/MonitoreoModelos
 R
 shiny::runApp()
 ```
+
 **Visualizando el dashboard**
 
 A continuación, se abrir una ventana del navegador con la dirección

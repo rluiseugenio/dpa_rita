@@ -652,5 +652,10 @@ shiny::runApp()
 
 **Technical mentors:**
 
-Danahi Ayzailadema Ramos Martínez, Paola Mejía Domenzaín, León Manuel Garay
-Vásquez, Luis Eugenio Rojón Jiménez y Cesar Zamora Martínez
+| Equipo RITA 1                     |
+|-----------------------------------|
+| Danahi Ayzailadema Ramos Martínez |
+| Paola Mejía Domenzaín             |
+| León Manuel Garay Vásquez         |
+| Luis Eugenio Rojón Jiménez        |
+| Cesar Zamora Martínez             | 

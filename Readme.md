@@ -1,17 +1,29 @@
 # Retrasos en vuelos de la base de datos RITA
 
 **Este proyecto automatiza la predicción de retrasos o cancelaciones de los
-vuelos de la base de datos denominada conocida como [RITA](http://stat-computing.org/dataexpo/2009/the-data.html) (ver también [transtats.bts.gov](https://www.transtats.bts.gov/OT_Delay/OT_DelayCause1.asp))**. Dicha base agrupa una serie de datos de vuelos que incluyen salidas a tiempo, llegadas a tiempo, demoras, vuelos cancelados de todo Estados Unidos del Departamento de Transporte. Dado que los tiempos de viaje de los usuarios se encuentran sujetos a la disponibilidad y viabilidad de los vuelos de las aerolíneas comerciales, los cuales a su vez se encuentran estrechamente ligados a otros factores (por ejemplo, políticas comerciales, incidentes de seguridad o eventos climáticos), los pasajeros experimentan cierto nivel de incertidumbre sobre si sus vuelos serán retrasados o cancelados en definitiva. La automatización de las predicciones como se plantean en este proyecto permite no solo que los usuarios prevean la administración de su tiempo al realizar viajes, sino que puedan diseñar estrategias que les permita continuar con su viaje en caso de una probable cancelación de un vuelo.
+vuelos de la base de datos denominada conocida como [RITA](http://stat-computing.org/dataexpo/2009/the-data.html) (ver también [transtats.bts.gov](https://www.transtats.bts.gov/OT_Delay/OT_DelayCause1.asp))**. Dicha base agrupa una
+serie de datos de vuelos que incluyen salidas a tiempo, llegadas a tiempo,
+demoras, vuelos cancelados de todo Estados Unidos del Departamento de
+Transporte. Dado que los tiempos de viaje de los usuarios se encuentran sujetos
+a la disponibilidad y viabilidad de los vuelos de las aerolíneas comerciales,
+los cuales a su vez se encuentran estrechamente ligados a otros factores (por
+  ejemplo, políticas comerciales, incidentes de seguridad o eventos climáticos),
+   los pasajeros experimentan cierto nivel de incertidumbre sobre si sus vuelos
+   serán retrasados o cancelados en definitiva. La automatización de las
+   predicciones como se plantean en este proyecto permite no solo que los
+   usuarios prevean la administración de su tiempo al realizar viajes, sino que
+   puedan diseñar estrategias que les permita continuar con su viaje en caso de
+   una probable cancelación de un vuelo.
 
 ## Tabla de contenidos
 
-1. [Introducción](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#introducción)
-2. [Consideraciones](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#consideraciones)
-3. [Requerimientos de infraestructura](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#requerimientos-de-infraestructura)
-4. [Instalación y setup](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#instalación-y-setup)
-5. [Corriendo el Pipeline](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#correr-el-pipeline)
-6. [Organización del proyecto](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#organización-del-proyecto)
-7. [Contributors](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#contributors)
+1. [Introducción](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#introducción)
+2. [Consideraciones](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#consideraciones)
+3. [Requerimientos de infraestructura](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#requerimientos-de-infraestructura)
+4. [Instalación y setup](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#instalación-y-setup)
+5. [Corriendo el Pipeline](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#correr-el-pipeline)
+6. [Organización del proyecto](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#organización-del-proyecto)
+7. [Contributors](https://github.com/paola-md/dpa_rita/blob/master/Readme.md#contributors)
 
 ## Introducción
 

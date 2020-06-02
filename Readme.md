@@ -676,9 +676,6 @@ http://127.0.0.1:4809/
 │   └── Readme.md
 ├── Makefile
 ├── README.md
-├── README2.md
-├── README3.md
-├── Readme_dssg.md
 ├── alter_orq.py
 ├── alter_orq_sep.py
 ├── clean_luigi.py
@@ -761,6 +758,7 @@ http://127.0.0.1:4809/
 │   ├── test_semantic_column_types.py
 │   └── test_semantic_columns.py
 └── tox.ini
+
 ```
 
 ## Contributors

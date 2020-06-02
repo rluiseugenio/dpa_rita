@@ -385,21 +385,8 @@ PYTHONPATH='.' AWS_PROFILE=dpa luigi --module luigi_main  Pipeline  --type predi
 ### Notebooks
 Existe un conjunto de cuadernos en el directorio `notebooks` de este repositorio. Contienen las funciones para cada uno de los pasos de la tubería, así como algunos análisis de datos elementales y se pueden usar para experimentar.
 
-## Code organization
-The code is organised as follows:
-1. `d00_utils`: Utility functions used throughout the system
-2. `d01_data`: Ingesting dicom metadata and XCelera csv files from s3 into database
-3. `d02_intermediate`: Cleaning and filtering database tables, downloading, decompressing and extracting images from dicom files for experiments
-4. `d03_classification`: Classification of dicom images in image directory
-5. `d04_segmentation`: Segmentation of heart chambers
-6. `d05_measurements`: Calculation of measurements from segmentations
-7. `d06_visualisation`: Generating plots for reporting
+## Organización del proyecto 
 
-## Contributors
-
-**Technical mentors:**
-
-Danahi Ayzailadema Ramos Martínez, Paola Mejía Domenzaín, León Manuel Garay Vásquez, Luis Eugenio Rojón Jiménez y Cesar Zamora Martínez
 
 ```
 ├── Diseño
@@ -499,5 +486,10 @@ Danahi Ayzailadema Ramos Martínez, Paola Mejía Domenzaín, León Manuel Garay 
 │   ├── test_semantic_column_types.py
 │   └── test_semantic_columns.py
 └── tox.ini
-
 ```
+
+## Contributors
+
+**Technical mentors:**
+
+Danahi Ayzailadema Ramos Martínez, Paola Mejía Domenzaín, León Manuel Garay Vásquez, Luis Eugenio Rojón Jiménez y Cesar Zamora Martínez

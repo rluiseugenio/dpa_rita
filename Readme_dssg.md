@@ -5,13 +5,13 @@ vuelos de la base de datos denominada conocida como [RITA](http://stat-computing
 
 ## Tabla de contenidos
 
-1. [Introducción](https://github.com/dssg/usal_echo#introduction)
-2. [Consideraciones](https://github.com/dssg/usal_echo#overview)
-3. [Requerimientos de infraestructura](https://github.com/dssg/usal_echo#infrastructure-requirements)
-4. [Instalación y setup](https://github.com/dssg/usal_echo#installation-and-setup)
-5. [Corriendo el Pipeline](https://github.com/dssg/usal_echo#run-the-pipeline)
-6. [Organización del código](https://github.com/dssg/usal_echo#code-organisation)
-7. [Contributors](https://github.com/dssg/usal_echo#contributors)
+1. [Introducción](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#introducción)
+2. [Consideraciones](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#consideraciones)
+3. [Requerimientos de infraestructura](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#requerimientos-de-infraestructura)
+4. [Instalación y setup](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#instalación-y-setup)
+5. [Corriendo el Pipeline](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#correr-el-pipeline)
+6. [Organización del código](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#code-organization)
+7. [Contributors](https://github.com/paola-md/dpa_rita/blob/master/Readme_dssg.md#contributors)
 
 ## Introducción
 

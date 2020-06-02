@@ -126,6 +126,7 @@ Se crean las siguientes carpetas en las cuales estarán las credenciales necesar
 mkidr ~/.aws
 mkdir ~/.rita
 mkdir ~/.rita/conf ~/.rita/keys ~/.rita/logs
+mkdir dpa_rita
 ```
 
 
@@ -144,7 +145,7 @@ conda activate usal_echo
 Para clonar el repositorio de trabajo del proyecto ejecutar:
 
 ```
-mkdir dpa_rita
+
 cd dpa_rita
 git clone https://github.com/paola-md/dpa_rita/
 ```
@@ -156,7 +157,7 @@ Para ejecutar el pipeline, se deben especificar las credenciales para su infraes
 ##### aws credentials   
 Se ubican en `~/.aws/credentials` y deben ser generadas como sigue
 ```
-mkdir ~/.aws
+
 nano ~/.aws/credentials
 
 # Luego se debe pegar la identificación de acceso y la clave a

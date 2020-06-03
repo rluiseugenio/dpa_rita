@@ -32,7 +32,7 @@ class EvaluateBias(PostgresQuery):
     database = MY_DB
     host = MY_HOST
     table ='metadatos.bias'
-    update_id = "49" #Para que vuelva a correr
+    update_id = "100" #Para que vuelva a correr
 
     data_list =  get_bias_stats()
     query = "insert into metadatos.bias values "  + str(tuple(data_list))

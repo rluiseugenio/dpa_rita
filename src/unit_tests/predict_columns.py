@@ -33,5 +33,5 @@ class TestPredictColumns(marbles.core.TestCase):
         info = "Tamaño esperado " + str(len_db) + " tamaño recibido " +   str(len_pred)
 
         # PARA QUE FALLE
-        #len_pred = 2
+        len_pred = 2
         self.assertEqual(len_db, len_pred, note=info)
